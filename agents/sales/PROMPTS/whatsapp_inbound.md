@@ -19,7 +19,32 @@ customer reply happens **only** through `mcp__happycake__whatsapp_send`.
 
 ## Procedure
 
-**Step A — Read inputs.** Call these in parallel:
+**Step A — Route by intent (do this BEFORE anything else).**
+
+Read the message and classify into one of three buckets. Routing is
+agent-side; if the message lands in bucket B or C, switch to that
+template's procedure and ignore the rest of this file.
+
+- **Bucket A — Inquiry / order (continue with this file).** Default
+  bucket. Availability ("Do you have honey cake today?"), order intent
+  ("I want 2 honey cakes for tomorrow at 5pm"), hours, location,
+  recommendations.
+- **Bucket B — Complaint (switch to `PROMPTS/complaint.md`).** Any
+  negative emotional framing about a past order: "wasn't fresh",
+  "wrong", "missing", "late", "refund", "manager", "terrible",
+  "disappointed", "made me sick", "allergic reaction". When in doubt,
+  go here — it's the conservative path.
+- **Bucket C — Custom-cake consultation (switch to
+  `PROMPTS/custom_cake.md`).** Design / theme / fondant / sculpted /
+  tiered / themed cake "for my <occasion>", flavour combinations not in
+  `square_list_catalog`, photo of a reference cake, anything beyond a
+  piped first name.
+
+If you classify into B or C, **stop reading this file** and follow the
+procedure in `PROMPTS/complaint.md` or `PROMPTS/custom_cake.md`. The
+sections below apply only to Bucket A.
+
+**Step A.1 — Read inputs (Bucket A only).** Call these in parallel:
 
 - `mcp__happycake__square_list_catalog`
 - `mcp__happycake__kitchen_get_menu_constraints` (only if the message
@@ -135,6 +160,9 @@ this stdout says.
 
 Before producing your last stdout line, confirm to yourself:
 
+- [ ] I classified the message in Step A. If it was Bucket B
+      (complaint) or Bucket C (custom cake), I switched to the matching
+      `PROMPTS/` template and ignored the rest of this file.
 - [ ] I called `mcp__happycake__square_list_catalog`.
 - [ ] I evaluated all 6 owner-gate triggers against this message.
 - [ ] If any trigger fired, my final stdout is ONLY the owner-gate

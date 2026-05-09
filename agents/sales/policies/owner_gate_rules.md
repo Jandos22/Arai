@@ -14,19 +14,33 @@
 | **Lead-time miss** | Customer's requested pickup is sooner than the product's `leadTimeMinutes` from `kitchen_get_menu_constraints` | We don't promise what the kitchen can't deliver. Honey cake slice 5 min · pistachio roll 20 min · whole honey cake 60 min · office dessert box 180 min · custom birthday cake 1,440 min. |
 | **`requiresCustomWork: true`** | `kitchen_get_menu_constraints[].requiresCustomWork` is true on any line item | Currently flips for `custom-birthday-cake` and `office-dessert-box`. |
 | **Emotional / complaint** | "Disappointed", "the last one was…", refund / replacement, anger, "we never received…" | Owner replies to complaints. Agent drafts but does not send. |
+| **Complaint path (always)** | Any inbound that lands on `PROMPTS/complaint.md` | T-013: every refund / comp / store credit / discount goes through Askhat. The agent sends an empathetic ack via `whatsapp_send` first, then owner-gates remediation. `severity: "high"` on any allergy / illness language. |
+| **Custom-cake consultation (always)** | Any inbound that lands on `PROMPTS/custom_cake.md` | T-013: custom cakes are owner-gated even under $80. The agent gathers requirements, does a kitchen check, and proposes a draft quote in the JSON for owner approval. |
 
 ## Owner-gate response shape
+
+The full schema (with per-`kind` requirements) lives in
+`agents/sales/CLAUDE.md` under "Owner-gate". Core fields, every path:
 
 ```json
 {
   "needs_approval": true,
+  "kind": "transactional | complaint | custom_cake_consult",
   "summary": "<2-3 sentences for the owner>",
   "draft_reply": "<exact text the owner can approve>",
+  "proposed_resolution": "refund_full | refund_partial | replacement | store_credit | apology_plus_discount | approve | discuss | decline",
+  "remediation_tool_chain": "<one-line summary of post-approval calls>",
   "trigger": "custom_decoration | allergy | over_$80 | lead_time | emotional | requires_custom_work",
-  "channel": "whatsapp" | "instagram",
+  "channel": "whatsapp | instagram",
   "to": "<E.164 phone | IG threadId>"
 }
 ```
+
+Add `severity` (low|medium|high) for `kind: "complaint"` —
+`"high"` on any allergy / illness claim. Add `request_details` and
+`kitchen_constraints` blocks for `kind: "custom_cake_consult"`. See
+`PROMPTS/complaint.md` and `PROMPTS/custom_cake.md` for full per-path
+shapes.
 
 The orchestrator's `_extract_json` (in `orchestrator/handlers/whatsapp.py`)
 walks the first balanced `{...}` block. So:

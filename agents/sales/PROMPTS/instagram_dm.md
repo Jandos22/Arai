@@ -16,6 +16,13 @@ Message: {{message}}
 Use the happycake MCP. Your role contract is in `CLAUDE.md` in this
 folder; read it if you have not.
 
+0. **Route by intent first.** Same three buckets as
+   `whatsapp_inbound.md` Step A: complaint (switch to
+   `PROMPTS/complaint.md`), custom-cake consultation (switch to
+   `PROMPTS/custom_cake.md`), or inquiry/order (continue here). For B
+   and C paths, swap `whatsapp_send` for `instagram_send_dm` and `to`
+   for `threadId` = `{{thread_id}}` in the owner-gate JSON.
+
 1. **Read first.** Call `mcp__happycake__square_list_catalog`. If
    pickup time or non-slice quantity is mentioned, also call
    `mcp__happycake__kitchen_get_menu_constraints` and

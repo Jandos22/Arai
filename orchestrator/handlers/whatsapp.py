@@ -52,10 +52,32 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:  # type: ignore[
         try:
             decoded = json.loads(_extract_json(response))
             if decoded.get("needs_approval"):
+                kind = decoded.get("kind", "transactional")
+                severity = decoded.get("severity")
+                summary = decoded.get("summary", "Pending action")
+                # Prefix the summary so it surfaces clearly in Telegram for
+                # the new T-013 paths (complaint with allergy, custom-cake quote).
+                tagged_summary = summary
+                if kind == "complaint":
+                    sev = (severity or "medium").upper()
+                    tagged_summary = f"[COMPLAINT · {sev}] {summary}"
+                elif kind == "custom_cake_consult":
+                    tagged_summary = f"[CUSTOM CAKE] {summary}"
                 ctx.telegram_notifier.request_approval(
-                    summary=decoded.get("summary", "Pending action"),
+                    summary=tagged_summary,
                     draft=decoded.get("draft_reply", ""),
-                    context={"channel": "whatsapp", "sender": sender, "body": body},
+                    context={
+                        "channel": "whatsapp",
+                        "sender": sender,
+                        "body": body,
+                        "kind": kind,
+                        "severity": severity,
+                        "proposed_resolution": decoded.get("proposed_resolution"),
+                        "remediation_tool_chain": decoded.get("remediation_tool_chain"),
+                        "request_details": decoded.get("request_details"),
+                        "kitchen_constraints": decoded.get("kitchen_constraints"),
+                        "trigger": decoded.get("trigger"),
+                    },
                 )
         except (ValueError, json.JSONDecodeError):
             ctx.evidence.write(
