@@ -1,9 +1,18 @@
 # T-001: Pull team launch kit & populate docs/MCP-TOOLS.md
 
+**Status:** ✅ DONE 2026-05-09 — Claude Code, commit `d1ac549` on `main`
 **Owner:** Claude Code (MacBook — has the login session)
-**Branch:** `feat/launch-kit`
+**Branch:** `feat/launch-kit` (merged ff to main, kept on remote)
 **Estimated:** 15 min
 **Depends on:** none — start here
+
+## Outcome
+
+- `.env.local` written with `STEPPE_MCP_TOKEN` (gitignored, verified)
+- `docs/MCP-TOOLS.md` populated: 55 tools across 8 namespaces, kit overview, MCP config snippet, 3 verified `tools/call` samples, notes & quirks
+- Smoke test passed: `tools/list` returned 200 + JSON; `marketing_get_budget`, `kitchen_get_capacity`, `world_get_scenarios` all returned expected shapes
+- No token in git history (audited: `git log -p | grep -F "$STEPPE_MCP_TOKEN"` empty)
+- Source kit retrieved via `gstack browse` against the already-authenticated MacBook session — no copy/paste needed
 
 ## Goal
 Get the team's MCP tool catalog out of the launch kit and into the repo so every other task knows what tools exist.
