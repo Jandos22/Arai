@@ -18,24 +18,30 @@ cd Arai
 cp .env.example .env.local
 # → fill in STEPPE_MCP_TOKEN (from your team launch kit) and Telegram bot tokens
 
-# website
-cd website && npm install && npm run dev
+# website (Next.js storefront)
+cd website && npm install && npm run dev          # http://localhost:3000
 
-# bots
-cd ../bots && python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python router.py
+# orchestrator (Python spine — scenario loop, dispatcher, evidence)
+cd ../orchestrator
+uv venv --python 3.12 .venv
+uv pip install -r requirements.txt
+PYTHONPATH=.. .venv/bin/python -m orchestrator.main --dry-run   # smoke
+set -a; source ../.env.local; set +a
+PYTHONPATH=.. .venv/bin/python -m orchestrator.main --scenario launch-day-revenue-engine
 ```
 
 ## Key docs
 
 - [`CLAUDE.md`](CLAUDE.md) — team contract, ownership, hard rules
+- [`docs/PLAN.md`](docs/PLAN.md) — strategy, time budget, decision log
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system diagram + event flow
+- [`docs/EVIDENCE-SCHEMA.md`](docs/EVIDENCE-SCHEMA.md) — JSONL evidence shape
 - [`docs/HACKATHON_BRIEF.md`](docs/HACKATHON_BRIEF.md) — original hackathon brief
 - [`docs/brand/HCU_BRANDBOOK.md`](docs/brand/HCU_BRANDBOOK.md) — Happy Cake brand book
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system design (TBD)
-- [`docs/MCP-TOOLS.md`](docs/MCP-TOOLS.md) — sandbox tool catalog (populated in T-001)
-- [`docs/MARKETING.md`](docs/MARKETING.md) — $500/mo marketing case (TBD)
-- [`tasks/`](tasks) — task briefs (INBOX → DOING → DONE)
+- [`docs/MCP-TOOLS.md`](docs/MCP-TOOLS.md) — sandbox tool catalog (55 tools)
+- [`docs/MCP-SETUP.md`](docs/MCP-SETUP.md) — Claude Code MCP wiring
+- [`docs/MARKETING.md`](docs/MARKETING.md) — $500/mo marketing case (T-006)
+- [`tasks/`](tasks) — task briefs (INBOX → DONE)
 
 ## Security
 

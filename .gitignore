@@ -15,6 +15,13 @@ evidence/*.sqlite*
 # website snapshot is regenerated from MCP — keep fixture in repo, not snapshot
 website/data/catalog.json
 
+# python venvs / caches
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+
 # node / next
 node_modules/
 .next/

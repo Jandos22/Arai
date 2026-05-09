@@ -9,16 +9,15 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 | ID | Title | Owner | Branch | Brief |
 |----|-------|-------|--------|-------|
 | T-006 | Marketing $500 → $5K demand-engine agent | CC | `feat/marketing-agent` | `tasks/INBOX/T-006-marketing-loop.md` |
-| T-003 | Orchestrator scaffold (Python): MCP client + Telegram bot + scenario loop + evidence logger | Hermes | `feat/orchestrator` (next) | TBD |
 
 ## Queued
 
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
-| T-005 | Sales agent: WA/IG inbound → answer → order → kitchen ticket → owner approval | CC | TBD |
-| T-007 | GMB review-reply + post agent | CC | TBD |
-| T-008 | World scenario runner: `world_start_scenario` → consume `world_next_event` → dispatch | CC | TBD |
-| T-009 | ARCHITECTURE.md final pass + DEMO.md + evidence schema docs | Hermes | TBD |
+| T-005 | Sales agent — `agents/sales/` Claude Code project: WA + IG inbound, brand voice, order intake → kitchen ticket, owner approval gate | CC | TBD |
+| T-007 | Ops agent — `agents/ops/`: GMB review-reply + IG post approval flow + kitchen state | CC | TBD |
+| T-008 | Sales agent — populate `agents/sales/` and verify orchestrator end-to-end against a mini scenario | CC | TBD |
+| T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
 
 ## Done
@@ -28,18 +27,19 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 | T-000 | Scaffold: CLAUDE.md, brief, brandbook, .env.example, .gitignore, README | 8ab7873 | Hermes |
 | T-001 | Pull launch kit & populate `docs/MCP-TOOLS.md` (55 tools cataloged) | 5d1424c | CC |
 | T-004 | `.mcp.json` + claude -p smoke test | da70ae3 | CC |
-| T-002 | Website skeleton + agent-readable storefront (Next.js, JSON-LD, /agent.json, /api/catalog, /api/policies, brand palette) | (this commit) | Hermes |
+| T-002 | Website skeleton + agent-readable storefront (Next.js, JSON-LD, /agent.json, /api/catalog, /api/policies, brand palette) | 7144e0e | Hermes |
+| T-003 | Orchestrator scaffold (Python spine: MCP client, scenario runner, dispatcher, Telegram, evidence, 15 unit tests) | (this commit) | Hermes |
 
 ## Architecture intent (locked in by sandbox shape)
 
-Spine = **scenario-driven orchestrator** (Python) running `world_next_event` loop. Four scoring loops hang off it:
+Spine = **scenario-driven orchestrator** (Python, shipped in T-003) running `world_next_event` loop. Four scoring loops hang off it:
 
 1. **POS + kitchen** — `square_create_order` → `kitchen_create_ticket` chain.
 2. **Channels** — WA/IG/GMB inbound → sales agent → outbound; IG posts go through `schedule → owner approval → publish` gate.
 3. **Marketing $500** — `marketing_create_campaign` → `launch` → `generate_leads` → `route_lead` → `adjust` → `report_to_owner`.
 4. **World scenario** — `world_start_scenario('launch-day-revenue-engine')` drives the evaluator-aligned timeline.
 
-Owner UI = Telegram bots (one per agent role, +1 router). Approval pattern = inline keyboard → flips simulator state.
+Owner UI = Telegram bot (orchestrator-attached, optional dedicated bots per agent role). Approval pattern = inline keyboard → flips simulator state.
 
 ## Coordination rules
 
