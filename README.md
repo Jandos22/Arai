@@ -28,6 +28,11 @@ uv pip install -r requirements.txt
 PYTHONPATH=.. .venv/bin/python -m orchestrator.main --dry-run   # smoke
 set -a; source ../.env.local; set +a
 PYTHONPATH=.. .venv/bin/python -m orchestrator.main --scenario launch-day-revenue-engine
+
+# (Optional) dedicated per-agent Telegram bots — one chat per role
+PYTHONPATH=.. .venv/bin/python -m bots.marketing_bot   # /budget /campaigns /report /run
+PYTHONPATH=.. .venv/bin/python -m bots.ops_bot         # /capacity /tickets /reviews
+PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders /pos
 ```
 
 ## Key docs
