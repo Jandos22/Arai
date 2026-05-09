@@ -12,7 +12,6 @@ _(none — pick from Queued)_
 
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
-| T-007 | Ops agent — `agents/ops/`: GMB review-reply + IG post approval flow + kitchen state | CC | `tasks/INBOX/T-007-ops-agent.md` |
 | T-008 | End-to-end smoke against a mini scenario — orchestrator + sales + marketing agents working together | CC | `tasks/INBOX/T-008-e2e-smoke.md` |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
@@ -28,6 +27,7 @@ _(none — pick from Queued)_
 | T-003 | Orchestrator scaffold (Python spine: MCP client, scenario runner, dispatcher, Telegram, evidence, 15 unit tests) | bc860c4 | Hermes |
 | T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | aa6a3bf | CC |
 | T-005 | Sales agent — `agents/sales/`: WA + IG prompts, owner-gate triggers (custom decoration / allergy / >$80 / lead-time / emotional / requires_custom_work), end-to-end smoke PASS on both paths | c736d14 | CC |
+| T-007 | Ops agent — `agents/ops/`: GMB review-reply (rev_001 5★ → cake "Honey" Saturday-bake reply) + canonical IG post owner-gate (schedule → approve → publish, all three stages PASS) + kitchen state prompt + escalation rules | _pending_ | CC |
 
 ## Architecture intent (locked in by sandbox shape)
 
