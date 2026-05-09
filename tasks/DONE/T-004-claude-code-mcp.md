@@ -23,11 +23,30 @@ A `.mcp.json` (or whichever config key Claude Code expects for project-scoped MC
 6. Update `TASKS.md` (move T-004 to Done with commit hash).
 
 ## Acceptance
-- [ ] `.mcp.json` at repo root references the token via env, never literal
-- [ ] `claude -p "..."` against `marketing_get_budget` returns the budget JSON
-- [ ] Smoke output saved to repo (verifiable by judges)
-- [ ] `docs/MCP-SETUP.md` lets a fresh-clone CC reproduce the wiring
-- [ ] `git diff` clean of any token value
+- [x] `.mcp.json` at repo root references the token via env, never literal
+- [x] `claude -p "..."` against `marketing_get_budget` returns the budget JSON
+- [x] Smoke output saved to repo (verifiable by judges)
+- [x] `docs/MCP-SETUP.md` lets a fresh-clone CC reproduce the wiring
+- [x] `git diff` clean of any token value
+
+## Outcome (CC, 2026-05-09)
+
+Shipped on `feat/cc-mcp` @ `1f47c0e`.
+
+- `.mcp.json` uses `${STEPPE_MCP_URL}` + `${STEPPE_MCP_TOKEN}` interpolation
+  — Claude Code v2.1.138 supports it natively in HTTP-transport `headers`.
+  No `claude mcp add` fallback needed.
+- Smoke test (`marketing_get_budget`) returned the expected sandbox JSON:
+  `{monthlyBudgetUsd:500, targetEffectUsd:5000, challenge:"$500 -> $5,000"}`.
+  Captured in `evidence/T-004-cc-mcp-smoke.txt`.
+- Headless invocation pattern that works in non-interactive bot wrappers:
+  `claude -p --permission-mode bypassPermissions --allowedTools "mcp__happycake__<tool>"`.
+  Documented in `docs/MCP-SETUP.md` along with troubleshooting.
+- `.gitignore` already lets `evidence/T-*.txt` through (only `*.jsonl/*.db/*.sqlite*`
+  blocked); no edit needed.
+
+Unblocks: T-005, T-006, T-007, T-008. Every future agent task can now call
+`mcp__happycake__*` natively from `claude -p`.
 
 ## Pitfalls
 - If Claude Code doesn't interpolate env vars in `.mcp.json` natively, fall back to documenting `claude mcp add --transport http happycake $STEPPE_MCP_URL --header "X-Team-Token: $STEPPE_MCP_TOKEN"` and explain that the user runs this once after cloning. Either path is fine; pick whatever the eval can reproduce from a fresh clone with only `.env.local` populated.

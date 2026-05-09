@@ -9,7 +9,6 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 | ID | Title | Owner | Branch | Brief |
 |----|-------|-------|--------|-------|
 | T-002 | Website skeleton + agent-readable storefront | Hermes | `feat/website` | `tasks/INBOX/T-002-website-skeleton.md` |
-| T-004 | Claude Code MCP wiring (`.mcp.json`) + smoke test | CC | `feat/cc-mcp` | `tasks/INBOX/T-004-claude-code-mcp.md` |
 
 ## Queued
 
@@ -29,6 +28,7 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 |----|-------|--------|-------|
 | T-000 | Scaffold: CLAUDE.md, brief, brandbook, .env.example, .gitignore, README | 8ab7873 | Hermes |
 | T-001 | Pull launch kit & populate `docs/MCP-TOOLS.md` (55 tools cataloged) | 5d1424c | CC |
+| T-004 | Claude Code MCP wiring (`.mcp.json`) + smoke test | 1f47c0e | CC |
 
 ## Architecture intent (locked in by sandbox shape)
 
