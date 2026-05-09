@@ -76,6 +76,34 @@ Three green steps = the skeleton is sound. Now hit the live sandbox.
 
 ---
 
+## One-command end-to-end smoke (T-008, ≤ 5 min wall-clock)
+
+```bash
+bash scripts/e2e_smoke.sh
+```
+
+What it does, in order:
+
+1. `orchestrator.main --dry-run` (preflight wiring)
+2. Asserts `STEPPE_MCP_TOKEN` is in `.env.local`
+3. `tools/list` against the live MCP and asserts ≥ 50 tools
+4. Starts the orchestrator on `launch-day-revenue-engine` in the
+   background (bounded — `SMOKE_MAX_EVENTS=3`, `SMOKE_ORCH_TIMEOUT=200s`)
+5. Injects three sanity events:
+   - `whatsapp_inject_inbound` — customer asking for cake "Honey"
+   - `instagram_inject_dm` — birthday-cake inquiry
+   - `world_inject_event` — 4-star GMB review
+6. Waits for the orchestrator (hard-kills at the budget)
+7. Calls `evaluator_get_evidence_summary`, all four `evaluator_score_*`,
+   and `evaluator_generate_team_report` — prints the four scores
+8. On PASS, writes `evidence/e2e-sample.jsonl` (last 50 lines of the
+   run, redacted) and exits 0
+
+A green PASS line at the bottom = the system the evaluator runs is the
+same loop we run locally.
+
+---
+
 ## Live demo path (≤ 5 min, uses Claude Max + sandbox)
 
 ### Path A — the marketing engine (T-006, scored 100/100)
@@ -99,10 +127,11 @@ After it exits, look at:
 - `bash scripts/evaluator_preview.sh` — fetches all 4
   `evaluator_score_*` responses; you'll see `marketing_loop` is 100/100.
 
-### Path B — the orchestrator scenario (T-008 e2e)
+### Path B — the orchestrator scenario (free-form)
 
 Drives the same `world_start_scenario('launch-day-revenue-engine')` loop
-the evaluator runs. Bounded to 30 events and 4 minutes wall-clock.
+the evaluator runs, but without the smoke's bounded budget — useful when
+you want to watch a longer run.
 
 ```bash
 set -a; source .env.local; set +a
@@ -117,6 +146,9 @@ While it runs, peek at:
 - `evidence/orchestrator-run-<id>.jsonl` (live append)
 - Telegram (if `TELEGRAM_BOT_TOKEN_OWNER` + `TELEGRAM_OWNER_CHAT_ID` are
   set) — you'll get notify + approval messages with inline keyboards.
+
+For the bounded, evaluator-aligned version, use `bash
+scripts/e2e_smoke.sh` (above).
 
 ### Path C — Owner Telegram bots
 
@@ -170,19 +202,22 @@ If you have an extra 5 minutes, these are the most informative pokes:
 
 ---
 
-## What's not yet done
+## Caveats and known shapes
 
-Be honest. As of submission:
-
-- T-005 sales agent — **in flight when this doc was written**; the WA/IG
-  inbound flow + order intake → kitchen ticket lives here.
-- T-007 ops agent — GMB review replies + IG post owner-approval gate.
-- T-008 e2e scenario smoke — the bounded 30-event run that touches all
-  four scoring loops in one go; landed close to deadline if it landed.
-
-If a path in this doc 404s or fails, those are the most likely missing
-pieces. The marketing loop (Path A) is the safest demo — that one
-shipped first and was scored 100/100 on a real run.
+- **Idempotency:** every smoke run creates a new orchestrator evidence
+  file (`evidence/orchestrator-run-<id>.jsonl`). The evaluator scores on
+  the team's cumulative sandbox audit log — re-running the smoke does
+  not "reset" prior scores, just adds more activity.
+- **Bounded budget vs raw score:** the smoke caps the orchestrator at
+  ~3 events / 200s so it stays under the 5-min budget. With per-event
+  `claude -p` calls running 30–90s, not every injected event finishes
+  end-to-end. The PASS gate is "all four scoring tools returned a
+  non-error response," not "all scores high." Fresh writes to
+  `pos_kitchen` in particular may not land inside the smoke window — the
+  marketing loop (Path A) is what carries the marketing score, and the
+  cumulative audit log carries the rest.
+- **No real WA/IG/POS:** every inbound and outbound message lives in the
+  sandbox — `*_inject_*` test tools are the entry point.
 
 ---
 

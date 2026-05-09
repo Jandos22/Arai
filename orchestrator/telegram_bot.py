@@ -180,6 +180,7 @@ class TelegramNotifier:
             pending.decided = verdict
         self.evidence.owner_msg(
             "approval_resolution",
+            f"{'approved' if verdict else 'rejected'} approval {approval_id}",
             approvalId=approval_id,
             verdict="approve" if verdict else "reject",
             auto=auto,
