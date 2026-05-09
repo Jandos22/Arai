@@ -16,6 +16,7 @@ _(none — pick from Queued)_
 | T-011 | LocalBusiness JSON-LD + Open Graph + sitemap on website (bonus +5 SEO/Prod) | Hermes | `tasks/INBOX/T-011-localbusiness-seo.md` |
 | T-012 | `docs/PRODUCTION-PATH.md` — post-hackathon real-adapter path (bonus +5 Prod) | Hermes | `tasks/INBOX/T-012-production-path.md` |
 | T-013 | Sales agent: complaint + custom-cake consultation flows (bonus +5 Real biz pain) | CC | `tasks/INBOX/T-013-sales-bonus-paths.md` |
+| T-014 | Self-eval agents — 7 shadow-judges (Functional/Depth/Impact/UX/Arch/Prod/Inn) + light red-team scoring our submission against the leaderboard rubric → `docs/SELF-EVAL.md` (bonus +5 Innovation/Prod, gated on core ≥ 80) | Both | `tasks/INBOX/T-014-self-eval-agents.md` |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
 
