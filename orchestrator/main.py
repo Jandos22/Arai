@@ -69,6 +69,9 @@ def build_routing_table() -> dict[str, Handler]:
         # Kitchen
         "kitchen:ticket_pending_owner_approval": handlers.kitchen.handle,
         "kitchen:*": handlers.kitchen.handle,
+        # Square / POS
+        "square:walk_in_order": handlers.square.handle,
+        "square:*": handlers.square.handle,
         # Marketing trigger
         "marketing:tick": handlers.marketing.handle,
         "marketing:*": handlers.marketing.handle,
