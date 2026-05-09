@@ -14,9 +14,32 @@ from ..dispatcher import HandlerContext
 
 def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
     payload = event.get("payload") or event
-    thread = payload.get("threadId") or payload.get("thread")
-    sender = payload.get("from") or "unknown"
-    body = payload.get("message") or payload.get("text") or ""
+    # IG events arrive in several shapes depending on whether they were
+    # injected via instagram_inject_dm (DM), instagram_inject_comment, or
+    # surfaced organically by the scenario. Try every key the launch-kit
+    # tools document.
+    thread = (
+        payload.get("threadId")
+        or payload.get("thread")
+        or payload.get("conversationId")
+        or payload.get("threadID")
+        or event.get("threadId")
+    )
+    sender = (
+        payload.get("from")
+        or payload.get("user")
+        or payload.get("username")
+        or payload.get("igHandle")
+        or "unknown"
+    )
+    body = (
+        payload.get("message")
+        or payload.get("text")
+        or payload.get("comment")
+        or payload.get("body")
+        or ""
+    )
+    comment_id = payload.get("commentId") or payload.get("comment_id")
     etype = event.get("type", "dm")
 
     ctx.evidence.write(
@@ -24,9 +47,19 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         channel="instagram",
         subtype=etype,
         threadId=thread,
+        commentId=comment_id,
         sender=sender,
         bodyPreview=body[:200],
     )
+
+    if not body and not thread and not comment_id:
+        ctx.evidence.write(
+            "channel_dropped",
+            channel="instagram",
+            reason="empty_payload",
+            event_keys=sorted(payload.keys()) if isinstance(payload, dict) else [],
+        )
+        return
 
     if ctx.sales_runner is None:
         ctx.evidence.write(

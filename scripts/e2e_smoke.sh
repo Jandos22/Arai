@@ -20,8 +20,8 @@
 #
 # Tunables (env):
 #   SMOKE_SCENARIO       (default launch-day-revenue-engine)
-#   SMOKE_MAX_EVENTS     (default 3 — keeps claude -p calls bounded)
-#   SMOKE_ORCH_TIMEOUT   (default 200 — hard wall-clock kill, seconds)
+#   SMOKE_MAX_EVENTS     (default 6 — 4 injects + ~2 scenario events)
+#   SMOKE_ORCH_TIMEOUT   (default 360 — hard wall-clock kill, seconds)
 #   PYTHON               (default orchestrator/.venv/bin/python)
 #
 # Exit codes: 0 PASS, 1 setup failure, 2 redaction tripwire, 3 score FAIL.
@@ -32,8 +32,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 SCENARIO="${SMOKE_SCENARIO:-launch-day-revenue-engine}"
-MAX_EVENTS="${SMOKE_MAX_EVENTS:-3}"
-ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-200}"
+MAX_EVENTS="${SMOKE_MAX_EVENTS:-6}"
+ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-360}"
 PYTHON="${PYTHON:-orchestrator/.venv/bin/python}"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
 
@@ -152,19 +152,23 @@ extract_text() {
   jq -r '.result.content[0].text // empty'
 }
 
-inj_wa=$(call_tool whatsapp_inject_inbound \
-  '{"from":"+12815550100","message":"Hi — do you have cake \"Honey\" available for pickup tomorrow?"}' | extract_text)
-plain "  WA  inject -> ${inj_wa:-(empty)}" | head -c 200; plain ""
+inj_wa_order=$(call_tool whatsapp_inject_inbound \
+  '{"from":"+128****0100","message":"Hi! I would like to order one medium honey cake (Medovik), pickup tomorrow at 4pm. My name is Sam."}' | extract_text)
+plain "  WA  inject (order)   -> ${inj_wa_order:-(empty)}" | head -c 200; plain ""
+
+inj_wa_q=$(call_tool whatsapp_inject_inbound \
+  '{"from":"+128****0101","message":"What time do you close today?"}' | extract_text)
+plain "  WA  inject (inquiry) -> ${inj_wa_q:-(empty)}" | head -c 200; plain ""
 
 inj_ig=$(call_tool instagram_inject_dm \
   '{"threadId":"smoke-thread-001","from":"smoketest_user","message":"Hi! Looking for a birthday cake for next Saturday — what do you recommend?"}' | extract_text)
-plain "  IG  inject -> ${inj_ig:-(empty)}" | head -c 200; plain ""
+plain "  IG  inject (DM)      -> ${inj_ig:-(empty)}" | head -c 200; plain ""
 
 inj_gmb=$(call_tool world_inject_event \
-  "$(jq -nc --arg ts "$TS" '{channel:"gmb", type:"review_received", payload:{reviewId:("rev_smoke_"+$ts), rating:4, author:"Smoke Test", text:"Tried the honey cake — really tender. Will be back."}}')" | extract_text)
-plain "  GMB inject -> ${inj_gmb:-(empty)}" | head -c 200; plain ""
+  "$(jq -nc --arg ts "$TS" '{channel:"gmb", type:"review_received", payload:{reviewId:("rev_smoke_"+$ts), rating:5, author:"Smoke Test", text:"Tried the honey cake — really tender. Will be back."}}')" | extract_text)
+plain "  GMB inject (review)  -> ${inj_gmb:-(empty)}" | head -c 200; plain ""
 
-green "  injected 3 events"
+green "  injected 4 events (1 order + 1 inquiry + 1 IG DM + 1 GMB review)"
 
 # ---------- 6. Wait for orchestrator with hard wall-clock kill ------------
 yellow "[6/7] Wait for orchestrator (hard timeout ${ORCH_TIMEOUT}s)"
