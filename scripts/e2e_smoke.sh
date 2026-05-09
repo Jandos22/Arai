@@ -20,8 +20,8 @@
 #
 # Tunables (env):
 #   SMOKE_SCENARIO       (default launch-day-revenue-engine)
-#   SMOKE_MAX_EVENTS     (default 6 — 4 injects + ~2 scenario events)
-#   SMOKE_ORCH_TIMEOUT   (default 360 — hard wall-clock kill, seconds)
+#   SMOKE_MAX_EVENTS     (default 12 — covers 6 seeded + 4 injects + slack)
+#   SMOKE_ORCH_TIMEOUT   (default 420 — hard wall-clock kill, seconds)
 #   PYTHON               (default orchestrator/.venv/bin/python)
 #
 # Exit codes: 0 PASS, 1 setup failure, 2 redaction tripwire, 3 score FAIL.
@@ -32,8 +32,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 SCENARIO="${SMOKE_SCENARIO:-launch-day-revenue-engine}"
-MAX_EVENTS="${SMOKE_MAX_EVENTS:-6}"
-ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-360}"
+MAX_EVENTS="${SMOKE_MAX_EVENTS:-12}"
+ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-420}"
 PYTHON="${PYTHON:-orchestrator/.venv/bin/python}"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
 

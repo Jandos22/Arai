@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 import os
 import shlex
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,38 @@ from pathlib import Path
 from .evidence import EvidenceLogger
 
 log = logging.getLogger(__name__)
+
+
+def _resolve_claude_binary(name: str = "claude") -> str:
+    """Find the ``claude`` CLI even when invoked from a sparse PATH (e.g. a
+    non-interactive ssh session whose PATH is ``/usr/bin:/bin:...``).
+
+    Search order:
+      1. Honour ``CLAUDE_BINARY`` env var if set (escape hatch for prod)
+      2. ``shutil.which`` against the inherited PATH
+      3. Common install locations: ``~/.local/bin/claude``, Homebrew, npm
+    """
+    override = os.environ.get("CLAUDE_BINARY")
+    if override and Path(override).exists():
+        return override
+
+    found = shutil.which(name)
+    if found:
+        return found
+
+    home = Path.home()
+    candidates = [
+        home / ".local" / "bin" / name,
+        Path("/opt/homebrew/bin") / name,
+        Path("/usr/local/bin") / name,
+        home / ".bun" / "bin" / name,
+    ]
+    for path in candidates:
+        if path.exists() and os.access(path, os.X_OK):
+            return str(path)
+    # Last resort: return bare name. subprocess will surface a clean
+    # FileNotFoundError that tells the user to set CLAUDE_BINARY.
+    return name
 
 
 class ClaudeRunError(RuntimeError):
@@ -31,8 +64,12 @@ class ClaudeRunner:
     project_dir: Path
     evidence: EvidenceLogger
     timeout: float = 180.0
-    binary: str = "claude"
+    binary: str = ""  # resolved lazily in __post_init__
     extra_args: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.binary:
+            self.binary = _resolve_claude_binary()
 
     def run(self, prompt: str, *, label: str = "claude_p") -> str:
         cmd = [self.binary, *self.extra_args, "-p", prompt]
