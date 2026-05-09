@@ -12,7 +12,7 @@ The launch-kit prose names the slice the evaluator scores:
 
 > Start your demand engine with `marketing_create_campaign`, then launch, generate leads, route them, adjust, and report back to the owner. Validate production promises with `kitchen_create_ticket`, capacity checks, accept/reject decisions, and ready-for-pickup status. Use `square_create_order` and `square_get_pos_summary` to prove your website and agents can drive POS-style orders. Run `world_start_scenario` and `world_next_event` to test against the same time-compressed business day as the evaluator. Use `evaluator_get_evidence_summary` and `evaluator_generate_team_report` to preview the evidence judges will inspect.
 
-Active token prefix for team **Jan Solo**: `sbc_team_18b…` (full token in `.env.local`).
+Active token: stored only in `.env.local` (`STEPPE_MCP_TOKEN`) on the captain's MacBook. Never appears in repo history, evidence files, screenshots, or commit messages. If you suspect a leak, message the SBC organizers immediately for rotation.
 
 ## Claude Code MCP config (placeholder — replace with your real token at runtime)
 

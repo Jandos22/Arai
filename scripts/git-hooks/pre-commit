@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# pre-commit hook — block commits that contain anything that looks like
+# a real Steppe MCP token or a Telegram bot token.
+#
+# Install (once per clone):
+#   ln -sf ../../scripts/git-hooks/pre-commit .git/hooks/pre-commit
+#
+# Bypass intentionally (e.g. for a documented placeholder):
+#   git commit --no-verify ...
+#
+# We are deliberately strict: false positives are easy to argue with,
+# leaked tokens cost a sandbox rotation.
+
+set -euo pipefail
+
+# Anything matching these patterns in staged content blocks the commit.
+# - sbc_team_<8+ char suffix>     real Steppe MCP team tokens
+# - Bearer <20+ char>             generic bearer tokens
+# - Telegram bot tokens           digits:35-char-base62
+PATTERNS=(
+  'sbc_team_[A-Za-z0-9_\-]{8,}'
+  'Bearer\s+[A-Za-z0-9_\-\.]{20,}'
+  '[0-9]{8,12}:[A-Za-z0-9_-]{30,}'
+)
+
+# But allow these intentional documentation placeholders:
+ALLOW_PATTERNS=(
+  'sbc_team_REPLACE_WITH_YOURS'
+  'sbc_team_xxxxxxxx'
+  'sbc_team_secret_blob_value_123'  # used in test_evidence.py
+  '__paste_team_token_here_never_commit__'
+)
+
+staged_diff=$(git diff --cached --diff-filter=ACM -U0)
+if [[ -z "$staged_diff" ]]; then
+  exit 0
+fi
+
+violations=()
+while IFS= read -r line; do
+  # only look at added lines (start with +, but not +++)
+  [[ "$line" =~ ^\+\+\+ ]] && continue
+  [[ "$line" =~ ^\+ ]] || continue
+
+  for pat in "${PATTERNS[@]}"; do
+    if [[ "$line" =~ $pat ]]; then
+      # Check allow-list
+      allowed=false
+      for allow in "${ALLOW_PATTERNS[@]}"; do
+        if [[ "$line" == *"$allow"* ]]; then
+          allowed=true
+          break
+        fi
+      done
+      [[ "$allowed" == false ]] && violations+=("$line")
+    fi
+  done
+done <<< "$staged_diff"
+
+if (( ${#violations[@]} > 0 )); then
+  echo "❌ pre-commit blocked: possible secret in staged diff:" >&2
+  for v in "${violations[@]}"; do
+    printf '  %s\n' "${v:0:120}" >&2
+  done
+  echo >&2
+  echo "If this is intentional (a documented placeholder), add it to" >&2
+  echo "ALLOW_PATTERNS in scripts/git-hooks/pre-commit, OR run:" >&2
+  echo "  git commit --no-verify ..." >&2
+  exit 1
+fi
+exit 0
