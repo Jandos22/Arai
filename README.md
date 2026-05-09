@@ -42,6 +42,7 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system diagram + event flow + running totals
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md) — brief checklist → repo file mapping
 - [`docs/AGENT-NOTES.md`](docs/AGENT-NOTES.md) — agent-friendly website contracts
+- [`docs/PRODUCTION-PATH.md`](docs/PRODUCTION-PATH.md) — post-hackathon real-adapter path
 - [`docs/EVIDENCE-SCHEMA.md`](docs/EVIDENCE-SCHEMA.md) — JSONL evidence shape
 - [`docs/HACKATHON_BRIEF.md`](docs/HACKATHON_BRIEF.md) — original hackathon brief
 - [`docs/brand/HCU_BRANDBOOK.md`](docs/brand/HCU_BRANDBOOK.md) — Happy Cake brand book
