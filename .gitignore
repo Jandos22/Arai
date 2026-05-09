@@ -1,0 +1,36 @@
+# env / secrets — NEVER commit STEPPE_MCP_TOKEN or any token
+.env
+.env.local
+.env.*.local
+*.token
+secrets/
+
+# evidence runtime data (schema docs are tracked, *.jsonl/*.db are not)
+evidence/*.jsonl
+evidence/*.db
+evidence/*.sqlite*
+
+# node / next
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# logs
+*.log
