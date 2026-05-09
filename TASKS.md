@@ -12,7 +12,6 @@ _(none — pick from Queued)_
 
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
-| T-005 | Sales agent — `agents/sales/` Claude Code project: WA + IG inbound, brand voice, order intake → kitchen ticket, owner approval gate | CC | `tasks/INBOX/T-005-sales-agent.md` |
 | T-007 | Ops agent — `agents/ops/`: GMB review-reply + IG post approval flow + kitchen state | CC | `tasks/INBOX/T-007-ops-agent.md` |
 | T-008 | End-to-end smoke against a mini scenario — orchestrator + sales + marketing agents working together | CC | `tasks/INBOX/T-008-e2e-smoke.md` |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
@@ -28,6 +27,7 @@ _(none — pick from Queued)_
 | T-002 | Website skeleton + agent-readable storefront (Next.js, JSON-LD, /agent.json, /api/catalog, /api/policies, brand palette) | 7144e0e | Hermes |
 | T-003 | Orchestrator scaffold (Python spine: MCP client, scenario runner, dispatcher, Telegram, evidence, 15 unit tests) | bc860c4 | Hermes |
 | T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | aa6a3bf | CC |
+| T-005 | Sales agent — `agents/sales/`: WA + IG prompts, owner-gate triggers (custom decoration / allergy / >$80 / lead-time / emotional / requires_custom_work), end-to-end smoke PASS on both paths | (this commit) | CC |
 
 ## Architecture intent (locked in by sandbox shape)
 

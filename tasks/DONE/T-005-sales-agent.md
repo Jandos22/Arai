@@ -135,3 +135,72 @@ Use the T-004 format plus:
 - `git diff --stat origin/main`
 - Smoke output (last 30 lines of `scripts/smoke.sh`)
 - 1–2 sentence note on any sandbox quirk discovered
+
+## Outcome (CC, 2026-05-09)
+
+Shipped on `feat/sales-agent`, branched from `79068b1`.
+
+**Smoke:** PASS on both paths against the live sandbox.
+
+- Non-gate (`"Do you have honey cake today?"`) — agent calls
+  `mcp__happycake__square_list_catalog` then
+  `mcp__happycake__whatsapp_send` with `to=+12815550199`.
+  4 turns, $0.29.
+- Owner-gate (`"I want to order 2 whole honey cakes for pickup
+  tomorrow at 5pm"`, $110 total) — agent reads catalog +
+  capacity + menu_constraints, returns the
+  `{"needs_approval": true, "trigger": "over_$80", ...}` JSON
+  with no `whatsapp_send`. 5 turns, $0.46.
+
+Sample rows live in `evidence/sales-sample.jsonl`; full
+stream-json transcripts in `evidence/sales-smoke-*.log`.
+
+**Files shipped:**
+- `agents/sales/CLAUDE.md` — role contract, allowed tools,
+  6 owner-gate triggers, brandbook §1+§2 distillation
+- `agents/sales/.mcp.json` — happycake server, env-interpolated
+- `agents/sales/PROMPTS/whatsapp_inbound.md` —
+  Step A read → Step B gate → Step C (conditional) order
+  chain → Step D **mandatory** `whatsapp_send` → Step E status,
+  closed with a pre-finish checklist
+- `agents/sales/PROMPTS/instagram_dm.md` — IG counterpart
+- `agents/sales/policies/owner_gate_rules.md` — operator cheat
+  sheet for the 6 triggers
+- `agents/sales/scripts/smoke.sh` — injects inbound, runs the
+  agent in `--output-format stream-json --verbose`, parses
+  every `tool_use` event, PASS-iff
+  `mcp__happycake__whatsapp_send(to=$SMOKE_FROM)` was called or
+  `needs_approval: true` was returned. Captures
+  `evaluator_get_evidence_summary.auditCalls` delta as
+  belt-and-suspenders proof of MCP activity.
+- `agents/sales/README.md` — bring-up + the sandbox-quirk note
+
+**Sandbox quirk discovered (write-up in
+`agents/sales/README.md`):** `whatsapp_send` returns the
+expected `[simulated] Message recorded for <phone>` text and
+increments `evaluator_get_evidence_summary.auditCalls`, **but**
+`whatsapp_list_threads.outbound` stays empty and
+`whatsappOutbound` in the evidence summary stays 0. The first
+two smoke iterations were chasing this bug — the agent was
+calling `whatsapp_send` correctly all along; the sandbox just
+doesn't persist outbound to the thread-list endpoint. Switched
+the smoke to verify via streamed `tool_use` events. Worth
+flagging in the orchestrator README so the WA handler doesn't
+fail-open on the same assumption.
+
+**Verifications:**
+- `claude mcp list` from `agents/sales/` shows
+  `happycake … ✓ Connected`.
+- `python -m orchestrator.main --dry-run` (in
+  `orchestrator/.venv`) prints `dry-run OK — wiring intact, no
+  live calls`.
+- Token-leak scan on every newly-added file is clean
+  (`grep -F "$STEPPE_MCP_TOKEN"` returns nothing).
+- Both smoke runs ended with `is_error=false`,
+  `permission_denials=[]`, `auditCalls` delta of +4 (non-gate)
+  and +5 (owner-gate).
+
+Unblocks: T-007 (ops agent — same scaffold pattern, GMB +
+kitchen-state-machine surface), T-008 (e2e smoke — orchestrator
+fans out WA event into `agents/sales/` and now has an end-to-end
+PASS contract to assert against).
