@@ -1,8 +1,9 @@
+import Image from "next/image";
 import { loadCatalog, priceRange } from "@/lib/catalog";
 
 export default function Home() {
   const catalog = loadCatalog();
-  const featured = catalog.items.slice(0, 4);
+  const featured = catalog.items.filter((i) => i.imageUrl).slice(0, 4);
 
   return (
     <div className="space-y-16">
@@ -34,11 +35,15 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-happy-blue-200 via-cream-100 to-cream-200 flex items-center justify-center">
-          <div className="text-center text-happy-blue-700/70">
-            <p className="font-display text-2xl">Cake photo</p>
-            <p className="text-xs mt-1">Replace with brand-pack image</p>
-          </div>
+        <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-cream-100 shadow-xl">
+          <Image
+            src="/brand/hero/hero-04.webp"
+            alt="Naked chocolate layer cake with piped cream pearls, ganache drip, and gold-accented chocolate decor."
+            fill
+            priority
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+          />
         </div>
       </section>
 
@@ -59,8 +64,20 @@ export default function Home() {
                 href={`/p/${item.slug}`}
                 className="group rounded-2xl bg-cream-100 p-4 hover:bg-cream-200 transition"
               >
-                <div className="aspect-square rounded-xl bg-happy-blue-200 mb-4 flex items-center justify-center text-happy-blue-700/60 text-xs">
-                  {item.name}
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-happy-blue-200 mb-4">
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.imageAlt ?? item.name}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover group-hover:scale-105 transition duration-500"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-happy-blue-700/60 text-xs">
+                      {item.name}
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-display text-lg text-happy-blue-900">{item.name}</h3>
                 <p className="text-sm text-ink/70 mt-1 line-clamp-2">{item.description}</p>

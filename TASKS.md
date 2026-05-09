@@ -13,6 +13,9 @@ _(none — pick from Queued)_
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
 | T-008 | End-to-end smoke against a mini scenario — orchestrator + sales + marketing agents working together | CC | `tasks/INBOX/T-008-e2e-smoke.md` |
+| T-011 | LocalBusiness JSON-LD + Open Graph + sitemap on website (bonus +5 SEO/Prod) | Hermes | `tasks/INBOX/T-011-localbusiness-seo.md` |
+| T-012 | `docs/PRODUCTION-PATH.md` — post-hackathon real-adapter path (bonus +5 Prod) | Hermes | `tasks/INBOX/T-012-production-path.md` |
+| T-013 | Sales agent: complaint + custom-cake consultation flows (bonus +5 Real biz pain) | CC | `tasks/INBOX/T-013-sales-bonus-paths.md` |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { findBySlug, loadCatalog } from "@/lib/catalog";
 import { notFound } from "next/navigation";
 
@@ -54,8 +55,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="aspect-square rounded-3xl bg-gradient-to-br from-happy-blue-200 via-cream-100 to-cream-200 flex items-center justify-center text-happy-blue-700/70 font-display text-2xl">
-        {item.name}
+      <div className="relative aspect-square rounded-3xl overflow-hidden bg-cream-100 shadow-md">
+        {item.imageUrl ? (
+          <Image
+            src={item.imageUrl}
+            alt={item.imageAlt ?? item.name}
+            fill
+            priority
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-happy-blue-700/70 font-display text-2xl text-center px-6">
+            {item.name}
+          </div>
+        )}
       </div>
       <div>
         <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">
