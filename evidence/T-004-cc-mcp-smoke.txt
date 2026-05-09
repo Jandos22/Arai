@@ -1,0 +1,51 @@
+# T-004 — Claude Code MCP smoke test
+
+Captured: 2026-05-09T17:22:52Z
+Captured by: Claude Code (Opus 4.7) on MacBook
+Branch: feat/cc-mcp
+Repo cwd: /Users/jandos/dev/Arai
+Claude Code version: 2.1.138
+
+## What this proves
+
+The repo's `.mcp.json` (project-scoped) wires the `happycake` HTTP MCP server
+into Claude Code with `${STEPPE_MCP_URL}` and `${STEPPE_MCP_TOKEN}` resolved
+from the shell environment. A fresh `claude -p` invocation successfully calls
+a real MCP tool against the Steppe sandbox and returns parsed JSON — no curl,
+no manual auth, no hand-rolled HTTP client.
+
+This is the runtime the evaluator will reproduce: clone, populate `.env.local`,
+`source` it, run `claude -p`. End-to-end verified here.
+
+## Reproduction command
+
+```bash
+cd /Users/jandos/dev/Arai
+set -a && source .env.local && set +a
+echo "Use the happycake MCP server. Call the marketing_get_budget tool with no arguments. Reply with ONLY the parsed JSON result — no prose, no code fences." \
+  | claude -p \
+      --permission-mode bypassPermissions \
+      --allowedTools "mcp__happycake__marketing_get_budget"
+```
+
+(`--permission-mode bypassPermissions` + scoped `--allowedTools` is the
+non-interactive equivalent of an in-session approval: it allows ONLY the one
+MCP tool we asked for, nothing else.)
+
+## Raw stdout
+
+```json
+{
+  "monthlyBudgetUsd": 500,
+  "targetEffectUsd": 5000,
+  "challenge": "$500 -> $5,000"
+}
+```
+
+## Notes
+
+- `.mcp.json` contains zero literal credentials. Both URL and token are
+  interpolated from environment variables at session start.
+- `.env.local` is gitignored. `.env.example` ships the variable names only.
+- Claude Code does NOT auto-load `.env.local`. Callers must `source` it (the
+  bot wrappers in `bots/` will do this in their startup script).

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "happycake": {
+      "type": "http",
+      "url": "${STEPPE_MCP_URL}",
+      "headers": {
+        "X-Team-Token": "${STEPPE_MCP_TOKEN}"
+      }
+    }
+  }
+}
