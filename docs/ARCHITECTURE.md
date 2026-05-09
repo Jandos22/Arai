@@ -127,3 +127,37 @@ PYTHONPATH=.. .venv/bin/python -m pytest tests
 15 tests cover `mcp_client`, `dispatcher`, `evidence` — all deterministic, no
 network, no token, no Telegram. The MacBook should also see green when these
 run there.
+
+## What's actually shipped (running totals)
+
+| Loop | Status | Evidence |
+|---|---|---|
+| Marketing $500 → $5K | ✅ `evaluator_score_marketing_loop` 100/100 (T-006) — 3 campaigns at $200/$150/$150, 9 leads routed, $6,636 projected revenue (13.27× ROAS) | `agents/marketing/`, `docs/MARKETING.md`, `evidence/marketing-sample.jsonl` |
+| POS + kitchen | 🚧 T-005 in flight — sales agent in `agents/sales/` | (pending) |
+| Channel response (WA / IG / GMB) | 🚧 T-005 (sales side) + T-007 (ops side) | (pending) |
+| World scenario | ✅ Spine ready (T-003); end-to-end run lands in T-008 | `orchestrator/`, `evidence/orchestrator-*.jsonl` |
+| Owner UI | ✅ Approval queue (T-003) + 3 dedicated bots (`bots/marketing_bot`, `ops_bot`, `sales_bot`) | `orchestrator/telegram_bot.py`, `bots/` |
+| Agent-readable site | ✅ `/agent.json`, `/api/catalog`, `/api/policies`, JSON-LD per product (T-002) | `website/`, `docs/AGENT-NOTES.md`, `scripts/test_website.sh` |
+
+## Marketing demand-engine trace (T-006, real run)
+
+The exact MCP call chain a fresh run produces, captured in
+`evidence/marketing-sample.jsonl`:
+
+```
+marketing_get_budget                        → $500/mo, target $5,000
+marketing_get_sales_history                 → 6 months, $14.8K – $19.2K
+marketing_get_margin_by_product             → 5 SKUs, 58–68% margin
+square_recent_sales_csv                     → cross-checked AOV $25.30
+gb_get_metrics(period: last_30_days)        → 1,842 profile views, 87 directions
+marketing_create_campaign × 3               → google_local $200, instagram $150, whatsapp $150
+marketing_launch_simulated_campaign × 3
+marketing_generate_leads × 3                → 9 total leads
+marketing_route_lead × 9                    → 5 owner_approval, 2 website, 1 wa, 1 ig
+marketing_get_campaign_metrics × 3
+marketing_adjust_campaign × 3               → with expectedImpact for each
+marketing_report_to_owner                   → final summary
+```
+
+This is the chain the brief explicitly asked for, end-to-end, in one
+session.
