@@ -63,9 +63,9 @@ class ClaudeRunError(RuntimeError):
 class ClaudeRunner:
     project_dir: Path
     evidence: EvidenceLogger
-    timeout: float = 180.0
+    timeout: float = 600.0
     binary: str = ""  # resolved lazily in __post_init__
-    extra_args: tuple[str, ...] = ()
+    extra_args: tuple[str, ...] = ("--mcp-config", ".mcp.json", "--permission-mode", "bypassPermissions")
 
     def __post_init__(self) -> None:
         if not self.binary:
