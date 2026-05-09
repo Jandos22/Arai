@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FBF6E8;
+  --ink: #1A1816;
+}
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--font-body, "Inter", system-ui, sans-serif); }
+.font-display { font-family: var(--font-display, "Fraunces", Georgia, serif); }

@@ -1,0 +1,95 @@
+{
+  "source": "fixture",
+  "capturedAt": "2026-05-09T00:00:00Z",
+  "items": [
+    {
+      "id": "fx_honey",
+      "slug": "medovik-honey-cake",
+      "name": "Medovik — Honey Cake",
+      "description": "Eight thin honey-baked layers folded with cool sour cream. The cake we built the bakery on. Like grandma's, on a good Sunday.",
+      "category": "signature",
+      "imageUrl": "/images/honey.jpg",
+      "variations": [
+        { "id": "fx_honey_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
+        { "id": "fx_honey_m", "name": "Medium (serves 10)", "priceUsd": 58, "available": true },
+        { "id": "fx_honey_l", "name": "Large (serves 16)", "priceUsd": 88, "available": true }
+      ],
+      "leadTimeMinutes": 90,
+      "allergens": ["wheat", "egg", "dairy"]
+    },
+    {
+      "id": "fx_napoleon",
+      "slug": "napoleon",
+      "name": "Napoleon",
+      "description": "Twelve buttery puff pastry layers with a vanilla custard our team has tuned for two years. A celebration cake that tastes like a celebration.",
+      "category": "signature",
+      "imageUrl": "/images/napoleon.jpg",
+      "variations": [
+        { "id": "fx_nap_s", "name": "Small (serves 6)", "priceUsd": 38, "available": true },
+        { "id": "fx_nap_m", "name": "Medium (serves 10)", "priceUsd": 60, "available": true },
+        { "id": "fx_nap_l", "name": "Large (serves 16)", "priceUsd": 92, "available": true }
+      ],
+      "leadTimeMinutes": 120,
+      "allergens": ["wheat", "egg", "dairy"]
+    },
+    {
+      "id": "fx_red_velvet",
+      "slug": "red-velvet",
+      "name": "Red Velvet",
+      "description": "Buttermilk red velvet sponge with a cream cheese frosting that is not too sweet. The birthday cake that doesn't apologize for itself.",
+      "category": "celebration",
+      "imageUrl": "/images/red-velvet.jpg",
+      "variations": [
+        { "id": "fx_rv_s", "name": "Small (serves 6)", "priceUsd": 34, "available": true },
+        { "id": "fx_rv_m", "name": "Medium (serves 10)", "priceUsd": 56, "available": true },
+        { "id": "fx_rv_l", "name": "Large (serves 16)", "priceUsd": 86, "available": true }
+      ],
+      "leadTimeMinutes": 90,
+      "allergens": ["wheat", "egg", "dairy"]
+    },
+    {
+      "id": "fx_chocolate",
+      "slug": "chocolate-truffle",
+      "name": "Chocolate Truffle",
+      "description": "A dark chocolate sponge with chocolate ganache and a dusting of cocoa. For when the moment calls for chocolate, not for a chocolate cake.",
+      "category": "celebration",
+      "imageUrl": "/images/chocolate.jpg",
+      "variations": [
+        { "id": "fx_ch_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
+        { "id": "fx_ch_m", "name": "Medium (serves 10)", "priceUsd": 58, "available": true },
+        { "id": "fx_ch_l", "name": "Large (serves 16)", "priceUsd": 90, "available": true }
+      ],
+      "leadTimeMinutes": 90,
+      "allergens": ["wheat", "egg", "dairy", "soy"]
+    },
+    {
+      "id": "fx_birthday_classic",
+      "slug": "birthday-classic-vanilla",
+      "name": "Birthday Classic — Vanilla",
+      "description": "Light vanilla sponge, vanilla buttercream, sprinkles. Add a hand-piped name on top if you tell us at order. Three lead-time hours, please.",
+      "category": "celebration",
+      "imageUrl": "/images/birthday.jpg",
+      "variations": [
+        { "id": "fx_bc_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
+        { "id": "fx_bc_m", "name": "Medium (serves 10)", "priceUsd": 58, "available": true },
+        { "id": "fx_bc_l", "name": "Large (serves 16)", "priceUsd": 88, "available": true }
+      ],
+      "leadTimeMinutes": 180,
+      "allergens": ["wheat", "egg", "dairy"]
+    },
+    {
+      "id": "fx_carrot",
+      "slug": "carrot-walnut",
+      "name": "Carrot & Walnut",
+      "description": "Lightly spiced carrot cake with cream cheese frosting and chopped walnuts. The cake people quietly come back for.",
+      "category": "everyday",
+      "imageUrl": "/images/carrot.jpg",
+      "variations": [
+        { "id": "fx_cw_s", "name": "Small (serves 6)", "priceUsd": 34, "available": true },
+        { "id": "fx_cw_m", "name": "Medium (serves 10)", "priceUsd": 54, "available": true }
+      ],
+      "leadTimeMinutes": 90,
+      "allergens": ["wheat", "egg", "dairy", "tree-nut"]
+    }
+  ]
+}

@@ -9,6 +9,11 @@ secrets/
 evidence/*.jsonl
 evidence/*.db
 evidence/*.sqlite*
+!evidence/T-*-*.txt
+!evidence/*-sample.jsonl
+
+# website snapshot is regenerated from MCP — keep fixture in repo, not snapshot
+website/data/catalog.json
 
 # node / next
 node_modules/

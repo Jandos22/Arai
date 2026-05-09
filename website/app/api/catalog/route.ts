@@ -1,0 +1,21 @@
+import { loadCatalog } from "@/lib/catalog";
+
+export const dynamic = "force-static";
+
+export function GET() {
+  const catalog = loadCatalog();
+  return Response.json(
+    {
+      ...catalog,
+      _description:
+        "Agent-readable HappyCake US catalog. Source of truth: square_list_catalog (sandbox MCP). " +
+        "Use the /p/<slug> page for human reading; use this endpoint for programmatic access.",
+      _orderPath: {
+        whatsapp: "https://wa.me/12815551234",
+        instagram: "https://instagram.com/happycakeus",
+        notes: "Order is confirmed by message before the kitchen starts. Lead times listed per item.",
+      },
+    },
+    { headers: { "Cache-Control": "public, max-age=300" } }
+  );
+}

@@ -8,15 +8,14 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 
 | ID | Title | Owner | Branch | Brief |
 |----|-------|-------|--------|-------|
-| T-002 | Website skeleton + agent-readable storefront | Hermes | `feat/website` | `tasks/INBOX/T-002-website-skeleton.md` |
+| T-006 | Marketing $500 → $5K demand-engine agent | CC | `feat/marketing-agent` | `tasks/INBOX/T-006-marketing-loop.md` |
+| T-003 | Orchestrator scaffold (Python): MCP client + Telegram bot + scenario loop + evidence logger | Hermes | `feat/orchestrator` (next) | TBD |
 
 ## Queued
 
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
-| T-003 | Orchestrator scaffold (Python): MCP client + Telegram bot + scenario loop + evidence logger | Hermes | TBD |
 | T-005 | Sales agent: WA/IG inbound → answer → order → kitchen ticket → owner approval | CC | TBD |
-| T-006 | Marketing $500 loop agent (full demand-engine chain) + `MARKETING.md` case write-up | CC | TBD |
 | T-007 | GMB review-reply + post agent | CC | TBD |
 | T-008 | World scenario runner: `world_start_scenario` → consume `world_next_event` → dispatch | CC | TBD |
 | T-009 | ARCHITECTURE.md final pass + DEMO.md + evidence schema docs | Hermes | TBD |
@@ -28,7 +27,8 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 |----|-------|--------|-------|
 | T-000 | Scaffold: CLAUDE.md, brief, brandbook, .env.example, .gitignore, README | 8ab7873 | Hermes |
 | T-001 | Pull launch kit & populate `docs/MCP-TOOLS.md` (55 tools cataloged) | 5d1424c | CC |
-| T-004 | Claude Code MCP wiring (`.mcp.json`) + smoke test | 1f47c0e | CC |
+| T-004 | `.mcp.json` + claude -p smoke test | da70ae3 | CC |
+| T-002 | Website skeleton + agent-readable storefront (Next.js, JSON-LD, /agent.json, /api/catalog, /api/policies, brand palette) | (this commit) | Hermes |
 
 ## Architecture intent (locked in by sandbox shape)
 
@@ -48,3 +48,4 @@ Owner UI = Telegram bots (one per agent role, +1 router). Approval pattern = inl
 - `git pull --rebase` before every push
 - 15–30 min cadence
 - Other-side touches: footer commit message with `@hermes please review` or `@cc please review`
+- Skip GitHub PRs; rebase on `origin/main`, fast-forward merge to `main` locally, push `main`
