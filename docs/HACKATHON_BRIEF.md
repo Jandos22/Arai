@@ -202,7 +202,7 @@ Use the approved Happy Cake materials.
 
 Important links:
 
-- Brandbook Markdown: `/hackathon-assets/happy-cake/BRANDBOOK.md`
+- Brandbook Markdown: `/hackathon-assets/HCU_BRANDBOOK.md`
 - Asset pack and photos: `/hackathon/brief/assets`
 - Sandbox page: `/hackathon/brief/sandbox`
 
@@ -249,6 +249,24 @@ It will check:
 - whether the system can be brought closer to a real Happy Cake deployment after the hackathon.
 
 Evidence matters. Logs, MCP calls, screenshots, state changes, and reproducible flows help more than claims.
+
+### Bonus points
+
+Core score is 100 points. Extra functions can add up to +15 bonus points when they solve real Happy Cake business pains after the core brief is already strong.
+
+Bonus areas:
+
+- up to +5 for solving a real business pain: custom cake intake, complaints/refunds, allergy-safe communication, production capacity, repeat customers, reviews, abandoned orders;
+- up to +5 for production readiness: clean deploy, mobile performance, admin/operator view, audit trail, failure handling, safe owner handoff;
+- up to +5 for growth upside: lead scoring, local SEO, referrals, WhatsApp follow-up, upsell logic, marketing budget optimization.
+
+Bonus cap:
+
+- Core score 80+ — eligible for up to +15 bonus points;
+- Core score 60-79 — maximum +5 bonus points;
+- Core score below 60 — bonus points do not apply.
+
+Bonus cannot replace the core brief. Maximum total score is 115.
 
 ## 10. Suggested way to use Claude Code
 

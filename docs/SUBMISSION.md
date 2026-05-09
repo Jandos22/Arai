@@ -36,7 +36,18 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | Submission form has correct repo link | https://www.steppebusinessclub.com/hackathon/submit — captain submits with `https://github.com/Jandos22/Arai` |
 | Final commit before May 10, 10:00 CT | T-010 dress rehearsal at ~09:00 CT |
 
-## Evaluator scoring loops (brief §9)
+## Scoring (brief §9)
+
+**Core = 100 points. Bonus = up to +15. Cap = 115.**
+
+Bonus gating:
+- Core 80+ → eligible for up to +15
+- Core 60–79 → max +5
+- Core <60 → bonus does not apply
+
+See [`BONUS-PLAN.md`](BONUS-PLAN.md) for the bonus-points strategy and ranked targets.
+
+### Core: evaluator scoring loops
 
 The four `evaluator_score_*` tools the seven-agent eval pipeline calls:
 
