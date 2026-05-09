@@ -18,6 +18,7 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | Agent-friendly website notes | [`/docs/AGENT-NOTES.md`](AGENT-NOTES.md) | ✅ |
 | On-site assistant test script | [`/scripts/test_website.sh`](../scripts/test_website.sh) | ✅ — exits 0 on green |
 | List of Telegram bots and what each does | [`/bots/README.md`](../bots/README.md) + [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) | ✅ |
+| Post-hackathon real-adapter path | [`/docs/PRODUCTION-PATH.md`](PRODUCTION-PATH.md) | ✅ |
 | **Never commit secrets** | `.gitignore` blocks `.env*`, `*.token`, etc. Pre-flight check: `git diff --cached \| grep -iE 'sbc_team\|Bearer'` empty | ✅ |
 
 ## Final checklist (brief §12)
