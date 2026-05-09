@@ -31,7 +31,7 @@ _(none — pick from Queued)_
 | T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | aa6a3bf | CC |
 | T-005 | Sales agent — `agents/sales/`: WA + IG prompts, owner-gate triggers (custom decoration / allergy / >$80 / lead-time / emotional / requires_custom_work), end-to-end smoke PASS on both paths | c736d14 | CC |
 | T-007 | Ops agent — `agents/ops/`: GMB review-reply (rev_001 5★ → cake "Honey" Saturday-bake reply) + canonical IG post owner-gate (schedule → approve → publish, all three stages PASS) + kitchen state prompt + escalation rules | d211d43 | CC |
-| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — bounded scenario + WA/IG/GMB injects + four `evaluator_score_*` calls, total 212s wall-clock, scores M:100 / POS:0 / Ch:70 / W:97 (PASS), evidence sample committed | _pending_ | CC |
+| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — bounded scenario + WA/IG/GMB injects + four `evaluator_score_*` calls, total 212s wall-clock, scores M:100 / POS:0 / Ch:70 / W:97 (PASS), evidence sample committed | bd05f31 | CC |
 
 ## Architecture intent (locked in by sandbox shape)
 
