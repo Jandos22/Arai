@@ -1,15 +1,118 @@
 import "./globals.css";
 import type { Metadata } from "next";
 
+const SITE_URL = "https://happycake.us";
+
+// LocalBusiness/Bakery JSON-LD — agent + SEO discoverability.
+// Address/phone/hours are PLACEHOLDERS pending confirmation from Askhat
+// (see docs/PRODUCTION-PATH.md). Real values land at production-swap time.
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Bakery",
+  "@id": `${SITE_URL}/#org`,
+  name: "HappyCake US",
+  alternateName: "HappyCake",
+  description:
+    "Traditional, hand-decorated cakes in Sugar Land, TX. Honey cake, Napoleon, Red Velvet, and more — made by hand, sold by neighborhood reputation.",
+  url: SITE_URL,
+  logo: `${SITE_URL}/brand/logo/logo-512.png`,
+  image: `${SITE_URL}/brand/hero/hero-04.webp`,
+  telephone: "+1-281-555-1234",
+  priceRange: "$$",
+  servesCuisine: ["Cakes", "Desserts", "Pastries"],
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "2123 Hwy 6 South",
+    addressLocality: "Sugar Land",
+    addressRegion: "TX",
+    postalCode: "77478",
+    addressCountry: "US",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 29.6197,
+    longitude: -95.6349,
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: "10:00",
+      closes: "19:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Sunday",
+      opens: "11:00",
+      closes: "17:00",
+    },
+  ],
+  areaServed: [
+    { "@type": "City", name: "Sugar Land" },
+    { "@type": "City", name: "Missouri City" },
+    { "@type": "City", name: "Stafford" },
+    { "@type": "City", name: "Richmond" },
+    { "@type": "City", name: "Houston" },
+  ],
+  sameAs: ["https://instagram.com/happycakeus"],
+  potentialAction: {
+    "@type": "OrderAction",
+    target: "https://wa.me/12815551234",
+    deliveryMethod: ["http://purl.org/goodrelations/v1#DeliveryModePickUp"],
+  },
+};
+
 export const metadata: Metadata = {
-  title: "HappyCake US — The original taste of happiness",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "HappyCake US — The original taste of happiness",
+    template: "%s · HappyCake US",
+  },
   description:
     "Hand-decorated, hand-packed cakes in Sugar Land, TX. The traditional, time-tested cakes our customers say taste 'just like homemade'.",
-  metadataBase: new URL("https://happycake.us"),
+  applicationName: "HappyCake US",
+  authors: [{ name: "HappyCake US" }],
+  keywords: [
+    "Sugar Land cakes",
+    "Houston bakery",
+    "Medovik honey cake",
+    "Napoleon cake",
+    "custom birthday cake Sugar Land",
+    "Russian cakes Houston",
+  ],
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
-    title: "HappyCake US",
-    description: "The original taste of happiness — Sugar Land, TX.",
     type: "website",
+    url: SITE_URL,
+    siteName: "HappyCake US",
+    title: "HappyCake US — The original taste of happiness",
+    description:
+      "Traditional, hand-decorated cakes in Sugar Land, TX. Order ahead by WhatsApp or pick up today.",
+    locale: "en_US",
+    images: [
+      {
+        url: "/brand/hero/hero-04.webp",
+        width: 1600,
+        height: 1000,
+        alt: "Naked chocolate layer cake with piped cream pearls and ganache drip.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HappyCake US — The original taste of happiness",
+    description: "Hand-decorated cakes in Sugar Land, TX.",
+    images: ["/brand/hero/hero-04.webp"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: "/brand/logo/logo-256.png",
+    apple: "/brand/logo/logo-512.png",
   },
 };
 
@@ -22,6 +125,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
         />
       </head>
       <body className="bg-cream-50 text-ink antialiased">
@@ -65,6 +172,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <li><a href="/agent.json" className="hover:text-happy-blue-500">/agent.json</a></li>
                 <li><a href="/api/catalog" className="hover:text-happy-blue-500">/api/catalog</a></li>
                 <li><a href="/api/policies" className="hover:text-happy-blue-500">/api/policies</a></li>
+                <li><a href="/sitemap.xml" className="hover:text-happy-blue-500">/sitemap.xml</a></li>
               </ul>
             </div>
           </div>

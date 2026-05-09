@@ -1,9 +1,37 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import { findBySlug, loadCatalog } from "@/lib/catalog";
 import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
   return loadCatalog().items.map((i) => ({ slug: i.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const item = findBySlug(slug);
+  if (!item) return {};
+  const image = item.imageUrl ?? "/brand/hero/hero-04.webp";
+  return {
+    title: item.name,
+    description: item.description,
+    openGraph: {
+      title: `${item.name} · HappyCake US`,
+      description: item.description,
+      images: [{ url: image, alt: item.imageAlt ?? item.name }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${item.name} · HappyCake US`,
+      description: item.description,
+      images: [image],
+    },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
