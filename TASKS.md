@@ -14,9 +14,9 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 
 | ID | Title | Owner | Brief |
 |----|-------|-------|-------|
-| T-005 | Sales agent — `agents/sales/` Claude Code project: WA + IG inbound, brand voice, order intake → kitchen ticket, owner approval gate | CC | TBD |
+| T-005 | Sales agent — `agents/sales/` Claude Code project: WA + IG inbound, brand voice, order intake → kitchen ticket, owner approval gate | CC | `tasks/INBOX/T-005-sales-agent.md` |
 | T-007 | Ops agent — `agents/ops/`: GMB review-reply + IG post approval flow + kitchen state | CC | TBD |
-| T-008 | Sales agent — populate `agents/sales/` and verify orchestrator end-to-end against a mini scenario | CC | TBD |
+| T-008 | End-to-end smoke against a mini scenario — orchestrator + sales + marketing agents working together | CC | TBD |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
 

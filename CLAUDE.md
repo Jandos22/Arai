@@ -43,11 +43,11 @@ Vertical slice we are building:
 6. All decisions + tool calls logged to `evidence/` (SQLite + JSONL) so the 7-pass evaluator can verify.
 
 Sub-systems:
-- `website/` — Next.js storefront `happycake.us` with agent-readable JSON-LD catalog and `/api/catalog`, `/api/policies`.
-- `agents/` — one Claude Code project per role (sales, ops, marketing). Each has its own `CLAUDE.md` and MCP config.
-- `bots/` — Python wrappers (one Telegram bot per agent role + one router for inbound webhooks).
-- `evidence/` — runtime logs (gitignored except schema docs).
-- `docs/` — README, ARCHITECTURE.md, MARKETING.md ($500 budget case), DEMO.md.
+- `website/` — Next.js storefront `happycake.us` with agent-readable JSON-LD catalog and `/api/catalog`, `/api/policies`, `/agent.json`. (T-002 ✅)
+- `orchestrator/` — Python spine: MCP client, scenario runner (`world_next_event` loop), event dispatcher, `claude -p` per-agent shell-out, Telegram owner notifier with approval queue, evidence JSONL writer. (T-003 ✅)
+- `agents/` — one Claude Code project per role (sales, ops, marketing). Each has its own `CLAUDE.md` and scoped `.mcp.json`. The orchestrator picks them up automatically when their dirs exist.
+- `evidence/` — runtime logs (gitignored except sample/schema docs).
+- `docs/` — README, ARCHITECTURE.md, EVIDENCE-SCHEMA.md, MARKETING.md, DEMO.md.
 
 ## MCP
 
