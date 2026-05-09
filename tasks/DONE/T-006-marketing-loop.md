@@ -101,3 +101,44 @@ Use the T-004 report format plus:
 ## After this task
 
 The orchestrator (T-003) will eventually wrap this agent with a Telegram `/marketing` command and overnight scheduling. For now, ship the agent + the doc. We're scoring the loop, not the polish.
+
+## Outcome (CC, 2026-05-09)
+
+Shipped on `feat/marketing-agent`, branched from `82aa0e7`.
+
+**Score:** `evaluator_score_marketing_loop` returned **100/100** with evidence
+`["3 campaign(s) created", "9 simulated lead(s) generated/routed", "1 owner
+report(s) recorded"]`. Only listed gap is "No POS order evidence tied to
+demand" — that's T-005 / sales agent territory, explicitly out of scope here.
+
+**Run summary:**
+- 3 campaigns at $500 total: google_local $200, instagram $150, whatsapp $150
+- 9 leads generated, all routed (5 → owner_approval, 2 → website, 1 → whatsapp,
+  1 → instagram)
+- 1 adjustment per campaign with cited rationale + expectedImpact
+- `marketing_report_to_owner`: projected revenue $6,636 → 13.27× ROAS,
+  ahead of the 10× target
+- 30-line `evidence/marketing.jsonl` produced; 20-line redacted sample
+  committed as `evidence/marketing-sample.jsonl`
+
+**Files shipped:**
+- `agents/marketing/CLAUDE.md` — role contract, allowed tools, brand voice
+- `agents/marketing/.mcp.json` — project-scoped happycake server, env-interp token
+- `agents/marketing/PROMPT.md` — mission prompt the driver feeds to `claude -p`
+- `agents/marketing/run.sh` — one-shot driver: sources `.env.local`, runs
+  `claude -p --permission-mode bypassPermissions`, extracts the evidence block
+- `docs/MARKETING.md` — the $500 case write-up (inputs / allocation / briefs /
+  results / routing / adjustments / owner report / next-month plan)
+- `evidence/marketing-sample.jsonl` — redacted sample of the audit trail
+
+**Risky-heads-up:** none. Orchestrator handler
+`orchestrator/handlers/marketing.py` already invokes a `claude_runner` keyed
+to a marketing project dir; once that runner is pointed at `agents/marketing/`,
+the orchestrator drives this same loop on a Telegram `/marketing` command
+without new agent code.
+
+**Anomalies:** sandbox returned identical leads (Maya / James / Nora) across
+all three campaigns — deterministic seed artefact, not a bug. Routing logic
+still differentiates per-channel.
+
+Unblocks: T-005 (sales agent), T-008 (orchestrator-driven smoke).

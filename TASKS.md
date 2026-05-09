@@ -6,9 +6,7 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 
 ## In flight
 
-| ID | Title | Owner | Branch | Brief |
-|----|-------|-------|--------|-------|
-| T-006 | Marketing $500 → $5K demand-engine agent | CC | `feat/marketing-agent` | `tasks/INBOX/T-006-marketing-loop.md` |
+_(none — pick from Queued)_
 
 ## Queued
 
@@ -28,7 +26,8 @@ Convention: ID = `T-NNN`. Owner is whoever should *execute* the task. Briefs liv
 | T-001 | Pull launch kit & populate `docs/MCP-TOOLS.md` (55 tools cataloged) | 5d1424c | CC |
 | T-004 | `.mcp.json` + claude -p smoke test | da70ae3 | CC |
 | T-002 | Website skeleton + agent-readable storefront (Next.js, JSON-LD, /agent.json, /api/catalog, /api/policies, brand palette) | 7144e0e | Hermes |
-| T-003 | Orchestrator scaffold (Python spine: MCP client, scenario runner, dispatcher, Telegram, evidence, 15 unit tests) | (this commit) | Hermes |
+| T-003 | Orchestrator scaffold (Python spine: MCP client, scenario runner, dispatcher, Telegram, evidence, 15 unit tests) | bc860c4 | Hermes |
+| T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | (this commit) | CC |
 
 ## Architecture intent (locked in by sandbox shape)
 
