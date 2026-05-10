@@ -76,6 +76,29 @@ class TelegramNotifier:
             return
         self._call("sendMessage", {"chat_id": self.chat_id, "text": text})
 
+    def send_with_button(
+        self,
+        text: str,
+        button_text: str | None = None,
+        button_url: str | None = None,
+        parse_mode: str | None = None,
+    ) -> None:
+        """Send a plain message; attach one inline URL button if provided.
+
+        Used by the daily-report digest to include an "Open audit" deeplink
+        without callers reaching into the private ``_call`` helper.
+        """
+        if not self.enabled:
+            return
+        payload: dict[str, Any] = {"chat_id": self.chat_id, "text": text}
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
+        if button_text and button_url:
+            payload["reply_markup"] = {
+                "inline_keyboard": [[{"text": button_text, "url": button_url}]],
+            }
+        self._call("sendMessage", payload)
+
     def request_approval(
         self,
         summary: str,

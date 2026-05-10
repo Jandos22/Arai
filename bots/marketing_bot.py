@@ -20,6 +20,7 @@ Run with:
 from __future__ import annotations
 
 import asyncio
+import html
 import json
 import logging
 import sys
@@ -98,6 +99,10 @@ def _daily_preface(target: date_cls) -> str | None:
 
     The bot reads the same JSON file the audit endpoint serves — that's the
     "agent analytics layer" in action. No recomputation from raw JSONL.
+
+    Output uses HTML parse mode (not Markdown) so LLM-generated content with
+    underscores or asterisks (phone numbers, hashtags, etc.) renders cleanly
+    instead of accidentally toggling Markdown italic/bold mode.
     """
     path = daily_report_path(target)
     if not path.exists():
@@ -108,13 +113,17 @@ def _daily_preface(target: date_cls) -> str | None:
         return None
     highs = body.get("highlights") or []
     lows = body.get("lowlights") or []
+    if not isinstance(highs, list):
+        highs = []
+    if not isinstance(lows, list):
+        lows = []
     if not highs and not lows:
         return None
-    lines = [f"_From the {target.isoformat()} daily report_"]
+    lines = [f"<i>From the {html.escape(target.isoformat())} daily report</i>"]
     for h in highs[:3]:
-        lines.append(f"✅ {h}")
+        lines.append(f"✅ {html.escape(str(h))}")
     for low in lows[:3]:
-        lines.append(f"⚠️ {low}")
+        lines.append(f"⚠️ {html.escape(str(low))}")
     return "\n".join(lines)
 
 
@@ -133,11 +142,11 @@ async def cmd_report(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
     if preface:
         chunks.append(preface)
         chunks.append("")
-    chunks.append("📋 *Marketing report*")
-    chunks.append("```")
-    chunks.append(json.dumps(report, indent=2)[:3200])
-    chunks.append("```")
-    await update.effective_message.reply_text("\n".join(chunks), parse_mode="Markdown")
+    chunks.append("📋 <b>Marketing report</b>")
+    chunks.append("<pre>")
+    chunks.append(html.escape(json.dumps(report, indent=2)[:3200]))
+    chunks.append("</pre>")
+    await update.effective_message.reply_text("\n".join(chunks), parse_mode="HTML")
 
 
 @owner_only
@@ -165,30 +174,38 @@ async def cmd_digest(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             await update.effective_message.reply_text(
                 f"❌ No daily report for {target.isoformat()} yet. "
-                f"Run `python -m orchestrator.daily_report --date {target.isoformat()}` first."
+                f"Run python -m orchestrator.daily_report --date {target.isoformat()} first."
             )
             return
 
     body = json.loads(path.read_text(encoding="utf-8"))
-    lines = [f"☀️ *Daily report — {target.isoformat()}*"]
+    highs = body.get("highlights") or []
+    lows = body.get("lowlights") or []
+    if not isinstance(highs, list):
+        highs = []
+    if not isinstance(lows, list):
+        lows = []
+
+    lines = [f"☀️ <b>Daily report — {html.escape(target.isoformat())}</b>"]
     if body.get("llmFallback"):
-        lines.append(f"_⚠️ LLM fallback active: {body.get('fallbackReason') or 'unknown'}_")
-    if body.get("highlights"):
+        reason = html.escape(str(body.get("fallbackReason") or "unknown"))
+        lines.append(f"<i>⚠️ LLM fallback active: {reason}</i>")
+    if highs:
         lines.append("")
-        lines.append("*Highlights:*")
-        for h in body["highlights"]:
-            lines.append(f"✅ {h}")
-    if body.get("lowlights"):
+        lines.append("<b>Highlights:</b>")
+        for h in highs:
+            lines.append(f"✅ {html.escape(str(h))}")
+    if lows:
         lines.append("")
-        lines.append("*Lowlights:*")
-        for low in body["lowlights"]:
-            lines.append(f"⚠️ {low}")
+        lines.append("<b>Lowlights:</b>")
+        for low in lows:
+            lines.append(f"⚠️ {html.escape(str(low))}")
     metrics = body.get("metrics") or {}
-    if metrics.get("totalEvents") is not None:
+    if isinstance(metrics, dict) and metrics.get("totalEvents") is not None:
         lines.append("")
-        lines.append(f"_Events recorded: {metrics['totalEvents']}_")
+        lines.append(f"<i>Events recorded: {metrics['totalEvents']}</i>")
     text = "\n".join(lines)
-    await update.effective_message.reply_text(text[:4000], parse_mode="Markdown")
+    await update.effective_message.reply_text(text[:4000], parse_mode="HTML")
 
 
 @owner_only

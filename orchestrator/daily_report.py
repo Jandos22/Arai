@@ -221,6 +221,18 @@ def summarize(
     if not isinstance(obj, dict):
         return _deterministic_summary(events, "claude -p returned non-object JSON")
 
+    # Shape-check the LLM output. If a field is the wrong type, drop it and let
+    # setdefault fill in the empty default. Without this, an LLM that returns
+    # ``"highlights": "win"`` (string instead of list) makes downstream
+    # ``for h in highs`` iterate over the characters of the string.
+    if not isinstance(obj.get("highlights"), list):
+        obj["highlights"] = []
+    if not isinstance(obj.get("lowlights"), list):
+        obj["lowlights"] = []
+    if not isinstance(obj.get("metrics"), dict):
+        obj["metrics"] = {"totalEvents": len(events), "byKind": {}}
+    if not isinstance(obj.get("evidence_refs"), list):
+        obj["evidence_refs"] = []
     obj.setdefault("highlights", [])
     obj.setdefault("lowlights", [])
     obj.setdefault("metrics", {"totalEvents": len(events), "byKind": {}})
@@ -280,12 +292,11 @@ def post_digest(
         log.warning("telegram disabled (no token/chat_id) — digest not sent, evidence logged")
         return
 
-    payload: dict[str, Any] = {"chat_id": notifier.chat_id, "text": text}
-    if audit_url:
-        payload["reply_markup"] = {
-            "inline_keyboard": [[{"text": "📊 Open audit", "url": audit_url}]],
-        }
-    notifier._call("sendMessage", payload)
+    notifier.send_with_button(
+        text,
+        button_text="📊 Open audit" if audit_url else None,
+        button_url=audit_url,
+    )
 
 
 def generate_daily(
@@ -307,7 +318,13 @@ def generate_daily(
 
     out_path = daily_report_path(d, base_dir=base_dir)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    # Atomic write: write to a temp file in the same dir, then os.replace.
+    # Without this, a crash mid-write leaves a partial JSON file that the
+    # audit endpoint can't parse — the endpoint would 500 until the next
+    # daily run rewrote the file.
+    tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
+    tmp_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp_path, out_path)
     log.info("wrote %s (%d events, llmFallback=%s)", out_path, len(events), summary.get("llmFallback"))
 
     if post_telegram:
