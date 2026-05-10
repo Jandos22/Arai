@@ -104,8 +104,17 @@ operator usefulness, business analysis, and innovation and depth.
 | `python -m orchestrator.main --dry-run` | Validate wiring, no live calls |
 | `python -m orchestrator.main --list-scenarios` | List sandbox scenarios |
 | `python -m orchestrator.main --webhook-server --port 8787` | Serve local WA/IG webhook endpoints for Cloudflare Tunnel |
-| `python -m orchestrator.main --register-webhooks https://...` | Register tunneled webhook URLs with sandbox MCP |
+| `bash scripts/register_webhooks.sh --dry-run --base-url https://...` | Prove the WA/IG registration targets without credentials or network calls |
+| `bash scripts/register_webhooks.sh --base-url https://...` | Register tunneled WA/IG webhook URLs with sandbox MCP |
 | `python -m orchestrator.main --scenario launch-day-revenue-engine` | Live run |
+
+Webhook registration derives the exact MCP calls from one base URL:
+`whatsapp_register_webhook` receives `<base>/webhooks/whatsapp`, and
+`instagram_register_webhook` receives `<base>/webhooks/instagram`.
+At runtime, the sandbox calls those tunneled endpoints; `webhook_server`
+normalizes each body into a dispatcher event, and `dispatcher.make_dispatcher`
+routes `whatsapp:inbound_message`, `instagram:dm`, or `instagram:comment` to
+the channel handlers.
 
 ## Files
 
