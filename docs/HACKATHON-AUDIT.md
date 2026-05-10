@@ -1,4 +1,4 @@
-# Hackathon Audit — what's actually behind sign-in (2026-05-09 ~14:50 CT)
+# Hackathon Audit — what's actually behind sign-in (2026-05-09, refreshed ~21:30 CT)
 
 > Comprehensive audit of every hackathon page reachable on Jandos's signed-in
 > Mac mini Chrome. This is the source of truth for what the organizers
@@ -9,6 +9,7 @@
 | URL | Title | What's there |
 |---|---|---|
 | `/hackathon` | Agentic AI for real business | Public landing page |
+| `/hackathon/register` | Register | Registration route linked from public landing page |
 | `/hackathon/brief` | The brief | Full brief (323 lines, also at `/hackathon-assets/HACKATHON_BRIEF.md`) |
 | `/hackathon/brief/sandbox` | Sandbox pack | Simulator modules + tool catalog summary + MCP config |
 | `/hackathon/brief/assets` | HappyCake assets | 22 photos + 3 logo sizes + metadata.json |
@@ -17,7 +18,57 @@
 | `/hackathon/submit` | Submit | Captain enters repo URL + optional evaluator notes |
 | `/hackathon/leaderboard` | Live leaderboard | Empty until 10:00 CT May 10 — **scores 7 official weighted passes** |
 
-All pages saved as JSON in `/tmp/sbc_audit/*.json` on the Mac mini for re-check.
+First pass pages were saved as JSON in `/tmp/sbc_audit/*.json` on the Mac mini.
+The later Chrome re-check is summarized from `.gstack/browse-audit.jsonl`,
+`.gstack/browse-network.log`, and the browser-visible pages listed above.
+
+## 2026-05-09 late source-route re-check
+
+Fresh Chrome coverage confirmed the route set from the first pass and added
+explicit evidence boundaries for assets and remaining gaps:
+
+| Source route / artifact | Evidence supplied | Notes |
+|---|---|---|
+| `/hackathon` | Public judging model, registration/brief/team links | Network log shows the route loaded successfully at 2026-05-09 21:06 CT. |
+| `/hackathon/register` | Registration route exists and is linked | The re-check only needed route coverage; no private registration payload is copied here. |
+| `/hackathon/brief` | Current brief text and links to sandbox/assets | `docs/HACKATHON_BRIEF.md` remains the repo copy for source alignment. |
+| `/hackathon/brief/sandbox` | Sandbox modules, runtime rules, MCP/evaluator preview framing | This continues to support the architecture decision that the MCP sandbox is source of truth. |
+| `/hackathon/brief/assets` | Rendered HappyCake asset inventory page | This page, plus `metadata.json`, is the safe evidence source for asset counts and rules. |
+| `/hackathon-assets/happy-cake/metadata.json` | Private source inventory metadata | Browser history shows the metadata URL was opened; repo copy records 562 source images, 2 zips, and the curated export rules. |
+| `/hackathon-assets/happy-cake/<raw originals>` | Not used as repo evidence | Treat raw original JPG/ZIP URLs as client-blocked/private source material. The repo must use only curated `website/public/brand/**` exports. |
+| `/hackathon/teams` | Team list / competitive landscape | Do not copy private account details beyond high-level team observations. |
+| `/hackathon/teams/<id>/kit` | Team-specific token, tool list, submission checklist | Token and private kit identifiers stay redacted. Only the tool categories and checklist are summarized below. |
+| `/hackathon/submit` | Required public repo URL and optional notes field | Confirms the final submission mechanics. |
+| `/hackathon/leaderboard` | Live scoring surface | Confirms public leaderboard exists; official scoring still maps to the seven weighted passes below. |
+
+### Asset mismatch now documented
+
+The re-check exposed an important distinction: the source asset system has a
+large private inventory, while this repo intentionally carries only a curated
+web-ready subset.
+
+| Asset source | Count / contents | Status in repo |
+|---|---:|---|
+| Steppe private source inventory (`metadata.json`) | 562 source images, 2 zips, 1 logo PNG, ~8.27 GB raw bytes | Not committed and not linked from public pages |
+| Rendered `/hackathon/brief/assets` page | 22 photos + 3 logo sizes + metadata | Used as crawl evidence |
+| `website/public/brand/` curated export | 4 hero images, 10 product images, 8 social crops, 3 logo PNGs, metadata | Committed, optimized, safe for Next.js public serving |
+
+Raw originals referenced by metadata `sourceId` values, such as `1V8A9769.jpg`,
+stay private. The app should keep serving only the curated filenames under
+`website/public/brand/`, and docs should avoid source filesystem paths or raw
+download URLs.
+
+### Gap table from the latest crawl
+
+| Gap from crawl | Evidence | Tracking |
+|---|---|---|
+| Audit doc lagged behind late Chrome re-check | This file did not previously include `/hackathon/register`, asset mismatch, or route-to-evidence mapping | [GitHub issue #20](https://github.com/Jandos22/Arai/issues/20) |
+| Website README was stale against current website behavior | Re-check noted README risk; current `website/README.md` now documents agent-readable endpoints, order-intent, assistant, and curated asset rules | Covered in repo docs; no token/private detail needed |
+| Mobile/performance proof still needed | Production-readiness bonus rewards mobile-ready storefront proof | [GitHub issue #8](https://github.com/Jandos22/Arai/issues/8) |
+| Google Business local simulator coverage is thin | Sandbox includes Google Business local/review/post/metrics capabilities beyond current smoke proof | [GitHub issue #19](https://github.com/Jandos22/Arai/issues/19) |
+| Growth bonus features remain partial | Lead scoring, referrals, follow-up, abandoned orders are explicitly bonus-relevant | [GitHub issue #22](https://github.com/Jandos22/Arai/issues/22) |
+| Telegram bot registration is operational, not code-only | Operator simulator expects owner/bot interaction; tokens must stay local | [GitHub issue #10](https://github.com/Jandos22/Arai/issues/10) |
+| Final dress rehearsal still pending | Submission requires clean clone, tests, evaluator preview, leak scan, final push | [GitHub issue #4](https://github.com/Jandos22/Arai/issues/4) |
 
 ## Critical finding: official judging is **seven weighted passes**, not four preview loops
 
