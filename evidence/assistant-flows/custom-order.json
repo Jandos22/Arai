@@ -1,0 +1,27 @@
+{
+  "flow": "custom_order",
+  "endpoint": "/api/assistant",
+  "method": "POST",
+  "request": {
+    "message": "I need a custom birthday cake tomorrow afternoon with a soccer theme"
+  },
+  "expected": {
+    "ok": true,
+    "intent": "custom_order",
+    "escalation": {
+      "required": true,
+      "reason": "custom cake or allergy/design signal"
+    },
+    "evidenceTools": [
+      "square_list_catalog",
+      "kitchen_get_capacity",
+      "kitchen_get_menu_constraints",
+      "owner_gate"
+    ],
+    "answer": "For custom birthday/design requests, HappyCake needs headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; if timing is tight in Sugar Land, I can suggest ready-made cake \"Honey\" (medovik) or cake \"Milk Maiden\" instead."
+  },
+  "source": {
+    "file": "website/app/api/assistant/route.ts",
+    "symbol": "CUSTOM_ORDER_ANSWER"
+  }
+}

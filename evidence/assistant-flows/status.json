@@ -1,0 +1,24 @@
+{
+  "flow": "status",
+  "endpoint": "/api/assistant",
+  "method": "POST",
+  "request": {
+    "message": "Can you check my order status for pickup?"
+  },
+  "expected": {
+    "ok": true,
+    "intent": "status",
+    "escalation": {
+      "required": false
+    },
+    "evidenceTools": [
+      "square_recent_orders",
+      "kitchen_list_tickets"
+    ],
+    "answer": "For HappyCake order status, share the order name and pickup time. I can read availability at /api/availability for the Sugar Land kitchen, but I do not mark cake \"Honey\", cake \"Milk Maiden\", or any order ready unless Square/kitchen status confirms it."
+  },
+  "source": {
+    "file": "website/app/api/assistant/route.ts",
+    "symbol": "STATUS_ANSWER"
+  }
+}

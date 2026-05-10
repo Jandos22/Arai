@@ -237,3 +237,67 @@ def test_instagram_greeting_triggers_proposed_reorder(tmp_path: Path) -> None:
     assert len(sent) == 1
     assert sent[0][1]["threadId"] == "t1"
     assert runner.prompts == []
+
+
+def test_instagram_owner_gated_response_queues_outbound_draft() -> None:
+    mcp = _FakeMCP({"square_recent_orders": {"orders": []}})
+    ev = _RecordingEvidence()
+    runner = _FakeRunner()
+    runner.run = lambda prompt, *, label="claude_p": (
+        '{"needs_approval": true, "kind": "transactional", '
+        '"trigger": "standing_order", "summary": "Owner review needed", '
+        '"draft_reply": "Thanks — I am checking this with the owner before confirming the Friday box."}'
+    )
+    ctx = HandlerContext(client=mcp, evidence=ev, sales_runner=runner)  # type: ignore[arg-type]
+
+    instagram_handler.handle(
+        {
+            "channel": "instagram",
+            "type": "dm",
+            "payload": {
+                "threadId": "ig-deshawn-001",
+                "from": "deshawn_office",
+                "message": "Can we set up a weekly office dessert box?",
+            },
+        },
+        ctx,
+    )
+
+    outbound = [entry for entry in ev.entries if entry["kind"] == "channel_outbound"]
+    assert len(outbound) == 1
+    assert outbound[0]["channel"] == "instagram"
+    assert outbound[0]["tool"] == "instagram_send_dm"
+    assert outbound[0]["recipient"] == "ig-deshawn-001"
+    assert outbound[0]["status"] == "queued_owner_gate"
+    assert "Friday box" in outbound[0]["bodyPreview"]
+
+
+def test_instagram_plain_response_without_recipient_queues_draft() -> None:
+    mcp = _FakeMCP({})
+    ev = _RecordingEvidence()
+    runner = _FakeRunner()
+    runner.run = lambda prompt, *, label="claude_p": (
+        "Draft reply ready once the comment id is attached: Yes, local delivery is quoted case by case."
+    )
+    ctx = HandlerContext(client=mcp, evidence=ev, sales_runner=runner)  # type: ignore[arg-type]
+
+    instagram_handler.handle(
+        {
+            "channel": "instagram",
+            "type": "comment",
+            "payload": {
+                "from": "unknown",
+                "comment": "Do you deliver in Sugar Land today?",
+            },
+        },
+        ctx,
+    )
+
+    outbound = [entry for entry in ev.entries if entry["kind"] == "channel_outbound"]
+    assert len(outbound) == 1
+    assert outbound[0]["channel"] == "instagram"
+    assert outbound[0]["tool"] == "instagram_reply_to_comment"
+    assert outbound[0]["recipient"] == "unknown"
+    assert outbound[0]["status"] == "draft_needs_recipient"
+    assert outbound[0]["reason"] == "missing_comment_or_thread_id"
+    assert any(entry["kind"] == "instagram_draft_queued" for entry in ev.entries)

@@ -1,0 +1,34 @@
+{
+  "flow": "escalation",
+  "endpoint": "/api/assistant",
+  "method": "POST",
+  "request": {
+    "message": "I want to order cake for an office Friday pickup",
+    "productSlug": "medovik-honey-cake",
+    "quantity": 3,
+    "customerName": "Assistant Fixture",
+    "contact": "+12815550000"
+  },
+  "expected": {
+    "ok": true,
+    "intent": "order_intent",
+    "status": "owner_review_required",
+    "escalation": {
+      "required": true,
+      "reason": "Estimated total $108 exceeds owner-gate threshold."
+    },
+    "evidenceTools": [
+      "create_order_intent"
+    ],
+    "suggestedActions": [
+      "Confirm pickup time",
+      "Confirm allergy concerns",
+      "Send to WhatsApp",
+      "Owner review if gated"
+    ]
+  },
+  "source": {
+    "file": "website/app/api/assistant/route.ts",
+    "branch": "order_intent"
+  }
+}

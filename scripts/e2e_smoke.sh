@@ -271,13 +271,13 @@ done
 
 # Capture redacted evidence sample on PASS.
 if (( ok )); then
-  yellow "Capturing redacted evidence sample (last 50 lines)"
+  yellow "Capturing redacted evidence sample (priority rows + last 80 lines)"
   latest=$(ls -t evidence/orchestrator-run-*.jsonl 2>/dev/null | head -1 || true)
   if [[ -n "$latest" && -s "$latest" ]]; then
     sample_tmp="$(mktemp)"
     {
-      grep -E '"kind": "square_capacity_decision".*"decision": "reject"|"decision": "reject".*"kind": "square_capacity_decision"|"kind": "owner_msg".*"subkind": "approval_request"|"subkind": "approval_request".*"kind": "owner_msg"' "$latest" || true
-      tail -n 50 "$latest"
+      grep -E '"kind": "square_capacity_decision".*"decision": "reject"|"decision": "reject".*"kind": "square_capacity_decision"|"kind": "owner_msg".*"subkind": "approval_request"|"subkind": "approval_request".*"kind": "owner_msg"|"kind": "channel_outbound"' "$latest" || true
+      tail -n 80 "$latest"
     } | awk '!seen[$0]++' > "$sample_tmp"
     sed -E 's/sbc_team_[A-Za-z0-9_-]+/[REDACTED]/g' "$sample_tmp" \
       | sed -E 's/(Bearer[[:space:]]+)[A-Za-z0-9._-]{20,}/\1[REDACTED]/g' \
