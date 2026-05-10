@@ -125,9 +125,9 @@ uv pip install -r requirements.txt
 PYTHONPATH=.. .venv/bin/python -m pytest tests
 ```
 
-15 tests cover `mcp_client`, `dispatcher`, `evidence` — all deterministic, no
-network, no token, no Telegram. The MacBook should also see green when these
-run there.
+23 tests cover `mcp_client`, `dispatcher`, `evidence`, Square capacity
+branching, and Claude stream parsing — all deterministic, no token, no
+Telegram. The MacBook should also see green when these run there.
 
 ## What's actually shipped (running totals)
 
@@ -137,8 +137,8 @@ The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. 
 | Loop | Status | Evidence |
 |---|---|---|
 | Marketing $500 → $5K | ✅ preview score 100/100 — demand-engine campaigns + routed leads + owner reports | `agents/marketing/`, `docs/MARKETING.md`, `evidence/marketing-sample.jsonl`, `evidence/e2e-sample.jsonl` |
-| POS + kitchen | ✅ preview score 55/100 after seeded Square walk-in fix — POS order + kitchen ticket + ready status; remaining gap is explicit capacity decision | `orchestrator/handlers/square.py`, `evidence/e2e-sample.jsonl`, `docs/SELF-EVAL.md` |
-| Channel response (WA / IG / GMB) | ⚠️ preview score 100/100, but latest evidence still shows sparse outbound counts; we route WA/IG/GMB/gbusiness and document the caveat honestly | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/` |
+| POS + kitchen | ✅ preview score 100/100 in latest committed sample — POS order + kitchen ticket + explicit `kitchen_get_capacity` / `square_capacity_decision` / ready status | `orchestrator/handlers/square.py`, `evidence/e2e-sample.jsonl`, `docs/SELF-EVAL.md` |
+| Channel response (WA / IG / GMB) | ✅ preview score 100/100 — WA/IG/GMB routed through agents; orchestrator now records streamed `agent_tool_use` plus `channel_outbound` rows for outbound proof | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/`, `orchestrator/claude_runner.py` |
 | World scenario | ✅ preview score 100/100 — deterministic launch-day scenario runs through `world_start_scenario` / `world_next_event` | `orchestrator/`, `evidence/e2e-sample.jsonl` |
 | Owner UI | ✅ Approval queue (T-003) + 3 dedicated bots (`bots/marketing_bot`, `ops_bot`, `sales_bot`) | `orchestrator/telegram_bot.py`, `bots/` |
 | Agent-readable site | ✅ `/agent.json`, `/api/catalog`, `/api/policies`, JSON-LD per product (T-002) | `website/`, `docs/AGENT-NOTES.md`, `scripts/test_website.sh` |
