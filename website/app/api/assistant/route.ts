@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { loadAvailability } from "@/lib/availability";
 import { createOrderIntent } from "@/lib/order-intent";
 import { Catalog, CatalogItem, loadCatalog, priceRange } from "@/lib/catalog";
 import { McpEvidence, isMcpConfigured, readMcpEvidence } from "@/lib/mcp";
@@ -171,14 +172,15 @@ async function getKitchenEvidence(): Promise<EvidenceSource[]> {
   return [capacity.evidence, constraints.evidence];
 }
 
-function catalogAnswer(catalog: Catalog | McpCatalog = loadCatalog()) {
+async function catalogAnswer(catalog: Catalog | McpCatalog = loadCatalog()) {
   const items = (catalog.items ?? []).slice(0, 5);
+  const availability = await loadAvailability();
   return `I can help you pick a cake. Popular options: ${items
     .map((item) => {
       const { min, max } = priceRange(item);
       return `${item.name} ($${min}–$${max}, ${item.leadTimeMinutes ?? 90} min lead)`;
     })
-    .join("; ")}. Tell me occasion, pickup time, allergy concerns, and headcount.`;
+    .join("; ")}. ${availability.customerPromise} Tell me occasion, pickup time, allergy concerns, and headcount.`;
 }
 
 export async function POST(request: NextRequest) {
@@ -277,7 +279,8 @@ export async function POST(request: NextRequest) {
         answer:
           "For custom birthday/design requests I need headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; I can still suggest ready-made Honey Cake or Milk Maiden if timing is tight.",
         escalation: { required: true, reason: "custom cake or allergy/design signal" },
-        endpoints: { catalog: "/api/catalog", policies: "/api/policies" },
+        endpoints: { catalog: "/api/catalog", policies: "/api/policies", availability: "/api/availability" },
+        availability: { endpoint: "/api/availability" },
         evidence: [...catalogEvidence, ...kitchenEvidence, localEvidence("owner_gate", { reason: "custom cake or allergy/design signal" })],
         suggestedActions: ["Collect missing details", "Offer ready-made alternative", "Escalate to owner Telegram gate"],
       });
@@ -298,7 +301,8 @@ export async function POST(request: NextRequest) {
         answer:
           "I’m sorry — we fix cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for replacement/refund decision before any irreversible action.",
         escalation: { required: true, reason: "complaint/remediation path" },
-        endpoints: { policies: "/api/policies" },
+        endpoints: { policies: "/api/policies", availability: "/api/availability" },
+        availability: { endpoint: "/api/availability" },
         evidence,
         suggestedActions: ["Collect photo", "Collect order name", "Owner-gated refund/replacement", "Follow up on WhatsApp"],
       });
@@ -323,9 +327,9 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "For order status, share the order name and pickup time. I check the configured Square/kitchen evidence path and ask the owner only when the matching status is unclear.",
+          "For order status, share the order name and pickup time. I can read availability at /api/availability, but I do not mark anything ready unless Square/kitchen status confirms it.",
         escalation: { required: false },
-        endpoints: { policies: "/api/policies" },
+        endpoints: { policies: "/api/policies", availability: "/api/availability" },
         evidence,
         suggestedActions: ["Ask for order name", "Ask for pickup time", "Check kitchen ticket", "Message customer with ETA"],
       });
@@ -337,9 +341,9 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "Pickup is the default path from Sugar Land. Local delivery is limited/case-by-case. Cakes can contain wheat, egg, dairy, and sometimes nuts/soy — tell us allergies before ordering. Same-day issues should be sent with a photo so the owner can approve replacement/refund.",
+          "Pickup is the default path from Sugar Land. Local delivery is limited/case-by-case. Same-day pickup is never guaranteed without live inventory and kitchen capacity confirmation. Cakes can contain wheat, egg, dairy, and sometimes nuts/soy — tell us allergies before ordering. Same-day issues should be sent with a photo so the owner can approve replacement/refund.",
         escalation: { required: false },
-        endpoints: { policies: "/api/policies", catalog: "/api/catalog" },
+        endpoints: { policies: "/api/policies", catalog: "/api/catalog", availability: "/api/availability" },
         evidence: [
           localEvidence("policy_static", { endpoint: "/api/policies", source: "repo policy contract" }),
           ...kitchenEvidence,
@@ -352,9 +356,9 @@ export async function POST(request: NextRequest) {
     return Response.json({
       ok: true,
       intent,
-      answer: catalogAnswer(catalog),
+      answer: await catalogAnswer(catalog),
       escalation: { required: false },
-      endpoints: { catalog: "/api/catalog", orderIntent: "/api/order-intent" },
+      endpoints: { catalog: "/api/catalog", availability: "/api/availability", orderIntent: "/api/order-intent" },
       evidence: [...evidence, ...kitchenEvidence],
     });
   } catch (error) {

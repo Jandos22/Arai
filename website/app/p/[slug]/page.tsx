@@ -1,7 +1,10 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import { inventoryForItem, loadAvailability } from "@/lib/availability";
 import { findBySlug, loadCatalog } from "@/lib/catalog";
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return loadCatalog().items.map((i) => ({ slug: i.slug }));
@@ -38,6 +41,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const item = findBySlug(slug);
   if (!item) notFound();
+  const availability = await loadAvailability();
+  const variationInventory = inventoryForItem(availability, item);
+  const inventoryById = new Map(variationInventory.map((entry) => [entry.variationId, entry]));
 
   const minPrice = Math.min(...item.variations.map((v) => v.priceUsd));
   const maxPrice = Math.max(...item.variations.map((v) => v.priceUsd));
@@ -109,17 +115,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </p>
         <p className="mt-6 text-ink/80 leading-relaxed">{item.description}</p>
 
+        <div className="mt-6 rounded-2xl border border-happy-blue-200 bg-white p-4 text-sm">
+          <p className="font-medium text-happy-blue-900">Availability check</p>
+          <p className="mt-1 text-ink/75">{availability.customerPromise}</p>
+          <p className="mt-2 text-ink/65">{availability.capacity.label}</p>
+        </div>
+
         <h2 className="font-display text-xl text-happy-blue-900 mt-8 mb-3">Sizes</h2>
         <ul className="space-y-2">
-          {item.variations.map((v) => (
-            <li
-              key={v.id}
-              className="flex items-center justify-between rounded-xl bg-cream-100 px-4 py-3"
-            >
-              <span>{v.name}</span>
-              <span className="font-medium">${v.priceUsd}</span>
-            </li>
-          ))}
+          {item.variations.map((v) => {
+            const stock = inventoryById.get(v.id);
+            return (
+              <li
+                key={v.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-cream-100 px-4 py-3"
+              >
+                <span>{v.name}</span>
+                <span className="text-right">
+                  <span className="block font-medium">${v.priceUsd}</span>
+                  <span className="block text-xs text-ink/60">
+                    {stock?.label ?? "Confirm stock before promising"}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
         </ul>
 
         {(item.leadTimeMinutes || item.allergens?.length) && (
@@ -127,7 +147,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {item.leadTimeMinutes && (
               <p>
                 <strong className="text-ink">Lead time:</strong> {item.leadTimeMinutes} minutes
-                from order to ready.
+                from confirmed order when kitchen capacity allows.
               </p>
             )}
             {item.allergens?.length && (

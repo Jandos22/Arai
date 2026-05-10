@@ -14,9 +14,13 @@ const policies = {
   },
   ordering: {
     channels: ["walk-in", "whatsapp", "instagram", "website"],
-    confirmation: "Owner or sales agent confirms by message before kitchen starts the cake.",
+    confirmation:
+      "Owner or sales agent confirms by message before kitchen starts the cake. Stock and pickup timing must be checked against /api/availability first.",
     minimumLeadTimeMinutes: 90,
     customNameLeadTimeMinutes: 180,
+    availabilityEndpoint: "/api/availability",
+    promiseRule:
+      "Lead times are planning estimates. If /api/availability is in conservative fallback or live tools are unavailable, do not promise same-day pickup or in-stock status.",
     pickupAddress: "TBD — confirm at order",
     deliveryArea: "Sugar Land + nearby Houston metro",
     deliveryFeeUsd: { min: 8, max: 15 },
@@ -45,7 +49,7 @@ const policies = {
   agentNotes: {
     sourceOfTruth: "square_list_catalog (sandbox MCP)",
     suggestedFlow:
-      "When a customer expresses intent, ask for: cake choice, size, pickup or delivery, date/time, hand-piped name (if any), allergy notes. Confirm against /api/catalog and /api/policies. Hand off to owner via Telegram for any custom-decoration request, allergy promise, or order > $80.",
+      "When a customer expresses intent, ask for: cake choice, size, pickup or delivery, date/time, hand-piped name (if any), allergy notes. Confirm against /api/catalog, /api/availability, and /api/policies. Hand off to owner via Telegram for any custom-decoration request, allergy promise, order > $80, or unavailable live capacity.",
   },
 };
 

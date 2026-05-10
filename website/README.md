@@ -13,8 +13,12 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-Nothing here calls the MCP at runtime — the catalog is **snapshotted** at
-build time (or shipped as a fixture for cold-start dev).
+The catalog is **snapshotted** at build time (or shipped as a fixture for
+cold-start dev). Runtime MCP calls are limited to `/api/availability`, which
+reads `square_get_inventory` and `kitchen_get_capacity` when
+`STEPPE_MCP_TOKEN` is configured. Without that token it returns conservative
+fallback copy so the storefront and agents do not promise stock or pickup
+timing.
 
 ## Catalog snapshot from sandbox
 
@@ -41,6 +45,7 @@ git history.
 | `/policies` | Pickup, delivery, allergens, returns |
 | `/agent.json` | Well-known agent descriptor — capabilities, endpoints, hints |
 | `/api/catalog` | Machine-readable catalog JSON |
+| `/api/availability` | Machine-readable inventory + kitchen capacity, live via MCP when configured and conservative otherwise |
 | `/api/policies` | Machine-readable policies JSON |
 
 ## Brand colors

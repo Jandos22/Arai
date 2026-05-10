@@ -8,8 +8,9 @@ export default function Policies() {
 
       <h2 className="font-display text-2xl text-happy-blue-900 mt-8">Pickup & lead time</h2>
       <p>
-        Most cakes ready 90 minutes from confirmed order. Birthday cakes with hand-piped names need
-        3 hours. Order by WhatsApp or Instagram DM; we confirm by message before kitchen starts.
+        Standard cakes often need about 90 minutes after confirmation, and birthday cakes with
+        hand-piped names often need 3 hours. Those are planning estimates, not promises. We check
+        live stock and kitchen capacity before confirming any pickup window.
       </p>
 
       <h2 className="font-display text-2xl text-happy-blue-900 mt-8">Delivery</h2>

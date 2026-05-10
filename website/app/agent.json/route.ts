@@ -17,6 +17,7 @@ const descriptor = {
   },
   endpoints: {
     catalog: "/api/catalog",
+    availability: "/api/availability",
     policies: "/api/policies",
     assistant: "/api/assistant",
     orderIntent: "/api/order-intent",
@@ -28,6 +29,7 @@ const descriptor = {
   capabilities: [
     "browse_catalog",
     "read_policies",
+    "read_live_inventory_and_capacity_when_configured",
     "capture_website_order_intent",
     "onsite_assistant_product_guidance",
     "onsite_assistant_custom_order_triage",
@@ -45,7 +47,9 @@ const descriptor = {
   hints: {
     preferredOrderChannels: ["website_order_intent", "whatsapp", "instagram"],
     confirmationFlow:
-      "Website /api/order-intent captures a structured source=website intent. Production adapter confirms customer contact, then calls Square and kitchen capacity-aware handoff. Custom, allergy, complaint, and high-value cases include owner-gate metadata for Telegram approval.",
+      "Website /api/order-intent captures a structured source=website intent. /api/availability exposes Square inventory and kitchen capacity when MCP is configured. Production adapter confirms customer contact, then calls Square and kitchen capacity-aware handoff. Custom, allergy, complaint, and high-value cases include owner-gate metadata for Telegram approval.",
+    availabilityRule:
+      "If /api/availability source is conservative-fallback or a tool state is not live, do not promise stock or same-day pickup. Ask for a pickup window and wait for confirmation.",
     leadTimeMinutesDefault: 90,
     leadTimeMinutesCustomName: 180,
   },
