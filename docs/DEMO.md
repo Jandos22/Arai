@@ -176,10 +176,23 @@ cloudflared tunnel --url http://localhost:8787
 Register that public URL with the sandbox MCP:
 
 ```bash
-source scripts/load_env.sh && arai_load_env "$PWD"
-PYTHONPATH=orchestrator orchestrator/.venv/bin/python \
-    -m orchestrator.main \
-    --register-webhooks https://YOUR-QUICK-TUNNEL.trycloudflare.com
+PUBLIC_WEBHOOK_BASE_URL=https://YOUR-QUICK-TUNNEL.trycloudflare.com \
+    bash scripts/register_webhooks.sh
+```
+
+The script calls `whatsapp_register_webhook` with
+`<PUBLIC_WEBHOOK_BASE_URL>/webhooks/whatsapp` and
+`instagram_register_webhook` with
+`<PUBLIC_WEBHOOK_BASE_URL>/webhooks/instagram`. It loads
+`STEPPE_MCP_TOKEN` from `.env.local`, `ARAI_ENV_FILE`, or
+`~/.config/arai/env.local`; never paste real credentials into the command or
+commit them to the repo.
+
+Dry-run the registration path without a token or network call:
+
+```bash
+PUBLIC_WEBHOOK_BASE_URL=https://YOUR-QUICK-TUNNEL.trycloudflare.com \
+    bash scripts/register_webhooks.sh --dry-run
 ```
 
 Local preflight without Cloudflare:
@@ -197,6 +210,17 @@ curl -s http://127.0.0.1:8787/webhooks/instagram \
 The POSTs route into the same dispatcher and handlers used by
 `world_next_event`, `whatsapp_inject_inbound`, and `instagram_inject_dm`.
 Evidence lands in `evidence/orchestrator-run-<id>.jsonl`.
+
+Inbound flow:
+
+```text
+Steppe sandbox WA/IG event
+  -> registered HTTPS tunnel URL
+  -> local /webhooks/whatsapp or /webhooks/instagram
+  -> orchestrator.webhook_server normalizes the payload
+  -> dispatcher.make_dispatcher routes channel:type
+  -> orchestrator/handlers/whatsapp.py or orchestrator/handlers/instagram.py
+```
 
 ### Path D — Owner Telegram bots
 

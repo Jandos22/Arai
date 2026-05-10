@@ -17,6 +17,7 @@ export type CatalogItem = {
   name: string;
   description: string;
   category: string;
+  kitchenProductId?: string;
   imageUrl?: string | null;
   imageAlt?: string | null;
   variations: CatalogVariation[];
