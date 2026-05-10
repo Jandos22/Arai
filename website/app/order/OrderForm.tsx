@@ -16,6 +16,8 @@ export default function OrderForm({ items, initialSlug, initialAttribution }: Pr
   const [quantity, setQuantity] = useState(1);
   const [customerName, setCustomerName] = useState("");
   const [contact, setContact] = useState("");
+  const [fulfillmentType, setFulfillmentType] = useState<"pickup" | "delivery">("pickup");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [pickupDate, setPickupDate] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [notes, setNotes] = useState("");
@@ -39,6 +41,8 @@ export default function OrderForm({ items, initialSlug, initialAttribution }: Pr
         quantity,
         customerName,
         contact,
+        fulfillmentType,
+        deliveryAddress,
         pickupDate,
         pickupTime,
         notes,
@@ -81,13 +85,44 @@ export default function OrderForm({ items, initialSlug, initialAttribution }: Pr
             <input className="mt-2 w-full rounded-xl border border-cream-300 bg-white px-4 py-3" value={contact} onChange={(e) => setContact(e.target.value)} placeholder="+1 ..." />
           </div>
         </div>
+        <fieldset>
+          <legend className="text-sm font-medium text-happy-blue-900">Fulfillment</legend>
+          <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-white p-1 border border-cream-300">
+            {(["pickup", "delivery"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setFulfillmentType(option)}
+                className={`rounded-lg px-4 py-2.5 text-sm font-medium capitalize transition ${
+                  fulfillmentType === option
+                    ? "bg-happy-blue-700 text-cream-50"
+                    : "text-happy-blue-900 hover:bg-cream-100"
+                }`}
+                aria-pressed={fulfillmentType === option}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        {fulfillmentType === "delivery" ? (
+          <div>
+            <label className="text-sm font-medium text-happy-blue-900">Delivery address</label>
+            <input
+              className="mt-2 w-full rounded-xl border border-cream-300 bg-white px-4 py-3"
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              placeholder="Street, city, ZIP"
+            />
+          </div>
+        ) : null}
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-happy-blue-900">Pickup date</label>
+            <label className="text-sm font-medium text-happy-blue-900">{fulfillmentType === "delivery" ? "Delivery date" : "Pickup date"}</label>
             <input className="mt-2 w-full rounded-xl border border-cream-300 bg-white px-4 py-3" type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-medium text-happy-blue-900">Pickup time</label>
+            <label className="text-sm font-medium text-happy-blue-900">{fulfillmentType === "delivery" ? "Delivery time" : "Pickup time"}</label>
             <input className="mt-2 w-full rounded-xl border border-cream-300 bg-white px-4 py-3" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
           </div>
         </div>
@@ -102,8 +137,8 @@ export default function OrderForm({ items, initialSlug, initialAttribution }: Pr
 
       <aside className="rounded-3xl border border-happy-blue-200 p-6 bg-white/70">
         <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">Realtime handoff preview</p>
-        <h2 className="font-display text-2xl text-happy-blue-900 mt-2">Website → cashier → kitchen</h2>
-        <p className="text-sm text-ink/70 mt-3">This prototype captures a structured website order intent. In production, this payload feeds Square and the kitchen capacity-aware handoff used by the orchestrator.</p>
+        <h2 className="font-display text-2xl text-happy-blue-900 mt-2">Website → cashier → payment → kitchen</h2>
+        <p className="text-sm text-ink/70 mt-3">This prototype captures a structured website order intent for pickup, delivery, or scheduled later fulfillment and returns a mock provider-hosted payment link when owner review is not required. In production, this payload feeds Square and the kitchen capacity-aware handoff used by the orchestrator.</p>
         {initialAttribution ? (
           <div className="mt-5 rounded-2xl bg-cream-100 p-4 text-sm text-ink/75">
             <p className="font-medium text-happy-blue-900">Campaign attribution attached</p>

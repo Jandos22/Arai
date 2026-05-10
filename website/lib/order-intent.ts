@@ -6,8 +6,11 @@ export type OrderIntentInput = {
   quantity?: number | null;
   customerName?: string | null;
   contact?: string | null;
+  fulfillmentType?: "pickup" | "delivery" | null;
+  deliveryAddress?: string | null;
   pickupDate?: string | null;
   pickupTime?: string | null;
+  scheduledFor?: string | null;
   notes?: string | null;
   source?: "website" | "assistant";
   attribution?: CampaignAttributionInput | null;
@@ -63,8 +66,11 @@ export type OrderIntent = {
   customer: {
     name: string;
     contact: string;
+    fulfillmentType: "pickup" | "delivery";
+    deliveryAddress?: string;
     pickupDate?: string;
     pickupTime?: string;
+    scheduledFor?: string;
     notes?: string;
   };
   handoff: {
@@ -108,6 +114,22 @@ function compactText(value: string | null | undefined): string | undefined {
 
 function normalizeChannel(value: string | null | undefined): string | undefined {
   return compactText(value)?.toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 40);
+}
+
+function normalizeFulfillmentType(value: string | null | undefined): "pickup" | "delivery" {
+  return value === "delivery" ? "delivery" : "pickup";
+}
+
+function normalizeScheduledFor(
+  scheduledFor: string | null | undefined,
+  pickupDate: string | null | undefined,
+  pickupTime: string | null | undefined,
+): string | undefined {
+  const explicit = compactText(scheduledFor);
+  if (explicit) return explicit;
+  const date = safeText(pickupDate);
+  const time = safeText(pickupTime);
+  return [date, time].filter(Boolean).join("T") || undefined;
 }
 
 function routeCampaignLead(
@@ -187,11 +209,17 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
   const quantity = Math.max(1, Math.min(24, Number(input.quantity ?? 1) || 1));
   const total = Number((variation.priceUsd * quantity).toFixed(2));
   const notes = safeText(input.notes);
+  const fulfillmentType = normalizeFulfillmentType(input.fulfillmentType);
+  const deliveryAddress = fulfillmentType === "delivery" ? compactText(input.deliveryAddress) : undefined;
+  const scheduledFor = normalizeScheduledFor(input.scheduledFor, input.pickupDate, input.pickupTime);
+  const fulfillmentNeedsReview = fulfillmentType === "delivery" && !deliveryAddress;
   const customSignals = /custom|design|theme|name|allerg|refund|complaint|problem|late|wrong/i.test(notes);
   const highValue = total > 80;
-  const ownerRequired = customSignals || highValue;
+  const ownerRequired = customSignals || highValue || fulfillmentNeedsReview;
   const ownerReason = ownerRequired
-    ? highValue
+    ? fulfillmentNeedsReview
+      ? "Delivery requested without a delivery address."
+      : highValue
       ? `Estimated total $${total} exceeds owner-gate threshold.`
       : "Customer notes include custom/allergy/complaint signal."
     : undefined;
@@ -218,8 +246,11 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
     customer: {
       name: safeText(input.customerName, "Website customer"),
       contact: safeText(input.contact, "contact-needed"),
+      fulfillmentType,
+      deliveryAddress,
       pickupDate: safeText(input.pickupDate) || undefined,
       pickupTime: safeText(input.pickupTime) || undefined,
+      scheduledFor,
       notes: notes || undefined,
     },
     handoff: {
@@ -231,7 +262,9 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
           source: input.source ?? "website",
           attribution,
           customerName: safeText(input.customerName, "Website customer"),
-          customerNote: notes || "Website order intent captured; confirm pickup before charging.",
+          customerNote:
+            notes ||
+            `Website order intent captured; confirm ${fulfillmentType} before charging.`,
         },
       },
       kitchen: {
@@ -240,8 +273,11 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
         payloadPreview: {
           customerName: safeText(input.customerName, "Website customer"),
           items: [{ productId: item.kitchenProductId ?? item.id, quantity }],
-          requestedPickupAt: [input.pickupDate, input.pickupTime].filter(Boolean).join("T") || undefined,
-          notes: notes || "Website order intent captured; confirm pickup before prep.",
+          requestedPickupAt: fulfillmentType === "pickup" ? scheduledFor : undefined,
+          requestedDeliveryAt: fulfillmentType === "delivery" ? scheduledFor : undefined,
+          fulfillmentType,
+          deliveryAddress,
+          notes: notes || `Website order intent captured; confirm ${fulfillmentType} before prep.`,
           attribution,
         },
       },
@@ -266,7 +302,7 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
     },
     nextStep: ownerRequired
       ? "Owner review required before cashier/kitchen handoff. The Telegram owner gate receives this context in production."
-      : "Confirm by WhatsApp/SMS, then create Square order and kitchen ticket if capacity allows.",
+      : `Confirm by WhatsApp/SMS, then create Square order and kitchen ticket if ${fulfillmentType} capacity allows.`,
   };
 }
 
