@@ -46,9 +46,10 @@ So bonus only matters if the core is strong. **Step 1 is locking core ≥ 80.** 
 |---|---|---|---|
 | A | custom cake intake | 🟢 | T-013 sales bonus path + website assistant/order-intent escalation metadata |
 | A | complaints / refunds | 🟢 | T-013 complaint path routes high-risk complaints to owner gate |
-| A | allergy-safe communication | 🟡 | owner-gated in sales agent; catalog still has limited structured allergen metadata |
-| A | production capacity | 🟢 | Square→kitchen handoff checks `kitchen_get_capacity` and writes `square_capacity_decision` evidence |
-| A | abandoned orders | 🟡 partial | WhatsApp follow-up due events now check Square context and send reminders; abandoned-cart detection is still not automatic |
+| A | allergy-safe communication | 🟢 | owner-gated in sales agent; `website/data/catalog.fixture.json` ships structured `allergens` arrays per SKU surfaced through `/api/catalog` |
+| A | production capacity | 🟢 | Square→kitchen handoff checks `kitchen_get_capacity` and writes `square_capacity_decision` evidence; reject branch fires live via `scripts/e2e_smoke.sh` (`evidence/e2e-sample.jsonl` carries the redacted row) |
+| A | repeat customers | 🟢 | `orchestrator/customers.py` profile store auto-upserts on every WA/IG inbound; `repeat_customer_detected` + `proposed_reorder` evidence rows; `/account/[id]` page demos seamless reorder |
+| A | abandoned orders | 🟢 | `orchestrator/handlers/abandoned.py` scheduler tick scans `square_recent_orders` for `pending_pickup` ≤ 2h before pickup and emits `whatsapp:follow_up_due`; orchestrator + tests cover the flow |
 | A | reviews | 🟢 | T-007 GMB review-reply path shipped |
 | B | clean deploy | 🟢 | website builds clean (`scripts/test_website.sh`) |
 | B | mobile performance | 🟡 untested | Next.js static, should pass; no Lighthouse yet |
