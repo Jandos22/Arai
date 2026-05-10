@@ -4,7 +4,7 @@
 # Touches all four scoring loops in one bash command, ≤ 5 min wall-clock:
 #
 #   1. Preflight: orchestrator --dry-run
-#   2. Verify .env.local has STEPPE_MCP_TOKEN
+#   2. Verify env has STEPPE_MCP_TOKEN
 #   3. Sanity-check MCP wiring via tools/list (>= 50 tools)
 #   4. Start orchestrator on a bounded scenario (background)
 #   5. Inject WA + IG + GMB events to exercise the channel handlers
@@ -64,21 +64,19 @@ else
 fi
 
 # ---------- 2. Token -------------------------------------------------------
-yellow "[2/7] Verify STEPPE_MCP_TOKEN in .env.local"
-if [[ ! -f .env.local ]]; then
-  red "  .env.local missing — copy .env.example and fill STEPPE_MCP_TOKEN"
+yellow "[2/7] Verify STEPPE_MCP_TOKEN in env"
+# shellcheck disable=SC1091
+source scripts/load_env.sh
+if ! arai_load_env "$repo_root"; then
+  red "  env missing — create .env.local or ~/.config/arai/env.local with STEPPE_MCP_TOKEN"
   exit 1
 fi
-set -a
-# shellcheck disable=SC1091
-source .env.local
-set +a
 if [[ -z "${STEPPE_MCP_TOKEN:-}" ]]; then
-  red "  STEPPE_MCP_TOKEN not set after sourcing .env.local"
+  red "  STEPPE_MCP_TOKEN not set after loading env"
   exit 1
 fi
 : "${STEPPE_MCP_URL:=https://www.steppebusinessclub.com/api/mcp}"
-green "  STEPPE_MCP_TOKEN present, MCP URL=${STEPPE_MCP_URL}"
+green "  STEPPE_MCP_TOKEN present, MCP URL=${STEPPE_MCP_URL}, env=${ARAI_ENV_FILE_LOADED}"
 
 # ---------- 3. Tool list sanity --------------------------------------------
 yellow "[3/7] MCP tools/list — assert >= 50 tools"

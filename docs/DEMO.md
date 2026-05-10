@@ -27,15 +27,18 @@ See [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) for the diagram.
 ## Setup (≤ 3 min from a fresh clone)
 
 You need: `node ≥20`, `python ≥3.11`, `uv` (or `pip + venv`), `jq`, a
-Steppe MCP team token, and (optionally) Telegram bot tokens.
+Steppe MCP team token, and (optionally) Telegram bot tokens. For the
+webhook-tunnel demo path, install `cloudflared`.
 
 ```bash
 git clone https://github.com/Jandos22/Arai.git
 cd Arai
 
-# Token + (optional) bot tokens
+# Token + (optional) bot tokens. For multiple worktrees, prefer the
+# shared path instead of copying secrets into each checkout:
 cp .env.example .env.local
 $EDITOR .env.local   # paste STEPPE_MCP_TOKEN at minimum
+mkdir -p ~/.config/arai && cp .env.example ~/.config/arai/env.local
 
 # Python
 cd orchestrator
@@ -134,7 +137,7 @@ the evaluator runs, but without the smoke's bounded budget — useful when
 you want to watch a longer run.
 
 ```bash
-set -a; source .env.local; set +a
+source scripts/load_env.sh && arai_load_env "$PWD"
 PYTHONPATH=orchestrator orchestrator/.venv/bin/python \
     -m orchestrator.main \
     --scenario launch-day-revenue-engine \
@@ -150,7 +153,52 @@ While it runs, peek at:
 For the bounded, evaluator-aligned version, use `bash
 scripts/e2e_smoke.sh` (above).
 
-### Path C — Owner Telegram bots
+### Path C — Cloudflare Tunnel webhook adapter
+
+This satisfies the brief's "inbound webhooks tunnel home" runtime shape
+without using real WhatsApp/Instagram production credentials. Terminal 1:
+
+```bash
+source scripts/load_env.sh && arai_load_env "$PWD"
+PYTHONPATH=orchestrator orchestrator/.venv/bin/python \
+    -m orchestrator.main \
+    --webhook-server \
+    --port 8787
+```
+
+Terminal 2:
+
+```bash
+cloudflared tunnel --url http://localhost:8787
+# copy the https://*.trycloudflare.com URL
+```
+
+Register that public URL with the sandbox MCP:
+
+```bash
+source scripts/load_env.sh && arai_load_env "$PWD"
+PYTHONPATH=orchestrator orchestrator/.venv/bin/python \
+    -m orchestrator.main \
+    --register-webhooks https://YOUR-QUICK-TUNNEL.trycloudflare.com
+```
+
+Local preflight without Cloudflare:
+
+```bash
+curl -s http://127.0.0.1:8787/healthz | jq
+curl -s http://127.0.0.1:8787/webhooks/whatsapp \
+  -H 'content-type: application/json' \
+  -d '{"from":"+12815550100","message":"Do you have honey cake today?"}' | jq
+curl -s http://127.0.0.1:8787/webhooks/instagram \
+  -H 'content-type: application/json' \
+  -d '{"threadId":"ig-demo","from":"maya","message":"Birthday cake?"}' | jq
+```
+
+The POSTs route into the same dispatcher and handlers used by
+`world_next_event`, `whatsapp_inject_inbound`, and `instagram_inject_dm`.
+Evidence lands in `evidence/orchestrator-run-<id>.jsonl`.
+
+### Path D — Owner Telegram bots
 
 The brief allows "one bot per agent". Three optional bots, owner-only,
 all reuse the orchestrator's MCP client + evidence logger:
@@ -216,7 +264,9 @@ If you have an extra 5 minutes, these are the most informative pokes:
   future bounded run returns lower, check whether the cumulative audit log
   already contains the complete path before treating it as a regression.
 - **No real WA/IG/POS:** every inbound and outbound message lives in the
-  sandbox — `*_inject_*` test tools are the entry point.
+  sandbox. The Cloudflare/ngrok adapter accepts sandbox/test webhook
+  payloads; `*_inject_*` and `world_next_event` remain the evaluator
+  source of truth.
 
 ---
 

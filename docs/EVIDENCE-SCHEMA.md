@@ -55,7 +55,25 @@ Variants of `subkind`:
 Outcome of a `claude -p` subprocess invocation.
 ```json
 {"kind":"claude_run","label":"whatsapp_inbound","ok":true,
- "project":"agents/sales","promptPreview":"...","responsePreview":"..."}
+ "project":"agents/sales","promptPreview":"...","responsePreview":"...",
+ "toolUseCount":2}
+```
+
+### `agent_tool_use`
+Every streamed Claude Code MCP tool call parsed from
+`--output-format stream-json --verbose`.
+```json
+{"kind":"agent_tool_use","label":"whatsapp_inbound",
+ "project":"agents/sales","tool":"mcp__happycake__whatsapp_send",
+ "args":{"to":"+128...","message":"..."}}
+```
+
+### `channel_outbound`
+Convenience proof row emitted for customer-facing send tools.
+```json
+{"kind":"channel_outbound","channel":"whatsapp",
+ "tool":"mcp__happycake__whatsapp_send","recipient":"+128...",
+ "bodyPreview":"Honey cake is available today..."}
 ```
 
 ### `dispatch_drop`, `dispatch_error`

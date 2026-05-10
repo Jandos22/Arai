@@ -7,7 +7,7 @@
 #   bash scripts/evaluator_preview.sh
 #
 # Requires:
-#   .env.local with STEPPE_MCP_TOKEN
+#   .env.local or ~/.config/arai/env.local with STEPPE_MCP_TOKEN
 #   curl, jq
 #
 # Output: prints a compact summary to stdout AND writes the full responses to
@@ -20,14 +20,11 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
-if [[ -f .env.local ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source .env.local
-  set +a
-fi
+# shellcheck disable=SC1091
+source scripts/load_env.sh
+arai_load_env "$repo_root" || true
 
-: "${STEPPE_MCP_TOKEN:?STEPPE_MCP_TOKEN not set in .env.local}"
+: "${STEPPE_MCP_TOKEN:?STEPPE_MCP_TOKEN not set in .env.local, ARAI_ENV_FILE, or ~/.config/arai/env.local}"
 : "${STEPPE_MCP_URL:=https://www.steppebusinessclub.com/api/mcp}"
 
 mkdir -p evidence
@@ -37,7 +34,10 @@ out="evidence/evaluator-preview-${ts}.json"
 # Helper: call a tool, return the JSON-decoded `result.content[0].text` payload.
 call_tool() {
   local tool="$1"
-  local args="${2:-{\}}"
+  local args="${2:-}"
+  if [[ -z "$args" ]]; then
+    args="{}"
+  fi
   local body
   body=$(jq -n \
     --arg method "tools/call" \
@@ -62,7 +62,7 @@ sc_pos=$(call_tool evaluator_score_pos_kitchen_flow)
 sc_channel=$(call_tool evaluator_score_channel_response)
 sc_world=$(call_tool evaluator_score_world_scenario)
 team_report=$(call_tool evaluator_generate_team_report \
-  '{"repoUrl":"https://github.com/Jandos22/Arai","notes":"Arai — Jan Solo team, hackathon submission preview"}')
+  '{"repoUrl":"https://github.com/Jandos22/Arai","notes":"Arai - Jan Solo team, hackathon submission preview"}')
 
 jq -n \
   --argjson evidence "$ev_summary" \

@@ -278,6 +278,7 @@ The README documents it.
 - Marketing demand engine — `agents/marketing/` (T-006, shipped)
 - Kitchen state-machine moves + GMB review replies — `agents/ops/` (T-007)
 - Telegram bot wiring + scenario loop — `orchestrator/` (T-003, shipped)
-- Real Meta/WhatsApp Business APIs or ngrok inbound webhooks — sandbox
-  `whatsapp_inject_inbound` / `instagram_inject_dm` are enough for both
-  development and the evaluator
+- Real Meta/WhatsApp Business APIs — forbidden by the brief. The local
+  Cloudflare/ngrok webhook adapter may receive sandbox/test webhook payloads,
+  but `whatsapp_inject_inbound`, `instagram_inject_dm`, and `world_next_event`
+  remain the source of truth for development and evaluator evidence.
