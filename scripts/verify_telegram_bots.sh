@@ -110,16 +110,17 @@ api_call() {
   local url="https://api.telegram.org/bot${token}/${method}"
 
   if [[ -n "$payload" ]]; then
-    curl -fsS \
+    curl -sS \
       -H "Content-Type: application/json" \
       -d "$payload" \
       "$url"
   else
-    curl -fsS "$url"
+    curl -sS "$url"
   fi
 }
 
 parse_get_me() {
+  local role="$1"
   python3 -c '
 import json
 import sys
@@ -141,7 +142,7 @@ username = result.get("username") or "(no username)"
 first_name = result.get("first_name") or "(no display name)"
 bot_id = result.get("id") or "?"
 print(f"{role}: @{username} ({first_name}) id={bot_id}")
-'
+' "$role"
 }
 
 send_test_message() {
@@ -168,6 +169,8 @@ data = json.load(sys.stdin)
 if not data.get("ok"):
     desc = data.get("description") or "unknown Telegram API error"
     print(f"{role}: sendMessage failed: {desc}", file=sys.stderr)
+    if "chat not found" in desc.lower():
+        print(f"{role}: open this bot in Telegram and send /start, then retry.", file=sys.stderr)
     sys.exit(4)
 print(f"{role}: test message sent")
 ' "$role"
@@ -196,12 +199,19 @@ green "All bot tokens are valid."
 if [[ "$SEND_TEST" -eq 1 ]]; then
   plain ""
   yellow "[2/2] Send test messages to TELEGRAM_OWNER_CHAT_ID"
+  send_failures=0
   for role_spec in "${roles[@]}"; do
     role="${role_spec%%:*}"
     token_var="${role_spec#*:}"
     token="${!token_var}"
-    send_test_message "$role" "$token"
+    if ! send_test_message "$role" "$token"; then
+      send_failures=$((send_failures + 1))
+    fi
   done
+  if (( send_failures > 0 )); then
+    red "${send_failures} test message(s) failed."
+    exit 1
+  fi
   green "All test messages sent."
 else
   plain ""

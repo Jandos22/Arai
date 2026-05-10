@@ -24,13 +24,13 @@ approval-gated actions. Run these for owner ergonomics.
 
    | Display name | Suggested username | Env var |
    |---|---|---|
-   | `Arai HappyCake Owner` | `@arai_tbot` | `TELEGRAM_BOT_TOKEN_OWNER` |
-   | `Arai HappyCake Sales` | `AraiHappyCakeSalesBot` | `TELEGRAM_BOT_TOKEN_SALES` |
-   | `Arai HappyCake Ops` | `AraiHappyCakeOpsBot` | `TELEGRAM_BOT_TOKEN_OPS` |
-   | `Arai HappyCake Marketing` | `AraiHappyCakeMarketingBot` | `TELEGRAM_BOT_TOKEN_MARKETING` |
+   | `Arai` | `@arai_tbot` | `TELEGRAM_BOT_TOKEN_OWNER` |
+   | `Arai Sales` | `@arai_sales_tbot` | `TELEGRAM_BOT_TOKEN_SALES` |
+   | `Arai Ops` | `@arai_ops_tbot` | `TELEGRAM_BOT_TOKEN_OPS` |
+   | `Arai Marketing` | `@arai_mark_bot` | `TELEGRAM_BOT_TOKEN_MARKETING` |
 
    If an exact username is unavailable, choose the nearest available
-   `Arai...Bot` variant and keep the display name role-specific.
+   `arai_*_bot` variant and keep the display name role-specific.
 2. Paste the tokens into `.env.local` or `~/.config/arai/env.local` next to
    `STEPPE_MCP_TOKEN`. Never commit these values.
    ```
@@ -45,6 +45,9 @@ approval-gated actions. Run these for owner ergonomics.
    ```bash
    curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN_OWNER/getUpdates" | jq '.result[].message.chat.id'
    ```
+   If `getUpdates` returns an empty list even after sending `/start`, use a
+   Telegram identity helper such as `@userinfobot` to get your numeric user
+   id, then paste that value into `TELEGRAM_OWNER_CHAT_ID`.
 5. Verify the tokens without printing secrets:
    ```bash
    bash scripts/verify_telegram_bots.sh
