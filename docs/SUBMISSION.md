@@ -43,6 +43,18 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | Submission form has correct repo link | https://www.steppebusinessclub.com/hackathon/submit — captain submits with `https://github.com/Jandos22/Arai` |
 | Final commit before May 10, 10:00 CT | T-010 dress rehearsal at ~09:00 CT |
 
+## Ground-rules compliance audit
+
+Checked against the hackathon hard rules and GitHub issue #7.
+
+| Rule | Result | Evidence |
+|---|---|---|
+| Judged agent runtime is Claude Code CLI via `claude -p` | ✅ | [`/orchestrator/claude_runner.py`](../orchestrator/claude_runner.py), [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) |
+| No Claude Agent SDK, LangGraph, CrewAI, n8n, or alternate LLM provider in runtime deps | ✅ | Dependency scan of `website/package*.json`, `orchestrator/requirements.txt`, `orchestrator/pyproject.toml`, `agents/`, and `bots/` returned no runtime matches |
+| Owner-facing UI is Telegram only | ✅ | [`/orchestrator/telegram_bot.py`](../orchestrator/telegram_bot.py), [`/bots/README.md`](../bots/README.md); no email/web-dashboard owner surface |
+| No real Happy Cake/Square/WhatsApp/Instagram/payment credentials in repo | ✅ | `.env.local` is gitignored; `.env.example` contains placeholders only |
+| Full-history secret scan | ✅ | Full-history scan for real Steppe team-token, bearer-token, and Telegram bot-token patterns returned no matches; only documented placeholders and redaction-test fixtures were present |
+
 ## Scoring (brief §9)
 
 **Core = 100 points. Bonus = up to +15. Cap = 115.**
