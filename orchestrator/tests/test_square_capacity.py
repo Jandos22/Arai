@@ -183,7 +183,8 @@ def test_reject_path_when_capacity_is_short_routes_to_owner_review():
     assert decision["remainingMinutes"] == 40
     assert "Capacity short" in decision["reason"]
 
-    assert captured_status["status"] == "delayed_or_needs_owner_review"
+    assert captured_status["status"] == "open"
+    assert captured_status["note"].startswith("Delayed / needs owner review:")
 
     assert len(notifier.calls) == 1
     assert "delayed" in notifier.calls[0]["summary"].lower()

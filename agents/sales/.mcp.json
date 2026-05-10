@@ -5,7 +5,21 @@
       "url": "${STEPPE_MCP_URL}",
       "headers": {
         "X-Team-Token": "${STEPPE_MCP_TOKEN}"
-      }
+      },
+      "enabledTools": [
+        "square_list_catalog",
+        "square_get_inventory",
+        "square_recent_orders",
+        "kitchen_get_capacity",
+        "kitchen_get_menu_constraints",
+        "whatsapp_list_threads",
+        "instagram_list_dm_threads",
+        "whatsapp_send",
+        "instagram_send_dm",
+        "instagram_reply_to_comment",
+        "square_create_order",
+        "kitchen_create_ticket"
+      ]
     }
   }
 }

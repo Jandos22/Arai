@@ -20,7 +20,8 @@
 #
 # Tunables (env):
 #   SMOKE_SCENARIO       (default launch-day-revenue-engine)
-#   SMOKE_MAX_EVENTS     (default 13 — covers 6 seeded + 5 injects + slack)
+#   SMOKE_SEED           (default 9100510 — launch-day seed from the kit)
+#   SMOKE_MAX_EVENTS     (default 14 — covers 6 seeded + 6 injects + slack)
 #   SMOKE_ORCH_TIMEOUT   (default 420 — hard wall-clock kill, seconds)
 #   PYTHON               (default orchestrator/.venv/bin/python)
 #
@@ -32,7 +33,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 SCENARIO="${SMOKE_SCENARIO:-launch-day-revenue-engine}"
-MAX_EVENTS="${SMOKE_MAX_EVENTS:-13}"
+SEED="${SMOKE_SEED:-9100510}"
+MAX_EVENTS="${SMOKE_MAX_EVENTS:-14}"
 ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-420}"
 PYTHON="${PYTHON:-orchestrator/.venv/bin/python}"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -45,7 +47,7 @@ plain()  { printf '%s\n' "$*"; }
 START_EPOCH=$(date +%s)
 
 plain "=== Arai E2E Smoke @ ${TS} ==="
-plain "scenario=${SCENARIO}  max_events=${MAX_EVENTS}  budget=${ORCH_TIMEOUT}s"
+plain "scenario=${SCENARIO}  seed=${SEED}  max_events=${MAX_EVENTS}  budget=${ORCH_TIMEOUT}s"
 plain ""
 
 # ---------- 1. Preflight ---------------------------------------------------
@@ -103,6 +105,7 @@ yellow "[4/7] Start orchestrator (bg) scenario=${SCENARIO} max-events=${MAX_EVEN
 ORCH_LOG="/tmp/arai-smoke-orchestrator-${TS}.log"
 PYTHONPATH=orchestrator "$PYTHON" -m orchestrator.main \
     --scenario "$SCENARIO" \
+    --seed "$SEED" \
     --max-events "$MAX_EVENTS" \
     --log-level INFO \
     > "$ORCH_LOG" 2>&1 &
@@ -127,7 +130,7 @@ for _ in $(seq 1 30); do
 done
 
 # ---------- 5. Inject sanity events ---------------------------------------
-yellow "[5/7] Inject WA + IG + GMB sanity events"
+yellow "[5/7] Inject WA + IG + GMB + Square sanity events"
 
 call_tool() {
   # $1 tool name, $2 args (JSON object as string). Default args = empty object.
@@ -170,7 +173,11 @@ inj_wa_followup=$(call_tool world_inject_event \
   "$(jq -nc --arg ts "$TS" '{channel:"whatsapp", type:"follow_up_due", payload:{to:"+12815550100", pickupAt:"tomorrow at 4pm", source:"growth_bonus_smoke"}}')" | extract_text)
 plain "  WA  inject (follow)  -> ${inj_wa_followup:-(empty)}" | head -c 200; plain ""
 
-green "  injected 5 events (1 order + 1 inquiry + 1 IG DM + 1 GMB review + 1 WA follow-up)"
+inj_square_reject=$(call_tool world_inject_event \
+  "$(jq -nc --arg ts "$TS" '{channel:"square", type:"walk_in_order", priority:"urgent", payload:{source:"walk-in", customerName:"Smoke Custom Walk-in", items:[{variationId:"sq_var_custom_birthday_cake", quantity:1, note:("custom-work reject branch smoke "+$ts)}]}}')" | extract_text)
+plain "  POS inject (reject)  -> ${inj_square_reject:-(empty)}" | head -c 200; plain ""
+
+green "  injected 6 events (1 order + 1 inquiry + 1 IG DM + 1 GMB review + 1 WA follow-up + 1 Square reject)"
 
 # ---------- 6. Wait for orchestrator with hard wall-clock kill ------------
 yellow "[6/7] Wait for orchestrator (hard timeout ${ORCH_TIMEOUT}s)"
@@ -267,14 +274,27 @@ if (( ok )); then
   yellow "Capturing redacted evidence sample (last 50 lines)"
   latest=$(ls -t evidence/orchestrator-run-*.jsonl 2>/dev/null | head -1 || true)
   if [[ -n "$latest" && -s "$latest" ]]; then
-    tail -n 50 "$latest" \
-      | sed -E 's/sbc_team_[A-Za-z0-9_-]+/[REDACTED]/g' \
+    sample_tmp="$(mktemp)"
+    {
+      grep -E '"kind": "square_capacity_decision".*"decision": "reject"|"decision": "reject".*"kind": "square_capacity_decision"|"kind": "owner_msg".*"subkind": "approval_request"|"subkind": "approval_request".*"kind": "owner_msg"' "$latest" || true
+      tail -n 50 "$latest"
+    } | awk '!seen[$0]++' > "$sample_tmp"
+    sed -E 's/sbc_team_[A-Za-z0-9_-]+/[REDACTED]/g' "$sample_tmp" \
       | sed -E 's/(Bearer[[:space:]]+)[A-Za-z0-9._-]{20,}/\1[REDACTED]/g' \
       | sed -E 's/(X-Team-Token["'\''[:space:]:=]+)[A-Za-z0-9_-]{16,}/\1[REDACTED]/g' \
       > evidence/e2e-sample.jsonl
+    rm -f "$sample_tmp"
     if grep -iE 'sbc_team|bearer ' evidence/e2e-sample.jsonl >/dev/null; then
       red "  WARNING: token-like content remains in evidence/e2e-sample.jsonl"
       exit 2
+    fi
+    if ! grep -E '"kind": "square_capacity_decision".*"decision": "reject"|"decision": "reject".*"kind": "square_capacity_decision"' evidence/e2e-sample.jsonl >/dev/null; then
+      red "  reject-branch square_capacity_decision missing from evidence/e2e-sample.jsonl"
+      exit 3
+    fi
+    if ! grep -E '"context": \{[^}]*"channel": "square"[^}]*"decision": "reject"[^}]*\}.*"kind": "owner_msg".*"subkind": "approval_request"' evidence/e2e-sample.jsonl >/dev/null; then
+      red "  Square reject owner approval request missing from evidence/e2e-sample.jsonl"
+      exit 3
     fi
     green "  wrote evidence/e2e-sample.jsonl ($(wc -l < evidence/e2e-sample.jsonl | tr -d ' ') lines)"
   else

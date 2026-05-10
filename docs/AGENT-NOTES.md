@@ -150,6 +150,60 @@ orders skip all MCP writes until approval.
 The `/assistant` page is a lightweight UI over that API, so judges do not need
 to script raw HTTP to test the assistant.
 
+## Sample Agent Tasks
+
+These are concrete prompt-and-response pairs a customer-side agent can mimic.
+They use only the stable website contracts above and avoid brittle HTML
+scraping.
+
+### 1. Browse Catalog
+
+**User prompt**
+
+> Find a ready-made cake for a family dinner tonight in Sugar Land. Keep it
+> simple and tell me how to order.
+
+**Agent response**
+
+I checked `GET /agent.json` and `GET /api/catalog`. HappyCake sells
+ready-made traditional cakes in Sugar Land and points orders to
+`/order?product={slug}`, WhatsApp, or Instagram. A good fit is cake "Honey"
+if it is present in the catalog: choose an available variation, confirm the
+pickup window from its `leadTimeMinutes`, then open `/order?product=honey-cake`
+or send the same product, size, quantity, name, and pickup time through
+WhatsApp for cashier confirmation.
+
+### 2. Refuse a Custom Request
+
+**User prompt**
+
+> Order me a three-tier unicorn photo cake with gluten-free sponge for tomorrow.
+
+**Agent response**
+
+I checked `GET /agent.json` and `GET /api/policies`. HappyCake is not a
+custom-cake bakery, does not promise special allergen-safe builds, and routes
+custom decoration outside owner review. I should not place this as an order.
+The safe alternative is to offer a ready-made cake from `/api/catalog`, such
+as cake "Honey" or cake "Milk Maiden" when available, and mention that a small
+piped name may be requested only as an owner-reviewed note.
+
+### 3. Capture Order Intent
+
+**User prompt**
+
+> Order one medium cake "Honey" for Maria, pickup tomorrow at 4 PM. Phone is
+> +1 281 555 0100.
+
+**Agent response**
+
+I checked `GET /api/catalog` for the product slug and variation, then submitted
+`POST /api/order-intent` with `source=website`, customer name, phone, selected
+variation, quantity `1`, and pickup window. The response gives the cashier
+handoff, estimated total, and kitchen handoff metadata. Because the website
+does not charge cards, I should tell Maria the order intent is captured and
+HappyCake will confirm before production or payment.
+
 ## Contract verification
 
 `scripts/test_website.sh` runs against a fresh `npm run build` + `npm start`
