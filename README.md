@@ -8,7 +8,7 @@ Built for the **Steppe Business Club Hackathon** — May 9–10, 2026.
 
 ## What this is
 
-A vertical slice that takes a customer from interest → order → kitchen handoff → owner approval, plus an agent-readable storefront and a $500/mo marketing plan. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and [`CLAUDE.md`](CLAUDE.md) for the team contract.
+A vertical slice that takes a customer from interest → website/WhatsApp/Instagram order intent → POS/cashier → kitchen handoff → owner approval, plus an agent-readable storefront, browser-testable on-site assistant, and a $500/mo marketing plan. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and [`CLAUDE.md`](CLAUDE.md) for the team contract.
 
 ## Quickstart (fresh clone)
 
@@ -18,8 +18,10 @@ cd Arai
 cp .env.example .env.local
 # → fill in STEPPE_MCP_TOKEN (from your team launch kit) and Telegram bot tokens
 
-# website (Next.js storefront)
+# website (Next.js storefront + /order + /assistant)
 cd website && npm install && npm run dev          # http://localhost:3000
+# browser routes: /menu, /order, /assistant
+# agent APIs: /agent.json, /api/catalog, /api/policies, /api/order-intent, /api/assistant
 
 # orchestrator (Python spine — scenario loop, dispatcher, evidence)
 cd ../orchestrator
@@ -53,7 +55,7 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders 
 
 ## Verification scripts
 
-- [`scripts/test_website.sh`](scripts/test_website.sh) — build + smoke the agent-readable surface (no token needed)
+- [`scripts/test_website.sh`](scripts/test_website.sh) — build + smoke website routes, order-intent API, assistant API, and agent-readable surface (no token needed)
 - [`scripts/evaluator_preview.sh`](scripts/evaluator_preview.sh) — call all four `evaluator_score_*` tools + team report against the live sandbox
 
 ## Security

@@ -138,12 +138,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         )}
 
-        <a
-          href={waUrl}
-          className="mt-8 inline-block rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium"
-        >
-          Order on WhatsApp
-        </a>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a
+            href={`/order?product=${item.slug}`}
+            className="inline-block rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium"
+          >
+            Start website order
+          </a>
+          <a
+            href={waUrl}
+            className="inline-block rounded-full border border-happy-blue-700 text-happy-blue-700 px-6 py-3 hover:bg-happy-blue-200/40 font-medium"
+          >
+            Order on WhatsApp
+          </a>
+        </div>
       </div>
     </article>
   );

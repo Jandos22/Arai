@@ -13,12 +13,13 @@ A customer-side agent (think: someone's personal AI assistant tasked with
 2. **Read** product data, prices, and policies from a stable JSON contract.
 3. **Decide** whether HappyCake meets the user's need (custom cake? same-day
    pickup? gluten-free?).
-4. **Act** — drop into a confirmable order channel (WhatsApp deeplink) with
-   the right context pre-filled.
-5. **Refuse cleanly** when HappyCake doesn't sell what was asked (custom
+4. **Act** — capture a structured website order intent (`/api/order-intent`) or
+   drop into WhatsApp/Instagram with context pre-filled.
+5. **Escalate** custom/allergy/complaint/high-value cases with explicit owner-gate metadata.
+6. **Refuse cleanly** when HappyCake doesn't sell what was asked (custom
    sculpted cake, dietary specials we can't promise) — without inventing.
 
-The website provides four contracts to make all five steps mechanical.
+The website provides six contracts to make those steps mechanical.
 
 ## Contract #1 — `/agent.json` (well-known descriptor)
 
@@ -37,13 +38,17 @@ Shape (see `website/app/agent.json/route.ts` for the live source):
   "endpoints": {
     "catalog": "/api/catalog",
     "policies": "/api/policies",
+    "assistant": "/api/assistant",
+    "orderIntent": "/api/order-intent",
     "productPage": "/p/{slug}",
-    "menu": "/menu"
+    "menu": "/menu",
+    "orderPage": "/order?product={slug}",
+    "assistantPage": "/assistant"
   },
-  "capabilities": ["browse_catalog", "read_policies", "deeplink_whatsapp_order", "deeplink_instagram_dm"],
-  "notSupported": ["online_payment_on_site", "real_time_order_status_via_website", "custom_decoration_requests_outside_owner_review"],
+  "capabilities": ["browse_catalog", "read_policies", "capture_website_order_intent", "onsite_assistant_product_guidance", "owner_gate_escalation_metadata", "deeplink_whatsapp_order", "deeplink_instagram_dm"],
+  "notSupported": ["online_payment_on_site", "website_direct_charge_without_cashier_confirmation", "custom_decoration_requests_outside_owner_review"],
   "hints": {
-    "preferredOrderChannels": ["whatsapp", "instagram"],
+    "preferredOrderChannels": ["website_order_intent", "whatsapp", "instagram"],
     "confirmationFlow": "...",
     "leadTimeMinutesDefault": 90,
     "leadTimeMinutesCustomName": 180
@@ -62,9 +67,8 @@ customer-side agent that reads this knows immediately not to invent a
 `GET /api/catalog` → JSON array of products with stable IDs, slugs,
 variations, prices, lead times, allergens. Source-of-truth is the sandbox
 MCP `square_list_catalog` tool, snapshotted at build time by
-`website/scripts/snapshot-catalog.ts`. A `_orderPath` field tells the agent
-how to convert intent into action (WhatsApp deeplink with pre-filled
-message).
+`website/scripts/snapshot-catalog.ts`. Product pages link to `/order?product=<slug>`
+for a browser-native intake flow and still keep WhatsApp as a fall-back channel.
 
 Cache header: `public, max-age=300` — agents can poll cheaply.
 
@@ -112,6 +116,33 @@ canonical `schema.org/Product` shape:
 Agents that prefer schema.org over our custom JSON can use this; both
 contracts agree. Verified by `scripts/test_website.sh`.
 
+## Contract #5 — `/api/order-intent` (website order intake)
+
+`POST /api/order-intent` captures `source=website` order intent and returns:
+
+- selected product/variation/quantity + estimated total
+- customer contact + pickup window
+- cashier handoff preview (`square_create_order`)
+- kitchen handoff preview (`kitchen_create_ticket` after capacity check)
+- owner-gate decision for custom/allergy/complaint/high-value cases
+
+This route deliberately does **not** charge cards. It is the safe browser-facing
+adapter seam between the future production website and the already-working
+sandbox POS/kitchen flow.
+
+## Contract #6 — `/api/assistant` + `/assistant` (on-site assistant)
+
+`POST /api/assistant` handles evaluator-driveable browser questions:
+
+- product guidance from catalog facts
+- custom cake consultation + owner-gate escalation
+- complaint/remediation triage
+- order-status triage
+- pickup/policy/allergen answers
+
+The `/assistant` page is a lightweight UI over that API, so judges do not need
+to script raw HTTP to test the assistant.
+
 ## Contract verification
 
 `scripts/test_website.sh` runs against a fresh `npm run build` + `npm start`
@@ -120,8 +151,10 @@ and asserts:
 - `/agent.json` returns a non-empty `name` + `capabilities`
 - `/api/catalog` returns ≥1 item, each with `id`/`slug`/`name`/`variations`
 - `/api/policies` returns the canonical business + ordering shape
+- `/api/order-intent` returns `source=website` POS/kitchen handoff metadata
+- `/api/assistant` returns owner-gated custom-order triage
 - Every product page contains `application/ld+json`
-- All static pages return HTTP 200
+- `/`, `/menu`, `/about`, `/policies`, `/order`, and `/assistant` render HTTP 200
 
 Exit code is the contract: 0 means an autonomous agent will not be
 surprised; non-zero means we shipped a regression.

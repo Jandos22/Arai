@@ -28,10 +28,16 @@ export default function Home() {
               See the cakes
             </a>
             <a
-              href="https://wa.me/12815551234?text=Hi%20HappyCake%21%20I%27d%20like%20to%20order."
+              href="/order"
               className="rounded-full border border-happy-blue-700 text-happy-blue-700 px-6 py-3 hover:bg-happy-blue-200/40 font-medium"
             >
-              Order on WhatsApp
+              Start website order
+            </a>
+            <a
+              href="/assistant"
+              className="rounded-full border border-coral text-coral px-6 py-3 hover:bg-coral/10 font-medium"
+            >
+              Ask cake assistant
             </a>
           </div>
         </div>

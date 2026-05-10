@@ -12,11 +12,11 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | README with setup from a fresh clone | [`/README.md`](../README.md) | ✅ |
 | ARCHITECTURE.md with agents, routing, MCP usage, owner-bot mapping | [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) | ✅ |
 | `.env.example` with placeholders only | [`/.env.example`](../.env.example) | ✅ — verified clean |
-| Website / storefront instructions | [`/website/README.md`](../website/README.md) | ✅ |
+| Website / storefront instructions | [`/website/README.md`](../website/README.md), [`/order`](../website/app/order/page.tsx), [`/assistant`](../website/app/assistant/page.tsx) | ✅ |
 | Production or local deploy notes | [`/website/README.md`](../website/README.md), [`/orchestrator/README.md`](../orchestrator/README.md) | ✅ |
 | Business-impact hypothesis incl. $500 case | [`/docs/MARKETING.md`](MARKETING.md) | ✅ — `evaluator_score_marketing_loop` 100/100 |
 | Agent-friendly website notes | [`/docs/AGENT-NOTES.md`](AGENT-NOTES.md) | ✅ |
-| On-site assistant test script | [`/scripts/test_website.sh`](../scripts/test_website.sh) | ✅ — exits 0 on green |
+| On-site assistant test script | [`/scripts/test_website.sh`](../scripts/test_website.sh), [`/api/assistant`](../website/app/api/assistant/route.ts) | ✅ — exercises custom-order escalation and exits 0 on green |
 | List of Telegram bots and what each does | [`/bots/README.md`](../bots/README.md) + [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) | ✅ |
 | Post-hackathon real-adapter path | [`/docs/PRODUCTION-PATH.md`](PRODUCTION-PATH.md) | ✅ |
 | **Never commit secrets** | `.gitignore` blocks `.env*`, `*.token`, etc. Pre-flight check: `git diff --cached \| grep -iE 'sbc_team\|Bearer'` empty | ✅ |
@@ -55,7 +55,7 @@ The four `evaluator_score_*` MCP tools are **preview checks** teams can run agai
 | Loop | What it scores | Where we cover it |
 |---|---|---|
 | `evaluator_score_marketing_loop` | $500 → $5K demand engine | T-006 — `agents/marketing/` + `docs/MARKETING.md` |
-| `evaluator_score_pos_kitchen_flow` | Order intake → kitchen handoff | T-005 — `agents/sales/` |
+| `evaluator_score_pos_kitchen_flow` | Order intake → kitchen handoff | Website `/api/order-intent` + seeded Square handler + T-005 sales |
 | `evaluator_score_channel_response` | WA / IG / GMB reply quality | T-005 (sales side) + T-007 (ops side) |
 | `evaluator_score_world_scenario` | Deterministic scenario + audit log | T-003 orchestrator + T-008 e2e smoke |
 

@@ -112,8 +112,45 @@ else
   failures=$((failures+1))
 fi
 
-# 5. Static pages render (not 404)
-for path in "/" "/menu" "/about" "/policies"; do
+# 5. Website order-intent API creates source=website handoff metadata
+order_payload=$(python3 - <<PY
+import json
+print(json.dumps({
+  "productSlug": "$slug",
+  "quantity": 1,
+  "customerName": "Website Smoke",
+  "contact": "+12815550000",
+  "pickupDate": "2026-05-10",
+  "pickupTime": "12:00",
+  "notes": "website smoke order"
+}))
+PY
+)
+order_intent=$(curl -sS -X POST "${BASE}/api/order-intent" -H 'Content-Type: application/json' --data "$order_payload")
+echo "$order_intent" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+intent = d["intent"]
+assert intent["source"] == "website"
+assert intent["handoff"]["cashier"]["tool"] == "square_create_order"
+assert intent["handoff"]["kitchen"]["tool"] == "kitchen_create_ticket"
+print("api/order-intent OK")
+' || { red "/api/order-intent FAILED"; failures=$((failures+1)); }
+
+# 6. On-site assistant API covers evaluator-driving paths
+assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon"}')
+echo "$assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "custom_order"
+assert d["escalation"]["required"] is True
+print("api/assistant OK")
+' || { red "/api/assistant FAILED"; failures=$((failures+1)); }
+
+# 7. Static pages render (not 404)
+for path in "/" "/menu" "/about" "/policies" "/order" "/assistant"; do
   code=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}${path}")
   if [[ "$code" != "200" ]]; then
     red "GET ${path} -> ${code}"

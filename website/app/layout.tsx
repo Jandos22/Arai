@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 const SITE_URL = "https://happycake.us";
 
 // LocalBusiness/Bakery JSON-LD — agent + SEO discoverability.
-// Address/phone/hours are PLACEHOLDERS pending confirmation from Askhat
-// (see docs/PRODUCTION-PATH.md). Real values land at production-swap time.
+// Only production-confirmed public facts are emitted here. Specific phone,
+// street address, and hours stay out of schema until HappyCake confirms them
+// for the real happycake.us cutover (see docs/PRODUCTION-PATH.md).
 const localBusinessJsonLd = {
   "@context": "https://schema.org",
   "@type": "Bakery",
@@ -17,36 +18,14 @@ const localBusinessJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/brand/logo/logo-512.png`,
   image: `${SITE_URL}/brand/hero/hero-04.webp`,
-  telephone: "+1-281-555-1234",
   priceRange: "$$",
   servesCuisine: ["Cakes", "Desserts", "Pastries"],
   address: {
     "@type": "PostalAddress",
-    streetAddress: "2123 Hwy 6 South",
     addressLocality: "Sugar Land",
     addressRegion: "TX",
-    postalCode: "77478",
     addressCountry: "US",
   },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 29.6197,
-    longitude: -95.6349,
-  },
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      opens: "10:00",
-      closes: "19:00",
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: "Sunday",
-      opens: "11:00",
-      closes: "17:00",
-    },
-  ],
   areaServed: [
     { "@type": "City", name: "Sugar Land" },
     { "@type": "City", name: "Missouri City" },
@@ -57,7 +36,7 @@ const localBusinessJsonLd = {
   sameAs: ["https://instagram.com/happycakeus"],
   potentialAction: {
     "@type": "OrderAction",
-    target: "https://wa.me/12815551234",
+    target: `${SITE_URL}/order`,
     deliveryMethod: ["http://purl.org/goodrelations/v1#DeliveryModePickUp"],
   },
 };
@@ -137,10 +116,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/" className="font-display text-xl font-bold text-happy-blue-700">
               HappyCake <span className="text-coral">·</span> US
             </a>
-            <nav className="flex gap-6 text-sm">
+            <nav className="flex gap-5 text-sm items-center">
               <a href="/menu" className="hover:text-happy-blue-500">Menu</a>
-              <a href="/about" className="hover:text-happy-blue-500">About</a>
-              <a href="/policies" className="hover:text-happy-blue-500">Pickup &amp; policies</a>
+              <a href="/assistant" className="hover:text-happy-blue-500">Assistant</a>
+              <a href="/order" className="hover:text-happy-blue-500">Order</a>
+              <a href="/policies" className="hover:text-happy-blue-500">Policies</a>
               <a
                 href="https://wa.me/12815551234?text=Hi%20HappyCake%2C%20I%27d%20like%20to%20ask%20about%20a%20cake."
                 className="rounded-full bg-happy-blue-700 text-cream-50 px-4 py-1.5 hover:bg-happy-blue-900"
@@ -162,6 +142,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="font-medium">Order</p>
               <ul className="mt-2 space-y-1">
                 <li><a href="/menu" className="hover:text-happy-blue-500">Menu</a></li>
+                <li><a href="/order" className="hover:text-happy-blue-500">Website order intent</a></li>
+                <li><a href="/assistant" className="hover:text-happy-blue-500">On-site assistant</a></li>
                 <li><a href="https://wa.me/12815551234" className="hover:text-happy-blue-500">WhatsApp</a></li>
                 <li><a href="https://instagram.com/happycakeus" className="hover:text-happy-blue-500">Instagram DM</a></li>
               </ul>
@@ -172,6 +154,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <li><a href="/agent.json" className="hover:text-happy-blue-500">/agent.json</a></li>
                 <li><a href="/api/catalog" className="hover:text-happy-blue-500">/api/catalog</a></li>
                 <li><a href="/api/policies" className="hover:text-happy-blue-500">/api/policies</a></li>
+                <li><a href="/api/assistant" className="hover:text-happy-blue-500">/api/assistant</a></li>
+                <li><a href="/api/order-intent" className="hover:text-happy-blue-500">/api/order-intent</a></li>
                 <li><a href="/sitemap.xml" className="hover:text-happy-blue-500">/sitemap.xml</a></li>
               </ul>
             </div>
