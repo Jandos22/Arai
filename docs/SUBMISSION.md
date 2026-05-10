@@ -19,6 +19,7 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | ARCHITECTURE.md with agents, routing, MCP usage, owner-bot mapping | [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) | ✅ |
 | `.env.example` with placeholders only | [`/.env.example`](../.env.example) | ✅ — verified clean |
 | Website / storefront instructions | [`/website/README.md`](../website/README.md), [`/order`](../website/app/order/page.tsx), [`/assistant`](../website/app/assistant/page.tsx) | ✅ |
+| Mobile performance proof | [`/docs/MOBILE-PERFORMANCE.md`](MOBILE-PERFORMANCE.md), [`/evidence/lighthouse-mobile-home.report.html`](../evidence/lighthouse-mobile-home.report.html) | ✅ — Lighthouse mobile: Performance 91, Accessibility 95, Best Practices 100, SEO 92 |
 | Production or local deploy notes | [`/website/README.md`](../website/README.md), [`/orchestrator/README.md`](../orchestrator/README.md) | ✅ |
 | Business-impact hypothesis incl. $500 case | [`/docs/MARKETING.md`](MARKETING.md) | ✅ — `evaluator_score_marketing_loop` 100/100 |
 | Agent-friendly website notes | [`/docs/AGENT-NOTES.md`](AGENT-NOTES.md) | ✅ |

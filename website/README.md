@@ -39,7 +39,9 @@ npm run start        # serves the production build
 Static pages and route handlers are safe to deploy on a standard Next.js host
 such as Vercel, Netlify, or a Node server. The current Next config keeps image
 optimization disabled (`images.unoptimized = true`) because the curated brand
-assets are already committed as web-ready files under `public/brand`.
+assets are already committed as web-ready files under `public/brand`. Mobile
+critical home-page images use smaller committed variants under
+`public/brand/home`.
 
 Production order handling still requires a backend adapter before charging
 customers or creating kitchen tickets. The website captures structured intent;
