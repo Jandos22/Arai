@@ -29,6 +29,7 @@ _OUTBOUND_TOOL_MAP = {
     "mcp__happycake__instagram_send_dm": ("instagram", "threadId", "message"),
     "mcp__happycake__instagram_reply_to_comment": ("instagram", "commentId", "message"),
     "mcp__happycake__gb_simulate_reply": ("gmb", "reviewId", "reply"),
+    "mcp__happycake__gb_simulate_post": ("gmb", "actionId", "content"),
 }
 
 
@@ -215,13 +216,16 @@ class ClaudeRunner:
             return True
 
         channel, recipient_key, body_key = outbound
+        recipient = args.get(recipient_key)
+        if name == "mcp__happycake__gb_simulate_post":
+            recipient = args.get("actionId") or args.get("postId") or "proposed_gmb_post"
         self.evidence.write(
             "channel_outbound",
             label=label,
             channel=channel,
             tool=name,
             recipientKey=recipient_key,
-            recipient=args.get(recipient_key),
+            recipient=recipient,
             bodyPreview=_body_preview(args.get(body_key)),
         )
         return True

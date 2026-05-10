@@ -77,6 +77,23 @@ Active token: stored only in `.env.local` (`STEPPE_MCP_TOKEN`) on the captain's 
 | `gb_get_metrics` | — | `period` (`last_7_days` \| `last_30_days`) | Sandbox metrics: views, calls, direction requests. |
 | `gb_list_simulated_actions` | — | — | Inspect everything the team has recorded in the GMB simulation namespace. |
 
+#### Google Business coverage audit
+
+Current repo coverage against the live `gb_*` catalog:
+
+| Tool | Coverage | Owner gate |
+|---|---|---|
+| `gb_list_reviews` | `agents/ops/PROMPTS/gmb_review.md`, `orchestrator/handlers/gmb.py`, and `agents/ops/scripts/smoke_gmb.sh` read reviews before replying. | Read-only; no gate. |
+| `gb_simulate_reply` | Review replies are recorded by the ops agent for 3+ star reviews after checking `gb_list_simulated_actions`. | 1-2 star reviews and any refund/replacement/money offer return owner-gate JSON before a reply is recorded. |
+| `gb_simulate_post` | `agents/ops/PROMPTS/gmb_local_presence.md` and `agents/ops/scripts/smoke_gmb_local.sh` record proposed local posts. | Public-facing local content returns owner-gate JSON with `trigger="gmb_post_publish"` after the simulator proposal is recorded. |
+| `gb_get_metrics` | Marketing reads `last_30_days`; ops local-presence smoke reads `last_7_days` and `last_30_days` for views, calls, and direction requests. | Read-only; no gate. |
+| `gb_list_simulated_actions` | Review and local-post flows inspect prior actions before proposing duplicate replies/posts. | Read-only; no gate. |
+
+No live Google Business Q&A read/write tool is exposed in the current
+catalog. Q&A/presence events are therefore documented as a simulator
+gap: the ops prompt reports the absence of Q&A tooling and does not
+invent a `gb_*` call.
+
 ### `marketing_*` — campaigns, leads, $500/mo loop (10)
 
 | Tool | Required | Optional | Purpose |

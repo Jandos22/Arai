@@ -9,6 +9,7 @@
 | Trigger | What to look for | Why |
 |---|---|---|
 | **`ig_post_publish`** | Any `instagram_publish_post` we'd call. ALWAYS, no exceptions. | Canonical owner-gate the sandbox documents and the evaluator scores. The owner taps Approve in Telegram before anything goes live. |
+| **`gmb_post_publish`** | Any proposed Google Business local post after `gb_simulate_post` records it in the sandbox. | Public-facing local content needs owner approval. The simulator has no separate publish tool, so never claim it is live. |
 | **`kitchen_reject`** | Any `kitchen_reject_ticket` we'd call — capacity short, lead-time miss, custom-work flag, inventory unsafe. | Owner may want to stretch capacity, partial-fulfil, or call the customer directly. We don't reject silently. |
 | **`kitchen_terminal_state`** | Ticket is already `completed`, `rejected`, or `cancelled` and someone re-asked us to act. | Confirm intent — usually a stale event. |
 | **`review_low_rating`** | GMB review with `rating ≤ 2`. | Even when the draft is calm and on brand, the owner sees it before it lands. |
@@ -21,7 +22,7 @@
   "needs_approval": true,
   "summary": "<2-3 sentences for the owner>",
   "draft": "<the exact text or post the owner can approve>",
-  "trigger": "ig_post_publish | kitchen_reject | kitchen_terminal_state | review_low_rating | review_refund_offer",
+  "trigger": "ig_post_publish | gmb_post_publish | kitchen_reject | kitchen_terminal_state | review_low_rating | review_refund_offer",
   "channel": "instagram | gmb | kitchen",
   "ref_id": "<scheduledPostId | ticketId | reviewId>"
 }
@@ -45,6 +46,8 @@ the first balanced `{...}` block. So:
   no gate; that's a routine state move.
 - Scheduling an IG post (`instagram_schedule_post`) → no gate; that's
   the *first half* of the canonical flow. The gate is the publish step.
+- Reading GMB metrics (`gb_get_metrics`) → no gate; read-only local
+  presence summary.
 - A 3-star review with no money on the table → reply directly, but
   acknowledge the gap and offer a clear next step. (4 and 5 stars also
   reply directly.)

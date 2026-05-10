@@ -4,6 +4,8 @@ Self-contained Claude Code project that the orchestrator (T-003) shells
 out to whenever:
 
 - a Google Business review needs a reply,
+- Google Business metrics, local posts, or Q&A/presence checks need a
+  simulator-safe action,
 - a kitchen / product trigger fires for an Instagram post,
 - the Sales agent escalates a kitchen ticket the state machine has to move.
 
@@ -18,12 +20,14 @@ agents/ops/
 ├── .mcp.json                # happycake MCP, env-interpolated token
 ├── PROMPTS/
 │   ├── gmb_review.md            # template — review reply
+│   ├── gmb_local_presence.md    # template — metrics, proposed GMB posts, Q&A gap
 │   ├── ig_post_proposal.md      # template — schedule → owner approve → publish
 │   └── kitchen_state.md         # template — accept / reject / mark_ready
 ├── policies/
 │   └── escalation_rules.md      # cheat sheet for when to escalate
 ├── scripts/
 │   ├── smoke_gmb.sh             # end-to-end review-reply test
+│   ├── smoke_gmb_local.sh       # metrics + proposed local-post test
 │   └── smoke_ig_post.sh         # schedule → owner approve → publish test
 └── README.md
 ```
@@ -33,6 +37,7 @@ agents/ops/
 ```sh
 # from repo root
 bash agents/ops/scripts/smoke_gmb.sh
+bash agents/ops/scripts/smoke_gmb_local.sh
 bash agents/ops/scripts/smoke_ig_post.sh
 ```
 
@@ -82,6 +87,20 @@ owner-gate pattern works end-to-end. The orchestrator will eventually
 replace step 2 with a real Telegram inline-keyboard callback; for now
 the harness simulates it directly.
 
+### `smoke_gmb_local.sh`
+
+PASS when both:
+
+- **Metrics stage** calls `gb_get_metrics` and
+  `gb_list_simulated_actions`, then summarizes local search presence.
+- **Post stage** calls `gb_simulate_post` and returns owner-gate JSON
+  with `trigger="gmb_post_publish"` and `channel="gmb"`.
+
+The smoke deliberately does not invent Google Business Q&A behavior:
+the live simulator catalog has no `gb_*` Q&A read/write tool. The
+prompt documents this as a gap and reports it instead of fabricating a
+tool call.
+
 ## Idempotency
 
 There's no upsert in the sandbox. Re-running the smokes adds new
@@ -94,6 +113,11 @@ the audit trail, not dedup behaviour.
 - **`gb_simulate_reply`** records the reply against the reviewId even
   if we've already replied; check `gb_list_simulated_actions` first to
   avoid double-replies.
+- **`gb_simulate_post`** records a proposed Google Business post in the
+  simulator. It is not a separate approve/publish state machine, so the
+  agent returns owner-gate JSON after recording the proposal.
+- **Google Business Q&A** is not exposed in the current live `gb_*`
+  catalog. Treat Q&A requests as a documented simulator gap.
 - **`instagram_publish_post`** errors hard if `instagram_approve_post`
   hasn't recorded approval for the same `scheduledPostId`. That
   hard-error is the safety net behind the canonical owner-gate
@@ -107,11 +131,15 @@ the audit trail, not dedup behaviour.
 
 Per-event hand-off pattern, mirroring `agents/sales/`:
 
-- GMB review → `orchestrator/handlers/gmb_review.py` (TODO)
-  builds the prompt from `gb_list_reviews`, calls
-  `ctx.ops_runner.run(prompt, label="gmb_review")`, parses the
+- GMB review → `orchestrator/handlers/gmb.py` builds the review prompt,
+  calls `ctx.ops_runner.run(prompt, label="gmb_review")`, parses the
   response. Owner-gate JSON → Telegram inline keyboard. Plain stdout
   with a `gb_simulate_reply` `tool_use` → done.
+- GMB local post / metrics / Q&A → `orchestrator/handlers/gmb.py`
+  builds the local-presence prompt. Proposed posts call
+  `gb_simulate_post` and return `gmb_post_publish` owner-gate JSON;
+  metrics-only checks summarize; Q&A requests report the missing live
+  tool.
 - Kitchen / product trigger → `orchestrator/handlers/ig_post.py` (TODO)
   builds the prompt with `stage=propose`. Owner-gate JSON →
   Telegram inline keyboard. On owner Approve, the bot calls
@@ -149,6 +177,7 @@ The full list is in `CLAUDE.md`. Headline:
 | Trigger | Channel | When |
 |---|---|---|
 | `ig_post_publish` | instagram | Always — every IG publish goes through the owner. |
+| `gmb_post_publish` | gmb | Any Google Business local post proposal after `gb_simulate_post`. |
 | `kitchen_reject` | kitchen | Capacity / lead-time / inventory makes the promise unsafe. |
 | `kitchen_terminal_state` | kitchen | Ticket already `completed` / `rejected` / `cancelled`. |
 | `review_low_rating` | gmb | GMB review with `rating ≤ 2`. |
