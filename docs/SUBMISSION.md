@@ -50,13 +50,13 @@ The public hackathon page describes the official grade as a weighted
 
 | Official pass | Weight | Primary repo evidence |
 |---|---:|---|
-| Functional tester | 20 | `scripts/e2e_smoke.sh`, `evidence/e2e-sample.jsonl`, `orchestrator/handlers/` |
+| Functional scenario tester | 20 | `scripts/e2e_smoke.sh`, `evidence/e2e-sample.jsonl`, `orchestrator/handlers/` |
 | Agent-friendliness auditor | 15 | `website/app/agent.json/route.ts`, `/api/catalog`, `/api/policies`, `docs/AGENT-NOTES.md` |
 | On-site assistant evaluator | 15 | `website/app/assistant/`, `website/app/api/assistant/route.ts`, `scripts/test_website.sh`, sales escalation prompts |
 | Code reviewer | 10 | `docs/ARCHITECTURE.md`, `orchestrator/tests/`, `.env.example`, `scripts/git-hooks/pre-commit` |
 | Operator simulator | 15 | `orchestrator/telegram_bot.py`, `bots/`, kitchen capacity decisions, owner-gated actions |
 | Business analyst | 15 | `docs/MARKETING.md`, `docs/PRODUCTION-PATH.md`, campaign metrics and ROAS evidence |
-| Innovation and depth spotter | 10 | scoped `.mcp.json` files, `/agent.json`, complaint/custom-cake paths, allergen safety gates |
+| Innovation/depth spotter | 10 | scoped `.mcp.json` files, `/agent.json`, complaint/custom-cake paths, allergen safety gates |
 
 Bonus functions can add up to +15 points after the 100-point core score:
 core 80+ is eligible for up to +15, core 60–79 is capped at +5, and core
@@ -72,11 +72,11 @@ The four `evaluator_score_*` MCP tools are **preview checks** teams can run agai
 | Loop | What it scores | Where we cover it |
 |---|---|---|
 | `evaluator_score_marketing_loop` | $500 → $5K demand engine | T-006 — `agents/marketing/` + `docs/MARKETING.md` |
-| `evaluator_score_pos_kitchen_flow` | Order intake → kitchen handoff | Website `/api/order-intent` + seeded Square handler + T-005 sales |
+| `evaluator_score_pos_kitchen_flow` | Order intake → capacity-aware kitchen handoff | Website `/api/order-intent` + seeded Square handler + T-005 sales |
 | `evaluator_score_channel_response` | WA / IG / GMB reply quality | T-005 (sales side) + T-007 (ops side) |
 | `evaluator_score_world_scenario` | Deterministic scenario + audit log | T-003 orchestrator + T-008 e2e smoke |
 
-Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T020747Z`: M:100 / POS:100 / Ch:100 / W:100, including `kitchen_get_capacity`, `square_capacity_decision`, `agent_tool_use`, and `channel_outbound` evidence. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across Functional tester, Agent-friendliness auditor, On-site assistant evaluator, Code reviewer, Operator simulator, Business analyst, and Innovation and depth spotter.
+Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T020747Z`: M:100 / POS:100 / Ch:100 / W:100, including `kitchen_get_capacity`, `square_capacity_decision`, `agent_tool_use`, and `channel_outbound` evidence. The POS/kitchen evidence shows the live accept path; reject/custom/unmapped branches are covered by `orchestrator/tests/test_square_capacity.py`, not by a second committed live evidence tail. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across Functional scenario tester, Agent-friendliness auditor, On-site assistant evaluator, Code reviewer, Operator simulator, Business analyst, and Innovation/depth spotter.
 
 ## Pre-submission ritual
 

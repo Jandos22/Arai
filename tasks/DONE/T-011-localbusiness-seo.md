@@ -1,5 +1,9 @@
 # T-011 — LocalBusiness JSON-LD + Open Graph + sitemap
 
+> Status: completed. This card was moved from `tasks/INBOX/` to
+> `tasks/DONE/` during stale-doc cleanup; the original task brief and
+> acceptance checklist are preserved below.
+
 **Owner:** Hermes
 **Dependencies:** T-002 done
 **Estimated:** 15 min

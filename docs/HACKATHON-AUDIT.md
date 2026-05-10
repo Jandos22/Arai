@@ -25,25 +25,25 @@ The public hackathon page lists seven official judging passes with weights:
 
 | Official pass | Weight | What it covers for Arai |
 |---|---:|---|
-| **Functional tester** | **20** | Drives simulated customer scenarios across WhatsApp, Instagram, and the website. Public scenarios are practice; secret ones decide. |
+| **Functional scenario tester** | **20** | Drives simulated customer scenarios across WhatsApp, Instagram, and the website. Public scenarios are practice; secret ones decide. |
 | **Agent-friendliness auditor** | **15** | Agent-readable website, structured catalog/policies, autonomous order-intent path, clear machine contracts |
 | **On-site assistant evaluator** | **15** | Consultation, custom order, complaint/status handling, escalation quality, owner/customer UX |
 | **Code reviewer** | **10** | Repo clarity, scoped agents, tests, security hygiene, readable architecture |
 | **Operator simulator** | **15** | Owner controls, Telegram approval flow, capacity decisions, operational usefulness during a live day |
 | **Business analyst** | **15** | $500-to-$5K case, campaign math, revenue impact, production adoption path |
-| **Innovation and depth spotter** | **10** | Differentiators beyond the brief: agent-readable storefront, scoped MCPs, safety gates, bonus paths |
+| **Innovation/depth spotter** | **10** | Differentiators beyond the brief: agent-readable storefront, scoped MCPs, safety gates, bonus paths |
 
 Our prior assumption — that the 4 `evaluator_score_*` MCP tools (`marketing_loop`, `pos_kitchen_flow`, `channel_response`, `world_scenario`) WERE the scoring loops — was wrong.
 
 The `evaluator_score_*` MCP tools are **what teams use to preview** their work. They are not the full grade. The official grade is a weighted 100-point total across the seven passes above:
 
-- Functional tester: 20%
+- Functional scenario tester: 20%
 - Agent-friendliness auditor: 15%
 - On-site assistant evaluator: 15%
 - Code reviewer: 10%
 - Operator simulator: 15%
 - Business analyst: 15%
-- Innovation and depth spotter: 10%
+- Innovation/depth spotter: 10%
 
 This means our current scoring dashboard (one MCP loop = 100/100) is a **partial** signal, not the full grade. Bonus-plan items map directly into operator usefulness, business analysis, and innovation/depth (audit trail, mobile perf, failure handling, lead scoring, referrals, follow-ups).
 

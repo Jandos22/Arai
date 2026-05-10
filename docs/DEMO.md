@@ -259,11 +259,10 @@ If you have an extra 5 minutes, these are the most informative pokes:
 - **Bounded budget vs raw score:** the smoke caps the orchestrator at
   ~3 events / 200s so it stays under the 5-min budget. With per-event
   `claude -p` calls running 30–90s, not every injected event finishes
-  end-to-end. The PASS gate is "all four scoring tools returned a
-  non-error response," not "all scores high." Fresh writes to
-  `pos_kitchen` in particular may not land inside the smoke window — the
-  marketing loop (Path A) is what carries the marketing score, and the
-  cumulative audit log carries the rest.
+  end-to-end. The latest committed evidence sample shows all four preview
+  scores at 100/100, including the capacity-aware POS/kitchen path. If a
+  future bounded run returns lower, check whether the cumulative audit log
+  already contains the complete path before treating it as a regression.
 - **No real WA/IG/POS:** every inbound and outbound message lives in the
   sandbox. The Cloudflare/ngrok adapter accepts sandbox/test webhook
   payloads; `*_inject_*` and `world_next_event` remain the evaluator

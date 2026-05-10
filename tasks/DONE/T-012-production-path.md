@@ -1,5 +1,9 @@
 # T-012 — Production-path doc
 
+> Status: completed. This card was moved from `tasks/INBOX/` to
+> `tasks/DONE/` during stale-doc cleanup; the original task brief and
+> acceptance checklist are preserved below.
+
 **Owner:** Hermes
 **Dependencies:** T-007 + T-008 done (so we can reference all agent boundaries accurately)
 **Estimated:** 25 min

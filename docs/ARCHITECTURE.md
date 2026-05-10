@@ -144,13 +144,13 @@ The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. 
 
 | Official pass | Weight | Where this architecture supports it |
 |---|---:|---|
-| Functional tester | 20 | Scenario loop, channel handlers, Square→kitchen path, evidence JSONL |
+| Functional scenario tester | 20 | Scenario loop, channel handlers, Square→kitchen path, evidence JSONL |
 | Agent-friendliness auditor | 15 | `/agent.json`, `/api/catalog`, `/api/policies`, structured product pages |
 | On-site assistant evaluator | 15 | `/assistant`, `/api/assistant`, sales prompt escalation paths |
 | Code reviewer | 10 | Plain Python orchestrator, tests, scoped agents, redaction, env hygiene |
 | Operator simulator | 15 | Telegram owner gate, kitchen capacity checks, approval queue, bot commands |
 | Business analyst | 15 | Marketing demand engine, campaign evidence, production-adapter path |
-| Innovation and depth spotter | 10 | Machine-readable storefront, scoped MCP configs, complaint/custom/allergen safety paths |
+| Innovation/depth spotter | 10 | Machine-readable storefront, scoped MCP configs, complaint/custom/allergen safety paths |
 
 See `docs/SELF-EVAL.md` for the current weighted seven-pass risk register.
 
@@ -158,7 +158,7 @@ See `docs/SELF-EVAL.md` for the current weighted seven-pass risk register.
 | Loop | Status | Evidence |
 |---|---|---|
 | Marketing $500 → $5K | ✅ preview score 100/100 — demand-engine campaigns + routed leads + owner reports | `agents/marketing/`, `docs/MARKETING.md`, `evidence/marketing-sample.jsonl`, `evidence/e2e-sample.jsonl` |
-| POS + kitchen | ✅ preview score 100/100 in latest committed sample — POS order + kitchen ticket + explicit `kitchen_get_capacity` / `square_capacity_decision` / ready status | `orchestrator/handlers/square.py`, `evidence/e2e-sample.jsonl`, `docs/SELF-EVAL.md` |
+| POS + kitchen | ✅ preview score 100/100 in latest committed sample — live evidence shows the accept path with POS order, kitchen ticket, explicit `kitchen_get_capacity` / `square_capacity_decision`, and ready status; unit tests cover reject/custom/unmapped branches | `orchestrator/handlers/square.py`, `orchestrator/tests/test_square_capacity.py`, `evidence/e2e-sample.jsonl`, `docs/SELF-EVAL.md` |
 | Channel response (WA / IG / GMB) | ✅ preview score 100/100 — WA/IG/GMB routed through agents; orchestrator now records streamed `agent_tool_use` plus `channel_outbound` rows for outbound proof | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/`, `orchestrator/claude_runner.py` |
 | World scenario | ✅ preview score 100/100 — deterministic launch-day scenario runs through `world_start_scenario` / `world_next_event` | `orchestrator/`, `evidence/e2e-sample.jsonl` |
 | Owner UI | ✅ Approval queue (T-003) + 3 dedicated bots (`bots/marketing_bot`, `ops_bot`, `sales_bot`) | `orchestrator/telegram_bot.py`, `bots/` |

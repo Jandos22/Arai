@@ -1,5 +1,9 @@
 # T-007: Ops agent — `agents/ops/`
 
+> Status: completed. This card was moved from `tasks/INBOX/` to
+> `tasks/DONE/` during stale-doc cleanup; the original task brief and
+> acceptance checklist are preserved below.
+
 **Owner:** Claude Code (MacBook)
 **Branch:** `feat/ops-agent`
 **Estimated:** 75–90 min
