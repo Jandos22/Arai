@@ -11,7 +11,13 @@ from typing import Any
 
 from ..customers import is_greeting, propose_reorder
 from ..dispatcher import HandlerContext
-from .whatsapp import _maybe_upsert_profile, _safe_recent_orders, _send_proposed_reorder
+from .whatsapp import (
+    _extract_json,
+    _maybe_upsert_profile,
+    _queue_owner_gated_draft,
+    _safe_recent_orders,
+    _send_proposed_reorder,
+)
 
 
 def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
@@ -106,6 +112,113 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         "instagram_reply_to_comment as appropriate. If the customer expresses "
         "order intent, route them to WhatsApp for confirmation (we centralize "
         "order intake there). Voice: warm, confident, ends with a clear next "
-        "step."
+        "step. If the request needs owner approval (custom decoration, allergy "
+        "promise, order > $80, standing order), do NOT call an Instagram send "
+        "tool — return a JSON object {\"needs_approval\": true, \"summary\": "
+        "\"...\", \"draft_reply\": \"...\"} and the orchestrator will route it "
+        "to the owner."
     )
-    ctx.sales_runner.run(prompt, label=f"instagram_{etype}")
+    response = ctx.sales_runner.run(prompt, label=f"instagram_{etype}")
+
+    if "needs_approval" not in response:
+        lowered = response.lower()
+        if not (thread or comment_id) or "draft" in lowered or "can't" in lowered or "cannot" in lowered:
+            _queue_instagram_response_draft(
+                ctx,
+                etype=etype,
+                thread=thread,
+                comment_id=comment_id,
+                identity=identity,
+                body=response,
+            )
+        return
+    try:
+        decoded = json.loads(_extract_json(response))
+    except (ValueError, json.JSONDecodeError):
+        _queue_instagram_response_draft(
+            ctx,
+            etype=etype,
+            thread=thread,
+            comment_id=comment_id,
+            identity=identity,
+            body=response,
+            parse_failed=True,
+        )
+        return
+    if not decoded.get("needs_approval"):
+        return
+
+    draft_reply = decoded.get("draft_reply", "")
+    recipient = thread or identity
+    tool = "instagram_reply_to_comment" if comment_id else "instagram_send_dm"
+    recipient_key = "commentId" if comment_id else "threadId"
+    _queue_owner_gated_draft(
+        ctx,
+        label=f"instagram_{etype}_owner_gate_draft",
+        channel="instagram",
+        tool=tool,
+        recipient_key=recipient_key,
+        recipient=comment_id or recipient,
+        body=draft_reply,
+        reason=decoded.get("trigger") or decoded.get("kind", "transactional"),
+    )
+
+    if ctx.telegram_notifier is None:
+        return
+    ctx.telegram_notifier.request_approval(
+        summary=decoded.get("summary", "Pending Instagram action"),
+        draft=draft_reply,
+        context={
+            "channel": "instagram",
+            "subtype": etype,
+            "sender": sender,
+            "threadId": thread,
+            "commentId": comment_id,
+            "body": body,
+            "kind": decoded.get("kind", "transactional"),
+            "trigger": decoded.get("trigger"),
+            "request_details": decoded.get("request_details"),
+            "proposed_resolution": decoded.get("proposed_resolution"),
+            "remediation_tool_chain": decoded.get("remediation_tool_chain"),
+        },
+    )
+
+
+def _queue_instagram_response_draft(
+    ctx: HandlerContext,
+    *,
+    etype: str,
+    thread: Any,
+    comment_id: Any,
+    identity: Any,
+    body: str,
+    parse_failed: bool = False,
+) -> None:
+    if not body.strip():
+        return
+    tool = "instagram_reply_to_comment" if etype == "comment" else "instagram_send_dm"
+    recipient_key = "commentId" if etype == "comment" else "threadId"
+    recipient = comment_id if etype == "comment" else thread
+    status = "draft_ready" if recipient else "draft_needs_recipient"
+    reason = None if recipient else "missing_comment_or_thread_id"
+    _queue_owner_gated_draft(
+        ctx,
+        label=f"instagram_{etype}_draft",
+        channel="instagram",
+        tool=tool,
+        recipient_key=recipient_key,
+        recipient=recipient or identity or "unknown",
+        body=body,
+        reason=reason,
+        status=status,
+    )
+    ctx.evidence.write(
+        "instagram_draft_queued",
+        subtype=etype,
+        status=status,
+        parseFailed=parse_failed,
+        recipientKey=recipient_key,
+        recipient=recipient or identity or "unknown",
+        bodyPreview=body[:240],
+        evidenceSources=["instagram_inbound", tool],
+    )

@@ -90,6 +90,36 @@ def test_whatsapp_inbound_writes_lead_score_from_square_evidence():
     assert "square_recent_orders" in scores[0]["evidenceSources"]
 
 
+def test_owner_gated_whatsapp_response_queues_outbound_draft():
+    mcp = _FakeMCP({"square_recent_orders": {"orders": []}})
+    ev = _RecordingEvidence()
+    runner = _FakeRunner(
+        '{"needs_approval": true, "kind": "custom_cake_consult", '
+        '"trigger": "custom_decoration", "summary": "Owner review needed", '
+        '"draft_reply": "Thanks — I am checking this with the owner before confirming."}'
+    )
+
+    whatsapp_handler.handle(
+        {
+            "channel": "whatsapp",
+            "type": "inbound_message",
+            "payload": {
+                "from": "+12815550123",
+                "message": "Can you make a custom birthday cake tomorrow?",
+            },
+        },
+        _ctx(mcp, ev, runner),
+    )
+
+    outbound = [entry for entry in ev.entries if entry["kind"] == "channel_outbound"]
+    assert len(outbound) == 1
+    assert outbound[0]["channel"] == "whatsapp"
+    assert outbound[0]["tool"] == "whatsapp_send"
+    assert outbound[0]["recipient"] == "+12815550123"
+    assert outbound[0]["status"] == "queued_owner_gate"
+    assert "checking this with the owner" in outbound[0]["bodyPreview"]
+
+
 def test_follow_up_due_respects_explicit_message_no_referral_pitch(tmp_path, monkeypatch):
     # Explicit caller-provided message must not be overridden with the pitch.
     from orchestrator import handlers

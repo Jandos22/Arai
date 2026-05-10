@@ -113,13 +113,24 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
     response = ctx.sales_runner.run(prompt, label="whatsapp_inbound")
 
     # Best-effort: detect approval-gated responses and forward to Telegram.
-    if ctx.telegram_notifier is not None and "needs_approval" in response:
+    if "needs_approval" in response:
         try:
             decoded = json.loads(_extract_json(response))
             if decoded.get("needs_approval"):
                 kind = decoded.get("kind", "transactional")
                 severity = decoded.get("severity")
                 summary = decoded.get("summary", "Pending action")
+                draft_reply = decoded.get("draft_reply", "")
+                _queue_owner_gated_draft(
+                    ctx,
+                    label="whatsapp_owner_gate_draft",
+                    channel="whatsapp",
+                    tool="whatsapp_send",
+                    recipient_key="to",
+                    recipient=sender,
+                    body=draft_reply,
+                    reason=decoded.get("trigger") or kind,
+                )
                 # Prefix the summary so it surfaces clearly in Telegram for
                 # the new T-013 paths (complaint with allergy, custom-cake quote).
                 tagged_summary = summary
@@ -128,9 +139,11 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
                     tagged_summary = f"[COMPLAINT · {sev}] {summary}"
                 elif kind == "custom_cake_consult":
                     tagged_summary = f"[CUSTOM CAKE] {summary}"
+                if ctx.telegram_notifier is None:
+                    return
                 ctx.telegram_notifier.request_approval(
                     summary=tagged_summary,
-                    draft=decoded.get("draft_reply", ""),
+                    draft=draft_reply,
                     context={
                         "channel": "whatsapp",
                         "sender": sender,
@@ -294,6 +307,32 @@ def _send_proposed_reorder(
         tool=tool,
         recipient=str(recipient),
         bodyPreview=str(proposal["message"])[:240],
+    )
+
+
+def _queue_owner_gated_draft(
+    ctx: HandlerContext,
+    *,
+    label: str,
+    channel: str,
+    tool: str,
+    recipient_key: str,
+    recipient: Any,
+    body: Any,
+    reason: Any,
+    status: str = "queued_owner_gate",
+) -> None:
+    """Record a channel draft that is queued behind owner approval."""
+    ctx.evidence.write(
+        "channel_outbound",
+        label=label,
+        channel=channel,
+        tool=tool,
+        recipientKey=recipient_key,
+        recipient=recipient,
+        status=status,
+        reason=reason,
+        bodyPreview=str(body or "")[:240],
     )
 
 

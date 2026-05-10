@@ -51,6 +51,15 @@ type McpTicket = {
   orderId?: string;
 };
 
+const CUSTOM_ORDER_ANSWER =
+  "For custom birthday/design requests, HappyCake needs headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; if timing is tight in Sugar Land, I can suggest ready-made cake \"Honey\" (medovik) or cake \"Milk Maiden\" instead.";
+
+const COMPLAINT_ANSWER =
+  "I’m sorry — HappyCake fixes cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for a replacement/refund decision before any irreversible action, with the Sugar Land pickup context included.";
+
+const STATUS_ANSWER =
+  "For HappyCake order status, share the order name and pickup time. I can read availability at /api/availability for the Sugar Land kitchen, but I do not mark cake \"Honey\", cake \"Milk Maiden\", or any order ready unless Square/kitchen status confirms it.";
+
 function classify(message: string): AssistantIntent {
   const m = message.toLowerCase();
   if (/complaint|wrong|late|refund|problem|bad|issue|pickup confusing/.test(m)) return "complaint";
@@ -194,9 +203,15 @@ export async function POST(request: NextRequest) {
     if (intent === "order_intent") {
       const order = createOrderIntent({
         productSlug,
-        quantity: 1,
+        variationId: typeof body.variationId === "string" ? body.variationId : undefined,
+        quantity: typeof body.quantity === "number" ? body.quantity : 1,
         customerName: body.customerName,
         contact: body.contact,
+        fulfillmentType: body.fulfillmentType,
+        deliveryAddress: body.deliveryAddress,
+        pickupDate: body.pickupDate,
+        pickupTime: body.pickupTime,
+        scheduledFor: body.scheduledFor,
         notes: message,
         source: "assistant",
       });
@@ -301,8 +316,7 @@ export async function POST(request: NextRequest) {
       return Response.json({
         ok: true,
         intent,
-        answer:
-          "For custom birthday/design requests, HappyCake needs headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; if timing is tight in Sugar Land, I can suggest ready-made cake \"Honey\" (medovik) or cake \"Milk Maiden\" instead.",
+        answer: CUSTOM_ORDER_ANSWER,
         escalation: { required: true, reason: "custom cake or allergy/design signal" },
         endpoints: { catalog: "/api/catalog", policies: "/api/policies", availability: "/api/availability" },
         availability: { endpoint: "/api/availability" },
@@ -323,8 +337,7 @@ export async function POST(request: NextRequest) {
       return Response.json({
         ok: true,
         intent,
-        answer:
-          "I’m sorry — HappyCake fixes cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for a replacement/refund decision before any irreversible action, with the Sugar Land pickup context included.",
+        answer: COMPLAINT_ANSWER,
         escalation: { required: true, reason: "complaint/remediation path" },
         endpoints: { policies: "/api/policies", availability: "/api/availability" },
         availability: { endpoint: "/api/availability" },
@@ -351,8 +364,7 @@ export async function POST(request: NextRequest) {
       return Response.json({
         ok: true,
         intent,
-        answer:
-          "For HappyCake order status, share the order name and pickup time. I can read availability at /api/availability for the Sugar Land kitchen, but I do not mark cake \"Honey\", cake \"Milk Maiden\", or any order ready unless Square/kitchen status confirms it.",
+        answer: STATUS_ANSWER,
         escalation: { required: false },
         endpoints: { policies: "/api/policies", availability: "/api/availability" },
         evidence,

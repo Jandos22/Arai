@@ -1,0 +1,25 @@
+{
+  "flow": "complaint",
+  "endpoint": "/api/assistant",
+  "method": "POST",
+  "request": {
+    "message": "My pickup was late and the cake was wrong. I want to make a complaint."
+  },
+  "expected": {
+    "ok": true,
+    "intent": "complaint",
+    "escalation": {
+      "required": true,
+      "reason": "complaint/remediation path"
+    },
+    "evidenceTools": [
+      "square_recent_orders",
+      "owner_gate"
+    ],
+    "answer": "I’m sorry — HappyCake fixes cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for a replacement/refund decision before any irreversible action, with the Sugar Land pickup context included."
+  },
+  "source": {
+    "file": "website/app/api/assistant/route.ts",
+    "symbol": "COMPLAINT_ANSWER"
+  }
+}

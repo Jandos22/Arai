@@ -1,0 +1,28 @@
+{
+  "flow": "consultation",
+  "endpoint": "/api/assistant",
+  "method": "POST",
+  "request": {
+    "message": "What cakes do you recommend for a family pickup today?"
+  },
+  "expected": {
+    "ok": true,
+    "intent": "catalog",
+    "escalation": {
+      "required": false
+    },
+    "evidenceTools": [
+      "square_list_catalog",
+      "kitchen_get_capacity",
+      "kitchen_get_menu_constraints"
+    ],
+    "answerMustInclude": [
+      "Popular options",
+      "Tell me occasion, pickup time, allergy concerns, and headcount."
+    ]
+  },
+  "source": {
+    "file": "website/app/api/assistant/route.ts",
+    "symbol": "catalogAnswer"
+  }
+}
