@@ -16,8 +16,8 @@ const localBusinessJsonLd = {
   description:
     "Traditional, hand-decorated cakes in Sugar Land, TX. Honey cake, Napoleon, Red Velvet, and more — made by hand, sold by neighborhood reputation.",
   url: SITE_URL,
-  logo: `${SITE_URL}/brand/logo/logo-512.png`,
-  image: `${SITE_URL}/brand/hero/hero-04.webp`,
+  logo: `${SITE_URL}/brand/logo/happy-cake-logo-512.png`,
+  image: `${SITE_URL}/brand/hero/happy-cake-hero-04.webp`,
   priceRange: "$$",
   servesCuisine: ["Cakes", "Desserts", "Pastries"],
   address: {
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/brand/hero/hero-04.webp",
+        url: "/brand/hero/happy-cake-hero-04.webp",
         width: 1600,
         height: 1000,
         alt: "Naked chocolate layer cake with piped cream pearls and ganache drip.",
@@ -83,15 +83,15 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "HappyCake US — The original taste of happiness",
     description: "Hand-decorated cakes in Sugar Land, TX.",
-    images: ["/brand/hero/hero-04.webp"],
+    images: ["/brand/hero/happy-cake-hero-04.webp"],
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/brand/logo/logo-256.png",
-    apple: "/brand/logo/logo-512.png",
+    icon: "/brand/logo/happy-cake-logo-256.png",
+    apple: "/brand/logo/happy-cake-logo-512.png",
   },
 };
 

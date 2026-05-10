@@ -192,10 +192,11 @@ Active token: stored only in `.env.local` (`STEPPE_MCP_TOKEN`) on the captain's 
 
 ## Sample calls
 
-All examples assume you've sourced `.env.local`:
+All examples assume you've loaded env from `.env.local`, `ARAI_ENV_FILE`, or
+`~/.config/arai/env.local`:
 
 ```bash
-set -a; source .env.local; set +a
+source scripts/load_env.sh && arai_load_env "$PWD"
 ```
 
 ### Discovery — `tools/list`

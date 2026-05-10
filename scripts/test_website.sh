@@ -122,7 +122,17 @@ print(json.dumps({
   "contact": "+12815550000",
   "pickupDate": "2026-05-10",
   "pickupTime": "12:00",
-  "notes": "website smoke order"
+  "notes": "website smoke order",
+  "attribution": {
+    "landingPath": "/office-boxes",
+    "campaign": "office-boxes",
+    "campaignId": "mkt_smoke_office_boxes",
+    "channel": "google_local",
+    "utm_source": "google_local",
+    "utm_medium": "paid_local",
+    "utm_campaign": "office_boxes_sugar_land",
+    "utm_content": "smoke"
+  }
 }))
 PY
 )
@@ -133,24 +143,125 @@ d = json.load(sys.stdin)
 assert d["ok"] is True
 intent = d["intent"]
 assert intent["source"] == "website"
+assert intent["attribution"]["landingPath"] == "/office-boxes"
+assert intent["attribution"]["utm"]["source"] == "google_local"
+assert intent["attribution"]["utm"]["campaign"] == "office_boxes_sugar_land"
+assert intent["handoff"]["campaignLead"]["routeTo"] == "website"
+assert "landingPath=/office-boxes" in intent["handoff"]["campaignLead"]["evidence"]
 assert intent["handoff"]["cashier"]["tool"] == "square_create_order"
 assert intent["handoff"]["kitchen"]["tool"] == "kitchen_create_ticket"
 print("api/order-intent OK")
 ' || { red "/api/order-intent FAILED"; failures=$((failures+1)); }
 
-# 6. On-site assistant API covers evaluator-driving paths
-assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon"}')
-echo "$assistant" | python3 -c '
+# 5b. Campaign routing covers website, WhatsApp, Instagram, and owner approval
+python3 - "$BASE" "$slug" <<'PY' || { red "campaign routing variants FAILED"; failures=$((failures+1)); }
+import json
+import sys
+import urllib.request
+
+base, slug = sys.argv[1], sys.argv[2]
+cases = [
+    ("google_local", 1, "website smoke route", "website"),
+    ("whatsapp", 1, "whatsapp smoke route", "whatsapp"),
+    ("instagram", 1, "instagram smoke route", "instagram"),
+    ("google_local", 3, "owner approval smoke route", "owner_approval"),
+]
+
+for source, quantity, notes, expected_route in cases:
+    payload = {
+        "productSlug": slug,
+        "quantity": quantity,
+        "customerName": "Campaign Smoke",
+        "contact": "+12815550000",
+        "notes": notes,
+        "attribution": {
+            "landingPath": "/office-boxes",
+            "campaign": "office-boxes",
+            "channel": source,
+            "utm_source": source,
+            "utm_medium": "paid_local",
+            "utm_campaign": "office_boxes_sugar_land",
+        },
+    }
+    req = urllib.request.Request(
+        f"{base}/api/order-intent",
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=5) as response:
+        data = json.load(response)
+    intent = data["intent"]
+    route = intent["handoff"]["campaignLead"]["routeTo"]
+    assert route == expected_route, f"{source}/{quantity}: expected {expected_route}, got {route}"
+    evidence = intent["handoff"]["campaignLead"]["evidence"]
+    assert f"routeTo={expected_route}" in evidence
+    assert "campaign=office-boxes" in evidence
+
+print("campaign routing variants OK")
+PY
+
+# 6. On-site assistant API covers required consultation scenarios without MCP.
+custom_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon with a soccer theme"}')
+echo "$custom_assistant" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
 assert d["ok"] is True
 assert d["intent"] == "custom_order"
 assert d["escalation"]["required"] is True
-print("api/assistant OK")
-' || { red "/api/assistant FAILED"; failures=$((failures+1)); }
+assert d["endpoints"]["catalog"] == "/api/catalog"
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "headcount" in answer and "pickup time" in answer and "allergy" in answer
+assert "owner-gated" in answer
+print("api/assistant custom_order OK")
+' || { red "/api/assistant custom_order FAILED"; failures=$((failures+1)); }
+
+complaint_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"My pickup was late and the cake was wrong. I want to make a complaint."}')
+echo "$complaint_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "complaint"
+assert d["escalation"]["required"] is True
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "photo" in answer and "order name" in answer
+assert "owner review" in answer
+assert "automatic refund" not in answer and "guaranteed refund" not in answer
+print("api/assistant complaint OK")
+' || { red "/api/assistant complaint FAILED"; failures=$((failures+1)); }
+
+status_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"Can you check my order status for pickup?"}')
+echo "$status_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "status"
+assert d["escalation"]["required"] is False
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "share the order name" in answer and "pickup time" in answer
+assert "ready now" not in answer and "completed" not in answer and "paid" not in answer
+print("api/assistant status OK")
+' || { red "/api/assistant status FAILED"; failures=$((failures+1)); }
+
+policy_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"What is your delivery policy?"}')
+echo "$policy_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "policy"
+assert d["escalation"]["required"] is False
+assert d["endpoints"]["policies"] == "/api/policies"
+assert d["endpoints"]["catalog"] == "/api/catalog"
+answer = d["answer"].lower()
+assert "limited/case-by-case" in answer
+print("api/assistant policy grounding OK")
+' || { red "/api/assistant policy grounding FAILED"; failures=$((failures+1)); }
 
 # 7. Static pages render (not 404)
-for path in "/" "/menu" "/about" "/policies" "/order" "/assistant"; do
+for path in "/" "/menu" "/office-boxes" "/about" "/policies" "/order" "/assistant"; do
   code=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}${path}")
   if [[ "$code" != "200" ]]; then
     red "GET ${path} -> ${code}"
@@ -158,6 +269,15 @@ for path in "/" "/menu" "/about" "/policies" "/order" "/assistant"; do
   fi
 done
 green "All static pages OK"
+
+# 8. Campaign landing page carries attribution into the order path
+office_boxes=$(curl -sS "${BASE}/office-boxes")
+if echo "$office_boxes" | grep -q 'utm_campaign=office_boxes_sugar_land' && echo "$office_boxes" | grep -q 'landingPath=%2Foffice-boxes'; then
+  green "Campaign landing attribution on /office-boxes OK"
+else
+  red "Campaign attribution missing on /office-boxes"
+  failures=$((failures+1))
+fi
 
 if (( failures > 0 )); then
   red "==== FAIL: ${failures} check(s) failed ===="

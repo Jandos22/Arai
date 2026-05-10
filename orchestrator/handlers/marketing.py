@@ -26,6 +26,8 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         "marketing_get_margin_by_product → marketing_create_campaign → "
         "marketing_launch_simulated_campaign → marketing_generate_leads → "
         "marketing_route_lead → marketing_adjust_campaign → marketing_report_to_owner. "
-        "Cite the data you used. End with the report-to-owner summary."
+        "Cite the data you used. End with the report-to-owner summary. "
+        "Do not edit files, write docs, or run local shell commands; the "
+        "orchestrator records the evidence for this smoke run."
     )
     ctx.marketing_runner.run(prompt, label="marketing_trigger")

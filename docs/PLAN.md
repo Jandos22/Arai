@@ -133,7 +133,7 @@ Arai/
 | Risk | Mitigation |
 |---|---|
 | `claude -p` rate limits / token burn during long scenario runs | Time-compress with `world_advance_time`; cache static reads (catalog, brandbook) once |
-| Webhook setup (ngrok) fails or token-gates | We don't actually need real inbound — `whatsapp_inject_inbound` and `instagram_inject_dm` are sandbox-only test tools. Use those for dev + evaluator dry-run. Real ngrok only if time permits. |
+| Webhook setup (Cloudflare Tunnel/ngrok) fails or token-gates | Implement a thin local webhook adapter and prefer Cloudflare Tunnel. Keep `whatsapp_inject_inbound`, `instagram_inject_dm`, and `world_next_event` as fallback/evaluator source of truth, but demonstrate the hard-rule tunnel shape before submission. |
 | Solo + tired → bad decisions overnight | CC sessions doing well-scoped tasks while Jandos sleeps; Hermes (Mac mini, no fatigue) writes docs and reviews diffs |
 | Token leak in commit | `.gitignore` + per-task acceptance check `git diff --cached \| grep -i token` empty; `.env.local` only |
 | Evaluator runs from clone, missing setup step | T-010 dress rehearsal runs `git clone` to a clean dir + brings up everything from `.env.example` only |

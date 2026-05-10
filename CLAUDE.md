@@ -27,7 +27,7 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 
 - Runtime = **Claude Code CLI + Opus 4.7** only. No Claude Agent SDK. No LangGraph, CrewAI, n8n.
 - Owner UI = **Telegram bots only**. No email, no web dashboard for the owner.
-- Pattern: WhatsApp/Instagram webhook → ngrok/Cloudflare Tunnel → bot wrapper → `claude -p "<prompt>"` headless → response back to channel.
+- Inbound webhooks tunnel home via Cloudflare Tunnel (ngrok fallback) to a local wrapper, then `claude -p "<prompt>"` headless. Sandbox `world_next_event` / WA+IG inject tools remain the evaluator/dev source of truth and feed the same dispatcher.
 - Sandbox MCP is the source of truth. No real Square/WA/IG/payment credentials.
 - **NEVER commit `STEPPE_MCP_TOKEN`** or any secret. Load secrets through `scripts/load_env.sh`; shared worktree env lives at `~/.config/arai/env.local`, with repo-local `.env.local` only as an override/fallback. `.env.example` ships placeholders.
 
@@ -35,8 +35,8 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 
 Vertical slice we are building:
 
-1. Customer DMs Instagram OR messages WhatsApp.
-2. Webhook → bot wrapper (Python) → `claude -p` with project context.
+1. Customer DMs Instagram OR messages WhatsApp in the sandbox/world scenario or webhook demo path.
+2. Cloudflare/ngrok webhook, sandbox event, or test inject → orchestrator/bot wrapper (Python) → `claude -p` with project context.
 3. Agent uses MCP tools (catalog, inventory, policies, kitchen, orders) to answer in Happy Cake brand voice.
 4. Order intent captured → kitchen handoff card created in sandbox.
 5. Owner gets Telegram message with inline approve/reject buttons for custom or high-value orders.
@@ -63,7 +63,10 @@ Sub-systems:
 
 ## Coordination protocol
 
-- **Branches:** `feat/<area>` (e.g. `feat/website`, `feat/sales-agent`, `feat/bots`). No direct commits to `main`.
+- **Solo workflow:** Jandos is working solo. PRs are optional, not the default.
+- **Default shipping path:** for non-trivial work, use a short-lived branch, verify locally, merge/push to `main`, then delete the branch. Create a PR only when Jandos explicitly asks for one or when a GitHub review page is useful.
+- **Issue-closing PRs:** when work is tied to a GitHub issue, include a closing keyword in the PR body before merge, e.g. `Closes #13`. After merge, verify with `gh issue view <number> --json state,stateReason,closedAt`.
+- **Branches:** prefer `codex/<area>` for Codex work unless Jandos requests a different name.
 - **Sync:** `git pull --rebase` before every push.
 - **Cadence:** small commits, push every 15–30 min so the other side can pull.
 - **Ownership defaults:** Hermes owns `website/`, `docs/`, `bots/router.py`, `.env.example`, `.gitignore`. Claude Code owns `agents/*/`, `bots/*-bot.py` (per-agent runtime), MCP wiring code that needs the live token.

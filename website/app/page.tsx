@@ -43,7 +43,7 @@ export default function Home() {
         </div>
         <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-cream-100 shadow-xl">
           <Image
-            src="/brand/hero/hero-04.webp"
+            src="/brand/hero/happy-cake-hero-04.webp"
             alt="Naked chocolate layer cake with piped cream pearls, ganache drip, and gold-accented chocolate decor."
             fill
             priority
