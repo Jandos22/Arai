@@ -69,10 +69,10 @@ This is a much stronger signal than "agent-friendly storefront." Our website nee
 ## Asset pack — pulled
 
 `website/public/brand/`:
-- `hero/hero-{01..04}.webp` — 1600×1000 lifestyle hero shots
-- `products/product-{01..10}.webp` — 1200×1200 product cake photos
-- `social/social-{01..04}.webp` — 1080×1350 social/IG crops
-- `logo/logo-{256,512,1024}.png`
+- `hero/happy-cake-hero-{01..04}.webp` — 1600×1000 lifestyle hero shots
+- `products/happy-cake-product-{01..10}.webp` — 1200×1200 product cake photos
+- `social/happy-cake-social-{01..08}.webp` — 1080×1080 social crops
+- `logo/happy-cake-logo-{256,512,1024}.png`
 - `metadata.json` — describes every file + palette + usage rules
 
 **Asset rules** (from metadata.json):

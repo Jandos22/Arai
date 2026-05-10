@@ -25,7 +25,7 @@ Three small additions, all in `website/app/`:
    - `openingHoursSpecification`: Tue–Sat 10:00–19:00, Sun 11:00–17:00, closed Mon (placeholder)
    - `priceRange`: `$$`
    - `servesCuisine`: `Desserts, Cakes`
-   - `image`: `/brand/hero/hero-04.webp`
+   - `image`: `/brand/hero/happy-cake-hero-04.webp`
 
 2. **Open Graph + Twitter Card metadata** in `app/layout.tsx` `metadata` export
    - `openGraph.images` → hero photo

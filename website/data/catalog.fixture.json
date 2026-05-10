@@ -9,7 +9,7 @@
       "name": "Medovik — Honey Cake",
       "description": "Eight thin honey-baked layers folded with cool sour cream and finished with a soft golden crumb. Our signature, the cake the bakery is built on.",
       "category": "signature",
-      "imageUrl": "/brand/products/product-10.webp",
+      "imageUrl": "/brand/products/happy-cake-product-10.webp",
       "imageAlt": "Classic Medovik honey cake with thin amber sponge layers, sour-cream filling, and golden crumb topping.",
       "variations": [
         { "id": "fx_med_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
@@ -25,7 +25,7 @@
       "name": "Red Velvet",
       "description": "Buttermilk red velvet sponge with cream cheese filling, finished with a glossy chocolate ganache drip and gold-leaf chocolate shards. The birthday cake that doesn't apologize for itself.",
       "category": "celebration",
-      "imageUrl": "/brand/products/product-03.webp",
+      "imageUrl": "/brand/products/happy-cake-product-03.webp",
       "imageAlt": "Naked-style layered red velvet cake with cream cheese filling and chocolate ganache drip.",
       "variations": [
         { "id": "fx_rv_s", "name": "Small (serves 6)", "priceUsd": 38, "available": true },
@@ -41,7 +41,7 @@
       "name": "Chocolate Truffle Layer",
       "description": "Tall chocolate sponge layered with airy white cream and finished with a dark ganache top. For when the moment calls for chocolate, not for a chocolate cake.",
       "category": "celebration",
-      "imageUrl": "/brand/products/product-04.webp",
+      "imageUrl": "/brand/products/happy-cake-product-04.webp",
       "imageAlt": "Cross-section of a tall chocolate sponge cake layered with airy white cream and dark ganache top.",
       "variations": [
         { "id": "fx_ch_s", "name": "Small (serves 6)", "priceUsd": 38, "available": true },
@@ -57,7 +57,7 @@
       "name": "Berry Vanilla Sponge",
       "description": "Light vanilla sponge layered with pastel berry buttercream and a bright fresh-berry filling. A celebration cake for spring birthdays and afternoon parties.",
       "category": "celebration",
-      "imageUrl": "/brand/products/product-09.webp",
+      "imageUrl": "/brand/products/happy-cake-product-09.webp",
       "imageAlt": "Slice of vanilla sponge layer cake with pastel lavender buttercream and bright berry filling.",
       "variations": [
         { "id": "fx_bv_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
@@ -73,7 +73,7 @@
       "name": "Pineapple Vanilla Layer",
       "description": "Vanilla sponge layered with whipped cream and bright pineapple between every tier. Light, fruity, and cheerful — the cake we bring out when the weather turns.",
       "category": "celebration",
-      "imageUrl": "/brand/products/product-08.webp",
+      "imageUrl": "/brand/products/happy-cake-product-08.webp",
       "imageAlt": "Layered vanilla sponge cake with whipped cream and pineapple pieces between every tier.",
       "variations": [
         { "id": "fx_pv_s", "name": "Small (serves 6)", "priceUsd": 36, "available": true },
@@ -88,7 +88,7 @@
       "name": "Strawberry Pavlova",
       "description": "Crisp meringue shell, billowy whipped cream, fresh strawberries. Made the morning of pickup — meringue waits for no one.",
       "category": "seasonal",
-      "imageUrl": "/brand/products/product-05.webp",
+      "imageUrl": "/brand/products/happy-cake-product-05.webp",
       "imageAlt": "Crisp pavlova topped with whipped cream and fresh strawberries.",
       "variations": [
         { "id": "fx_pv_s", "name": "Single (serves 4)", "priceUsd": 28, "available": true },
@@ -103,7 +103,7 @@
       "name": "Kartoshka — Cake Truffles",
       "description": "Hand-rolled cake-crumb truffles dusted with poppy seeds. Six pieces per box. The childhood-treat slice you take home when you can't choose a whole cake.",
       "category": "everyday",
-      "imageUrl": "/brand/products/product-01.webp",
+      "imageUrl": "/brand/products/happy-cake-product-01.webp",
       "imageAlt": "Hand-rolled cake-crumb truffle balls dusted with poppy seeds on a white plate.",
       "variations": [
         { "id": "fx_kt_box6", "name": "Box of 6", "priceUsd": 14, "available": true },
@@ -118,7 +118,7 @@
       "name": "Black Forest",
       "description": "Chocolate sponge with cherry compote, whipped cream, and dark chocolate curls. The classic, done patiently. Cherries are seasonal — call ahead.",
       "category": "celebration",
-      "imageUrl": "/brand/hero/hero-01.webp",
+      "imageUrl": "/brand/hero/happy-cake-hero-01.webp",
       "imageAlt": "Black Forest cake crowned with whipped cream rosettes, stemmed cherries, and dark chocolate curls.",
       "variations": [
         { "id": "fx_bf_s", "name": "Small (serves 6)", "priceUsd": 42, "available": true },
