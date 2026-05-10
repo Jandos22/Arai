@@ -103,9 +103,8 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
         tool: "square_create_order",
         source: input.source ?? "website",
         payloadPreview: {
+          items: [{ variationId: variation.id, quantity }],
           source: input.source ?? "website",
-          variationId: variation.id,
-          quantity,
           customerName: safeText(input.customerName, "Website customer"),
           customerNote: notes || "Website order intent captured; confirm pickup before charging.",
         },
@@ -114,9 +113,10 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
         tool: "kitchen_create_ticket",
         when: "after cashier confirmation and capacity check",
         payloadPreview: {
-          productId: item.id,
-          quantity,
-          requestedPickup: [input.pickupDate, input.pickupTime].filter(Boolean).join(" ") || "TBD",
+          customerName: safeText(input.customerName, "Website customer"),
+          items: [{ productId: item.kitchenProductId ?? item.id, quantity }],
+          requestedPickupAt: [input.pickupDate, input.pickupTime].filter(Boolean).join("T") || undefined,
+          notes: notes || "Website order intent captured; confirm pickup before prep.",
         },
       },
       ownerGate: {

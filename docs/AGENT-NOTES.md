@@ -122,13 +122,20 @@ contracts agree. Verified by `scripts/test_website.sh`.
 
 - selected product/variation/quantity + estimated total
 - customer contact + pickup window
-- cashier handoff preview (`square_create_order`)
-- kitchen handoff preview (`kitchen_create_ticket` after capacity check)
+- cashier handoff preview and, when `STEPPE_MCP_TOKEN` is present, a direct
+  `square_create_order` MCP write
+- kitchen handoff preview and, after Square returns an order id, a direct
+  `kitchen_create_ticket` MCP write
 - owner-gate decision for custom/allergy/complaint/high-value cases
 
 This route deliberately does **not** charge cards. It is the safe browser-facing
 adapter seam between the future production website and the already-working
-sandbox POS/kitchen flow.
+sandbox POS/kitchen flow. Website intake calls MCP directly instead of enqueueing
+through the Python orchestrator, because the route is already the realtime
+customer boundary; the orchestrator remains responsible for world/scenario and
+channel events. Without `STEPPE_MCP_TOKEN`, the route stays in offline fixture
+mode and returns deterministic handoff metadata without write calls. Owner-gated
+orders skip all MCP writes until approval.
 
 ## Contract #6 — `/api/assistant` + `/assistant` (on-site assistant)
 
