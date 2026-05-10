@@ -26,7 +26,8 @@ mkdir -p ~/.config/arai && cp .env.example ~/.config/arai/env.local
 # → fill in STEPPE_MCP_TOKEN (from your team launch kit) and Telegram bot tokens
 
 # website (Next.js storefront + /order + /assistant)
-cd website && npm install && npm run dev          # http://localhost:3000
+cd website && npm install
+cd .. && npm run dev                              # http://localhost:3000
 # browser routes: /menu, /order, /assistant
 # agent APIs: /agent.json, /api/catalog, /api/policies, /api/order-intent, /api/assistant
 
