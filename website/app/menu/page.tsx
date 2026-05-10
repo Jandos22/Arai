@@ -1,7 +1,9 @@
 import Image from "next/image";
+import { itemAvailabilityLabel, loadAvailability } from "@/lib/availability";
 import { loadCatalog, priceRange } from "@/lib/catalog";
 
 export const metadata = { title: "Menu — HappyCake US" };
+export const dynamic = "force-dynamic";
 
 const CATEGORY_LABELS: Record<string, string> = {
   signature: "Signature cakes",
@@ -18,8 +20,9 @@ function leadDisplay(min: number | undefined): string {
   return `${Math.round(min / 60 / 24)}-day lead`;
 }
 
-export default function Menu() {
+export default async function Menu() {
   const catalog = loadCatalog();
+  const availability = await loadAvailability();
   const byCategory = catalog.items.reduce<Record<string, typeof catalog.items>>((acc, item) => {
     (acc[item.category] ||= []).push(item);
     return acc;
@@ -31,9 +34,13 @@ export default function Menu() {
         <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">Menu</p>
         <h1 className="mt-2 font-display text-4xl text-happy-blue-900">Every cake, every size.</h1>
         <p className="mt-3 text-ink/70 max-w-xl">
-          Order by WhatsApp or Instagram DM. Most cakes are ready in 90 minutes; cakes with hand-piped
-          names need 3 hours. Pickup at our Sugar Land kitchen.
+          Order by WhatsApp or Instagram DM. Stock and kitchen capacity are checked before we confirm
+          a pickup window at our Sugar Land kitchen.
         </p>
+        <div className="mt-5 rounded-2xl border border-happy-blue-200 bg-white p-4 text-sm text-ink/75">
+          <p className="font-medium text-happy-blue-900">Today&apos;s capacity</p>
+          <p className="mt-1">{availability.customerPromise}</p>
+        </div>
       </header>
 
       {Object.entries(byCategory).map(([cat, items]) => (
@@ -71,6 +78,9 @@ export default function Menu() {
                     <span className="font-medium text-happy-blue-700">${min}–${max}</span>
                     <span className="text-ink/60">{leadDisplay(item.leadTimeMinutes)}</span>
                   </div>
+                  <p className="mt-2 text-xs font-medium text-coral">
+                    {itemAvailabilityLabel(availability, item)}
+                  </p>
                 </a>
               );
             })}

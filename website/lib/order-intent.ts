@@ -86,6 +86,13 @@ export type OrderIntent = {
       routeTo: CampaignRoute;
       evidence: string[];
     };
+    availability: {
+      endpoint: "/api/availability";
+      requiredBeforePromise: true;
+      inventoryTool: "square_get_inventory";
+      capacityTool: "kitchen_get_capacity";
+      fallbackRule: string;
+    };
   };
   nextStep: string;
 };
@@ -237,6 +244,14 @@ export function createOrderIntent(input: OrderIntentInput): OrderIntent {
           requestedPickup: [input.pickupDate, input.pickupTime].filter(Boolean).join(" ") || "TBD",
           attribution,
         },
+      },
+      availability: {
+        endpoint: "/api/availability",
+        requiredBeforePromise: true,
+        inventoryTool: "square_get_inventory",
+        capacityTool: "kitchen_get_capacity",
+        fallbackRule:
+          "If live availability is unavailable, do not promise stock or pickup timing; confirm with staff before accepting payment.",
       },
       ownerGate: {
         required: ownerRequired,

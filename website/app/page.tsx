@@ -1,8 +1,12 @@
 import Image from "next/image";
+import { loadAvailability } from "@/lib/availability";
 import { loadCatalog, priceRange } from "@/lib/catalog";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
   const catalog = loadCatalog();
+  const availability = await loadAvailability();
   const featured = catalog.items.filter((i) => i.imageUrl).slice(0, 4);
 
   return (
@@ -18,7 +22,8 @@ export default function Home() {
           </h1>
           <p className="mt-6 text-lg text-ink/80 max-w-md">
             Traditional, time-tested cakes — hand-decorated, hand-packed, the kind your grandmother
-            would say tastes like real home baking. Order ahead by WhatsApp or pick up today.
+            would say tastes like real home baking. Order ahead by WhatsApp or request a confirmed
+            pickup window.
           </p>
           <div className="mt-8 flex gap-3 flex-wrap">
             <a
@@ -50,6 +55,34 @@ export default function Home() {
             sizes="(min-width: 768px) 50vw, 100vw"
             className="object-cover"
           />
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-happy-blue-200 bg-white p-6">
+        <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+          <div>
+            <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">
+              Availability today
+            </p>
+            <h2 className="mt-2 font-display text-2xl text-happy-blue-900">
+              Stock and pickup timing are checked before we promise.
+            </h2>
+            <p className="mt-3 text-sm text-ink/75 max-w-2xl">{availability.customerPromise}</p>
+          </div>
+          <div className="grid gap-3 text-sm">
+            <div className="rounded-xl bg-cream-100 px-4 py-3">
+              <p className="font-medium text-happy-blue-900">Inventory</p>
+              <p className="text-ink/70">
+                {availability.tools.square_get_inventory === "live"
+                  ? "Live Square inventory is connected."
+                  : "Live Square inventory is unavailable; stock needs confirmation."}
+              </p>
+            </div>
+            <div className="rounded-xl bg-cream-100 px-4 py-3">
+              <p className="font-medium text-happy-blue-900">Kitchen capacity</p>
+              <p className="text-ink/70">{availability.capacity.label}</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -107,7 +140,7 @@ export default function Home() {
         <div>
           <p className="font-display text-2xl">Same-day pickup.</p>
           <p className="text-cream-200 mt-2 text-sm">
-            Most cakes ready in 90 minutes from order. Custom names, 3 hours.
+            Requested when stock and kitchen capacity allow; every pickup window is confirmed first.
           </p>
         </div>
         <div>

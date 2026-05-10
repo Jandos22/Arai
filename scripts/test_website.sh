@@ -81,24 +81,46 @@ d = json.load(sys.stdin)
 assert "items" in d
 assert d["source"] in ("fixture", "mcp-snapshot")
 assert len(d["items"]) >= 1
+assert d["_availabilityEndpoint"] == "/api/availability"
+assert "availability" in d["_orderPath"]["notes"].lower()
 for item in d["items"]:
     for k in ("id", "slug", "name", "variations"):
         assert k in item, f"item missing {k}"
 print("api/catalog OK ({} items, source={})".format(len(d["items"]), d["source"]))
 ' || { red "/api/catalog FAILED"; failures=$((failures+1)); }
 
-# 3. /api/policies
+# 3. /api/availability
+availability=$(curl -sS "${BASE}/api/availability")
+echo "$availability" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["source"] in ("mcp-live", "partial-live", "conservative-fallback")
+assert d["tools"]["square_get_inventory"] in ("live", "unconfigured", "error")
+assert d["tools"]["kitchen_get_capacity"] in ("live", "unconfigured", "error")
+assert "inventory" in d and len(d["inventory"]) >= 1
+assert d["capacity"]["source"] in ("kitchen_get_capacity", "fallback")
+assert "promise" in d["customerPromise"].lower() or "confirmation" in d["customerPromise"].lower()
+if d["source"] == "conservative-fallback":
+    assert d["tools"]["square_get_inventory"] == "unconfigured"
+    assert d["tools"]["kitchen_get_capacity"] == "unconfigured"
+    assert "unavailable" in d["customerPromise"].lower()
+print("api/availability OK (source={})".format(d["source"]))
+' || { red "/api/availability FAILED"; failures=$((failures+1)); }
+
+# 4. /api/policies
 policies=$(curl -sS "${BASE}/api/policies")
 echo "$policies" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
 assert d["business"]["name"] == "HappyCake US"
 assert "ordering" in d and "channels" in d["ordering"]
+assert d["ordering"]["availabilityEndpoint"] == "/api/availability"
+assert "do not promise" in d["ordering"]["promiseRule"].lower()
 assert "allergens" in d
 print("api/policies OK")
 ' || { red "/api/policies FAILED"; failures=$((failures+1)); }
 
-# 4. JSON-LD on a product page
+# 5. JSON-LD on a product page
 slug=$(echo "$catalog" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
@@ -112,7 +134,7 @@ else
   failures=$((failures+1))
 fi
 
-# 5. Website order-intent API creates source=website handoff metadata
+# 6. Website order-intent API creates source=website handoff metadata
 order_payload=$(python3 - <<PY
 import json
 print(json.dumps({
@@ -150,10 +172,13 @@ assert intent["handoff"]["campaignLead"]["routeTo"] == "website"
 assert "landingPath=/office-boxes" in intent["handoff"]["campaignLead"]["evidence"]
 assert intent["handoff"]["cashier"]["tool"] == "square_create_order"
 assert intent["handoff"]["kitchen"]["tool"] == "kitchen_create_ticket"
+assert intent["handoff"]["availability"]["endpoint"] == "/api/availability"
+assert intent["handoff"]["availability"]["requiredBeforePromise"] is True
+assert "do not promise" in intent["handoff"]["availability"]["fallbackRule"].lower()
 print("api/order-intent OK")
 ' || { red "/api/order-intent FAILED"; failures=$((failures+1)); }
 
-# 5b. Campaign routing covers website, WhatsApp, Instagram, and owner approval
+# 6b. Campaign routing covers website, WhatsApp, Instagram, and owner approval
 python3 - "$BASE" "$slug" <<'PY' || { red "campaign routing variants FAILED"; failures=$((failures+1)); }
 import json
 import sys
@@ -201,7 +226,7 @@ for source, quantity, notes, expected_route in cases:
 print("campaign routing variants OK")
 PY
 
-# 6. On-site assistant API covers required consultation scenarios without MCP.
+# 7. On-site assistant API covers required consultation scenarios without MCP.
 custom_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon with a soccer theme"}')
 echo "$custom_assistant" | python3 -c '
 import json, sys
@@ -240,6 +265,7 @@ assert d["ok"] is True
 assert d["intent"] == "status"
 assert d["escalation"]["required"] is False
 assert d["endpoints"]["policies"] == "/api/policies"
+assert d["endpoints"]["availability"] == "/api/availability"
 answer = d["answer"].lower()
 assert "share the order name" in answer and "pickup time" in answer
 assert "ready now" not in answer and "completed" not in answer and "paid" not in answer
@@ -255,12 +281,14 @@ assert d["intent"] == "policy"
 assert d["escalation"]["required"] is False
 assert d["endpoints"]["policies"] == "/api/policies"
 assert d["endpoints"]["catalog"] == "/api/catalog"
+assert d["endpoints"]["availability"] == "/api/availability"
 answer = d["answer"].lower()
 assert "limited/case-by-case" in answer
+assert "never guaranteed" in answer
 print("api/assistant policy grounding OK")
 ' || { red "/api/assistant policy grounding FAILED"; failures=$((failures+1)); }
 
-# 7. Static pages render (not 404)
+# 8. Static pages render (not 404)
 for path in "/" "/menu" "/office-boxes" "/about" "/policies" "/order" "/assistant"; do
   code=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}${path}")
   if [[ "$code" != "200" ]]; then
@@ -270,7 +298,7 @@ for path in "/" "/menu" "/office-boxes" "/about" "/policies" "/order" "/assistan
 done
 green "All static pages OK"
 
-# 8. Campaign landing page carries attribution into the order path
+# 9. Campaign landing page carries attribution into the order path
 office_boxes=$(curl -sS "${BASE}/office-boxes")
 if echo "$office_boxes" | grep -q 'utm_campaign=office_boxes_sugar_land' && echo "$office_boxes" | grep -q 'landingPath=%2Foffice-boxes'; then
   green "Campaign landing attribution on /office-boxes OK"
