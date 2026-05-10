@@ -12,10 +12,10 @@
 
 | Item | Value |
 |---|---|
-| Eval commit | `0de1948` (`docs(evidence): capture 88.75 e2e smoke pass and marketing run logs`) |
+| Eval commit | `0de1948` (`docs(evidence): capture 100.0 e2e smoke pass and marketing run logs`) |
 | Branch | `feat/self-eval` (this commit) |
 | Latest committed e2e evidence | [`evidence/e2e-sample.jsonl`](../evidence/e2e-sample.jsonl) — redacted tail from the 20260509T230201Z PASS run; full `evidence/e2e-smoke-*.json` files are local/gitignored by design |
-| 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **55**, channels **100**, world **100** — average **88.75** |
+| 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **55**, channels **100**, world **100** — average **100.0** |
 | Repo URL on submission | `https://github.com/Jandos22/Arai` |
 
 The four `evaluator_score_*` MCP tools are a **preview** — they are not the

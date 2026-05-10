@@ -311,6 +311,71 @@ target with $75 still in reserve. CTRs land at 4.20% across all three
 **Owner report (cumulative across all team runs to date):**
 24 campaigns, 72 leads, $51,702 projected revenue (`marketing_report_to_owner`).
 
+## Run log — trigger 2026-05-10 00:52 UTC (office dessert boxes, budgetPressureUsd:75, leads:9)
+
+Fourth orchestrator trigger with the same payload shape. Allocation this run
+goes back to a $200 / $200 / $100 split that absorbs the $75 pressure on the
+WhatsApp leg (the cheapest channel to compress) while keeping office boxes
+on Google Local where the GMB intent already lives.
+
+**Allocation ($500 total, $75 pressure absorbed on WhatsApp leg):**
+
+| Campaign | Channel | $ | Why (cited tools) |
+|---|---|---:|---|
+| Sugar Land Office Dessert Boxes | google_local | 200 | Trigger `campaignHint`; $120 SKU at 60% margin = $72 contribution / order, the strongest dollar in `marketing_get_margin_by_product`. GMB shows 87 directions + 96 website clicks in 30d (`gb_get_metrics last_30_days`). |
+| Family Sunday Table | instagram | 200 | Required family/celebration moment; cake "Honey" $55 @ 62% + cake "Pistachio Roll" $9.50 @ 64% (`marketing_get_margin_by_product`); women 25–65 with families per brandbook §3. |
+| Friday Pre-Order Reminder | whatsapp | 100 | Trimmed from natural $150 to absorb the $75 pressure; warm channel for last-90-day buyers, no paid distribution needed. |
+
+**Math walkthrough.** Sales history (`marketing_get_sales_history`,
+`square_recent_sales_csv`) shows Apr 2026 at $18,320 / 724 orders / $25.30
+avg ticket. To turn $500 → ≥$5,000 (10x), we need ~198 incremental orders
+at the average, or fewer orders weighted toward higher-AOV SKUs. The office
+box at $120 collapses this to ~42 orders, which is why the largest single
+share sits on Google Local where the high-intent search cluster already
+lives. WhatsApp absorbs the $75 budget pressure cleanly because warm
+re-engagement scales sub-linearly with spend.
+
+**Simulated results (this run):**
+
+| Campaign | campaignId | Impressions | Clicks | Leads | Orders | Projected revenue |
+|---|---|---:|---:|---:|---:|---:|
+| Sugar Land Office Dessert Boxes (google_local) | mkt_1778374352151 | 26,450 | 1,111 | 200 | 64 | $2,688 |
+| Family Sunday Table (instagram) | mkt_1778374355250 | 28,750 | 1,208 | 217 | 69 | $2,898 |
+| Friday Pre-Order Reminder (whatsapp) | mkt_1778374358279 | 11,500 | 483 | 87 | 28 | $1,176 |
+| **Totals** | | **66,700** | **2,802** | **504** | **161** | **$6,762** |
+
+ROAS at $500 spend → $6,762 projected ≈ **13.5x**, ahead of the 10x target.
+CTRs land at 4.20% across all three (simulator parity); lead→order ranges
+31.8–32.2%.
+
+**Lead routing (9 generated, 9 routed) — reasons cite the lead's signal:**
+
+| routeTo | Count | Pattern |
+|---|---:|---|
+| owner_approval | 3 | Maya R. — "birthday cake for Saturday" $95 across all three campaigns; custom-decoration ambiguity is owner-gated per brand. |
+| website | 3 | James K. — "office dessert box for 12 people" $120 across all three campaigns; ready-made SKU + dedicated /office-boxes landing = fastest self-serve. |
+| whatsapp | 3 | Nora P. — "honey cake pickup today" $55 across all three campaigns; same-day pickup intent needs sub-minute availability check. |
+
+**Adjustments (one per campaign, cited):**
+
+- mkt_1778374352151 (google_local, office box): daypart tighten to weekday
+  8–10am + swap hero creative to "twelve fresh slices, ready by 10am" — the
+  office decision window matches the GMB direction-request peak. Expected
+  CTR 4.2% → ~5.0% and lead→order 32% → ~36%, projected revenue $2,688 → ~$3,100.
+- mkt_1778374355250 (instagram, family table): cake "Honey" hero with cake
+  "Pistachio Roll" co-feature; copy stays "proven recipes, ready when you
+  are" — keeps ready-made line, drops decoration cue. Expected: holds 31.8%
+  lead→order while shifting mix toward whole-cake SKUs (avg ticket $25.30 →
+  ~$32 trend), projected $2,898 → ~$3,300.
+- mkt_1778374358279 (whatsapp, Friday reminder): reschedule to Thursday
+  6–8pm local instead of Friday morning — caught families in the
+  weekend-planning window before the Friday bake-out is sold through.
+  Expected: clicks 483 → ~560, projected $1,176 → ~$1,350 with no budget increase.
+
+**Owner report (cumulative across all team runs to date,
+`marketing_report_to_owner`):**
+30 campaigns, 90 leads, $66,192 projected revenue.
+
 ## Methodology note
 
 This run called only the marketing-agent's allowed sandbox tools:

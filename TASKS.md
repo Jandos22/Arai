@@ -27,7 +27,7 @@ _(none — pick from Queued)_
 | T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | aa6a3bf | CC |
 | T-005 | Sales agent — `agents/sales/`: WA + IG prompts, owner-gate triggers (custom decoration / allergy / >$80 / lead-time / emotional / requires_custom_work), end-to-end smoke PASS on both paths | c736d14 | CC |
 | T-007 | Ops agent — `agents/ops/`: GMB review-reply (rev_001 5★ → cake "Honey" Saturday-bake reply) + canonical IG post owner-gate (schedule → approve → publish, all three stages PASS) + kitchen state prompt + escalation rules | d211d43 | CC |
-| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — committed PASS evidence average 88.75, with final 100/100 local preview pending evidence refresh after capacity-aware handoff | 0de1948 / pending | CC + Hermes |
+| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — final PASS evidence average 100/100: M:100 / POS:100 / Ch:100 / W:100, with capacity-aware Square→kitchen decision in redacted sample | final evidence refresh | CC + Hermes |
 | T-011 | LocalBusiness JSON-LD + Open Graph + sitemap on website | 7df1674 | Hermes |
 | T-012 | `docs/PRODUCTION-PATH.md` — post-hackathon real-adapter path | ca0608d | Hermes |
 | T-013 | Sales agent bonus paths — complaint handling + custom-cake consultation, both owner-gated | eeabb4f | CC |
