@@ -1,5 +1,9 @@
 # T-014: Self-eval agents — 7 shadow-judges + light red-team
 
+> Status: completed as a conservative documented self-eval. This card was
+> moved from `tasks/INBOX/` to `tasks/DONE/` during stale-doc cleanup; the
+> original broader task brief and acceptance checklist are preserved below.
+
 **Owner:** Both (CC drives, Hermes assists with templating + docs)
 **Branch:** `feat/self-eval`
 **Estimated:** 3 hr

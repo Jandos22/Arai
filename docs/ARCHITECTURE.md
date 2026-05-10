@@ -137,8 +137,8 @@ The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. 
 | Loop | Status | Evidence |
 |---|---|---|
 | Marketing $500 → $5K | ✅ preview score 100/100 — demand-engine campaigns + routed leads + owner reports | `agents/marketing/`, `docs/MARKETING.md`, `evidence/marketing-sample.jsonl`, `evidence/e2e-sample.jsonl` |
-| POS + kitchen | ✅ preview score 55/100 after seeded Square walk-in fix — POS order + kitchen ticket + ready status; remaining gap is explicit capacity decision | `orchestrator/handlers/square.py`, `evidence/e2e-sample.jsonl`, `docs/SELF-EVAL.md` |
-| Channel response (WA / IG / GMB) | ⚠️ preview score 100/100, but latest evidence still shows sparse outbound counts; we route WA/IG/GMB/gbusiness and document the caveat honestly | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/` |
+| POS + kitchen | ✅ preview score 100/100 after capacity-aware Square→kitchen handoff — order, ticket, capacity check, accept/ready, POS status update | `orchestrator/handlers/square.py`, `orchestrator/tests/test_square_capacity.py`, `evidence/e2e-sample.jsonl` |
+| Channel response (WA / IG / GMB) | ✅ preview score 100/100; evidence includes channel inbounds + agent response previews, with remaining polish around explicit outbound-action counters | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/`, `evidence/e2e-sample.jsonl` |
 | World scenario | ✅ preview score 100/100 — deterministic launch-day scenario runs through `world_start_scenario` / `world_next_event` | `orchestrator/`, `evidence/e2e-sample.jsonl` |
 | Owner UI | ✅ Approval queue (T-003) + 3 dedicated bots (`bots/marketing_bot`, `ops_bot`, `sales_bot`) | `orchestrator/telegram_bot.py`, `bots/` |
 | Agent-readable site | ✅ `/agent.json`, `/api/catalog`, `/api/policies`, JSON-LD per product (T-002) | `website/`, `docs/AGENT-NOTES.md`, `scripts/test_website.sh` |

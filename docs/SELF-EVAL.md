@@ -12,10 +12,10 @@
 
 | Item | Value |
 |---|---|
-| Eval commit | `0de1948` (`docs(evidence): capture 100.0 e2e smoke pass and marketing run logs`) |
-| Branch | `feat/self-eval` (this commit) |
-| Latest committed e2e evidence | [`evidence/e2e-sample.jsonl`](../evidence/e2e-sample.jsonl) — redacted tail from the 20260509T230201Z PASS run; full `evidence/e2e-smoke-*.json` files are local/gitignored by design |
-| 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **55**, channels **100**, world **100** — average **100.0** |
+| Eval commit | `2756932` (`docs: reframe Arai as product system`) |
+| Branch | current fork/worktree |
+| Latest committed e2e evidence | [`evidence/e2e-sample.jsonl`](../evidence/e2e-sample.jsonl) — redacted tail from the 20260510T004907Z PASS run; full `evidence/e2e-smoke-*.json` files are local/gitignored by design |
+| 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **100**, channels **100**, world **100** — average **100.0** |
 | Repo URL on submission | `https://github.com/Jandos22/Arai` |
 
 The four `evaluator_score_*` MCP tools are a **preview** — they are not the
@@ -27,9 +27,9 @@ what's actually committed.
 
 - Each pass cites concrete files / line spans / evidence artefacts. No
   hand-waving "we have great architecture" — point at the file.
-- Where the four-loop preview shows a real gap (`pos_kitchen 55`, channels
-  `0 WhatsApp response(s)` even though the score is 100), we **lower** the
-  judge-side score, not raise it.
+- Where the four-loop preview is now green, we still keep judge-side scores
+  conservative when evidence is thin or requires a human to infer behavior
+  from `claude_run` previews instead of explicit outbound-action rows.
 - One actionable fix per dim, scoped to fit the May 10 10:00 CT window.
 - Each gap traceable to a closure path in
   [`PRODUCTION-PATH.md`](PRODUCTION-PATH.md) where the post-hackathon
@@ -40,33 +40,32 @@ what's actually committed.
 
 | # | Dimension | Likely score | Confidence | One-line read |
 |---|---|---:|---|---|
-| 1 | Functional | **80** | medium | All four loops fire; pos_kitchen partial; channels score-100 / response-count-0 dissonance is a judge tripwire |
+| 1 | Functional | **86** | medium | All four loops now preview 100; capacity-aware Square→kitchen evidence is present; channel outbound counters are still worth polishing |
 | 2 | Depth | **78** | medium-low | 5 owner-gate triggers + complaint + custom-cake paths shipped; per-call agent reasoning is opaque to evaluator beyond `claude_run` markers |
-| 3 | Impact | **84** | medium | $500 case is real-data math (`MARKETING.md:5-44`); ROAS 13.27× simulator; production path concrete; POS still capacity-blind |
+| 3 | Impact | **88** | medium | $500 case is real-data math (`MARKETING.md:5-44`); ROAS 13.27× simulator; production path concrete; POS now checks capacity before accepting |
 | 4 | UX | **78** | medium-low | Website JSON-LD + `/agent.json` + real photos shipped; no Lighthouse number on file; Telegram owner UX is solid but undocumented in screenshots |
 | 5 | Arch | **88** | high | Plain-Python orchestrator, single MCP chokepoint, no SDK/n8n, swap path drawn in `PRODUCTION-PATH.md:19-40` |
 | 6 | Prod | **76** | medium | Pre-commit hook + `.env.example` clean + evidence redaction in place; no CI, no Lighthouse, no health-check pipe |
 | 7 | Inn | **76** | medium-low | `/agent.json`, per-agent scoped MCPs, T-013 bonus paths, allergen owner-gate; bucket C bonus items mostly unbuilt (lead scoring, referrals, follow-up) |
-| | **Mean (equal weights)** | **80** | | Plausibly 75–85 depending on judge calibration |
+| | **Mean (equal weights)** | **82** | | Plausibly 78–87 depending on judge calibration |
 
-Below 80 if judges punish the four "0 WhatsApp response" rows hard, or if
-they read pos_kitchen=55 as a partial-credit ceiling on Functional. Above
-85 only if Inn rewards the agent-readable surface as a category in itself.
+Below 80 only if judges heavily discount sandbox previews and require richer
+human-visible UX proof. Above 85 if they reward the agent-readable storefront,
+owner-gate safety, and production-adapter path as real product surface.
 
 ---
 
 ## Pass 1 — Functional
 
-**Likely score: 80 / 100. Confidence: medium.**
+**Likely score: 86 / 100. Confidence: medium.**
 
 What the dimension covers: does each channel work end-to-end? Does the
 order intent → kitchen handoff close? Does the marketing loop run?
 
 ### Evidence in repo / logs
 
-- All four MCP loops report a non-error response in
-  `evidence/e2e-sample.jsonl` (redacted sample from the 20260509T230201Z PASS run). Marketing 100, channels 100,
-  world 100, pos_kitchen 55.
+- All four MCP loops report a 100/100 preview in the latest committed
+  evidence summary: marketing 100, pos_kitchen 100, channels 100, world 100.
 - Walk-in order **completes the production lifecycle**:
   `square_create_order` → `kitchen_create_ticket` → `kitchen_accept_ticket`
   → `kitchen_mark_ready` → `square_update_order_status` —
@@ -80,15 +79,13 @@ order intent → kitchen handoff close? Does the marketing loop run?
 
 ### Risks / gaps (be honest)
 
-- **Channels score = 100 but `whatsappOutbound = 0`** in the same payload
-  (20260509T230201Z PASS run evidence counts, summarized in `evidence/e2e-sample.jsonl`). The evaluator
-  scored on world events delivered, not on outbound replies — if a
-  Functional judge clicks one level deeper, the inconsistency reads as
-  "score is generous". Same for Instagram (0 actions) and GMB (0
-  replies). If the judge is mean, the dimension drops 10+ points.
-- **Pos_kitchen = 55, not 100.** Walk-in is auto-accepted with no
-  capacity check; no reject path ever exercised; one ticket ever created.
-  Detail in §"Why POS/kitchen is 55, not 100" below.
+- **Channel outbound evidence is still indirect.** The committed sample has
+  `claude_run.responsePreview` rows and owner-gate rows, but explicit
+  `channel_outbound` counters would make the WA/IG/GMB paths easier for a
+  judge to verify at a glance.
+- **The live e2e sample exercises the accept path, while unit tests cover
+  reject/custom/unmapped branches.** Good enough for preview scoring; richer
+  live evidence across both branches would be more convincing.
 - **No real customer loop ever round-trips.** All inbound is from
   `world_*` injects or `whatsapp_inject_inbound` — there is no real WA
   webhook. We're transparent about this in the brief, but a Functional
@@ -96,14 +93,9 @@ order intent → kitchen handoff close? Does the marketing loop run?
 
 ### One actionable fix (≤30 min)
 
-Patch `orchestrator/handlers/whatsapp.py` to **also** capture the agent's
-final `whatsapp_send` tool call as an explicit evidence row
-(`channel_outbound`, channel/whatsapp/to/preview). The sales agent
-already has `whatsapp_send` permission in
-`agents/sales/CLAUDE.md:60-62`; the gap is just that the orchestrator
-log doesn't surface the call as an `outbound` event in the smoke
-payload. With one row per outbound, the next smoke shows
-`whatsappOutbound > 0` and the score-vs-counts mismatch closes.
+Patch the channel handlers to write explicit `channel_outbound` evidence rows
+whenever the agent returns or triggers a send/reply action. The agent prompts
+already have the right tool permissions; this is mostly evidence shape.
 
 ---
 
@@ -192,10 +184,9 @@ Monday? Does the math hold up?
 
 ### Risks / gaps
 
-- **POS automation is capacity-blind.** Real Happy Cake doesn't auto-accept
-  every walk-in — they look at the prep board first. The current handler
-  always accepts. This is the single biggest "would Askhat actually use
-  this on Monday" question.
+- **Live capacity evidence is still narrow.** The committed e2e sample proves
+  an accept decision with capacity math; the reject path is covered by unit
+  tests rather than a live sandbox run.
 - **Lead routing has logic but no scoring.** Owner sees one lead at a
   time without "this lead is 8/10 vs 4/10" context — would matter at any
   scale (BONUS-PLAN.md:58).
@@ -205,11 +196,9 @@ Monday? Does the math hold up?
 
 ### One actionable fix (≤30 min)
 
-Wire `kitchen_get_capacity` into `orchestrator/handlers/square.py`
-between `kitchen_create_ticket` and `kitchen_accept_ticket`. If
-headroom < 0, call `kitchen_reject_ticket` with reason and surface to
-owner via Telegram. Same change closes the pos_kitchen 55→90+ gap and
-the "would Askhat actually use this" Impact concern in one PR.
+Run one live `weekend-capacity-crunch` or synthetic overloaded Square event
+after the current accept-path smoke, then commit a redacted evidence tail that
+shows both accept and reject/owner-review behavior.
 
 ---
 
@@ -427,114 +416,62 @@ adding any new doc.
 
 ---
 
-## Why POS/kitchen is currently 55, not 100
+## Why POS/kitchen is now 100
 
-Score history across all eight smoke runs today:
-
-```
-20T200418Z  pos=0    (handler dropped seeded square:walk_in_order)
-20T202402Z  pos=0
-20T202847Z  pos=0
-20T203734Z  pos=0
-21T215254Z  pos=0
-22T220630Z  pos=0
-22T222608Z  pos=0
-23T230201Z  pos=55   ← after commit 5f1bd8f
-```
-
-What changed in `5f1bd8f` ("handle seeded Square walk-in orders through
-kitchen handoff"): `orchestrator/handlers/square.py` was previously
-dropping `square:walk_in_order` events. The fix walks the seeded order
-through `square_create_order` → `kitchen_create_ticket` →
-`kitchen_accept_ticket` → `kitchen_mark_ready` →
-`square_update_order_status`. The evaluator now sees real evidence:
-`1 Square/POS simulator order(s)` and `1 kitchen ticket(s)`, up from 0.
-
-The remaining gap, exactly as the evaluator reports it
-(latest 20260509T230201Z PASS run; redacted sample committed as `evidence/e2e-sample.jsonl`):
-
-> "gaps": ["No capacity-aware accept/reject decision"]
-
-The handler **always** accepts the walk-in, regardless of
-`kitchen_get_capacity` headroom. It never branches into the reject path.
-And only **one** order ever moves through — the seeded walk-in. The
-evaluator's rubric clearly rewards (a) capacity-aware decisions, (b)
-both sides of the accept/reject tree exercised, and probably (c) more
-than a single ticket in the run.
-
-A capacity-blind 100% acceptance rate is also the single least-realistic
-behavior for a real bakery — Askhat would not ship that on Monday. So
-the 55 is an honest read: *we have an evidence trail, but the decision
-loop is degenerate.*
-
-## What production path closes the remaining gap
-
-**Hackathon-window fix (≤30 min, in scope):**
-
-In `orchestrator/handlers/square.py`, between
-`kitchen_create_ticket` (line 85) and `kitchen_accept_ticket` (line
-102), insert a `kitchen_get_capacity` call. Branch on headroom:
+The earlier self-eval was written after the first Square fix but before the
+capacity-aware handoff landed. At that point POS/kitchen had moved from 0 to
+55 because the orchestrator finally carried a seeded walk-in order through:
 
 ```
-capacity = ctx.client.call_tool("kitchen_get_capacity", {})
-headroom_min = capacity.get("headroomMinutes", 0)
-
-if headroom_min < required_minutes_for(kitchen_items):
-    ctx.client.call_tool("kitchen_reject_ticket",
-        {"ticketId": ticket_id, "reason": "capacity_full"})
-    ctx.evidence.write("kitchen_reject", reason="capacity_full",
-                       ticketId=ticket_id, headroomMinutes=headroom_min)
-    if ctx.telegram_notifier:
-        ctx.telegram_notifier.request_approval(
-            summary=f"Kitchen at capacity — reject walk-in {order_id}?",
-            draft="Reject; offer pickup tomorrow.",
-            context={...})
-    return
-
-# else: continue to existing accept path
+square_create_order → kitchen_create_ticket → kitchen_accept_ticket
+→ kitchen_mark_ready → square_update_order_status
 ```
 
-This produces both branches of the decision tree in evidence
-(reject + accept across runs as load varies), which is what the
-evaluator rubric is asking for. Expected lift: pos_kitchen 55 → ~90.
-Functional and Impact also lift slightly because the same change is
-the "would Askhat actually use this" answer.
+The later fix added the missing production decision loop in
+`orchestrator/handlers/square.py`: after `kitchen_create_ticket`, the handler
+now reads `kitchen_get_capacity` and `kitchen_get_menu_constraints`, computes
+required prep minutes, writes a `square_capacity_decision` row, and then either
+accepts/marks ready or routes a rejection/owner-review path.
 
-**Post-hackathon path** (already drawn in `PRODUCTION-PATH.md:64-65`):
+The latest committed `evidence/e2e-sample.jsonl` shows the green accept path:
+6 honey-cake slices require 18 prep minutes, capacity has 402 minutes
+remaining, the ticket is accepted, marked ready, and the Square order is moved
+to `ready`. `docs/SUBMISSION.md` records the corresponding preview result:
+M:100 / POS:100 / Ch:100 / W:100.
 
-The kitchen state machine is one of the few sandbox tools without a
-vendor — we host it ourselves. The recommended targets are Airtable /
-Notion DB / lightweight Postgres + a kitchen-iPad PWA. Same
-`kitchen_get_capacity` tool name, real headroom from a real prep
-schedule. Decision logic in the agent layer doesn't change.
+The remaining honesty note is narrow: the committed live e2e sample shows the
+accept branch, while `orchestrator/tests/test_square_capacity.py` covers the
+reject/custom/unmapped branches. That is enough for the preview score, but a
+second redacted live sample from a capacity-crunch scenario would make the
+production story even easier to verify.
 
 ## Top 5 final fixes before submission
 
 In rank order by points-per-minute:
 
-1. **Capacity-aware accept/reject in `orchestrator/handlers/square.py`**
-   (~30 min). Closes pos_kitchen 55 → ~90, Functional 80 → ~85,
-   Impact 84 → ~88. Sketch above. **Single biggest move on the
-   leaderboard.**
-2. **Capture `whatsapp_send` / `instagram_send_dm` calls as
+1. **Capture `whatsapp_send` / `instagram_send_dm` calls as
    `channel_outbound` evidence rows** in `handlers/whatsapp.py` and
    `handlers/instagram.py` (~20 min). Closes the
-   "channels=100 / outbound=0" credibility gap, lifts Functional and
-   Depth defensibility.
-3. **Run Lighthouse mobile against the website + commit a screenshot**
+   "channels=100 but outbound proof is indirect" credibility gap, and lifts
+   Functional and Depth defensibility.
+2. **Run Lighthouse mobile against the website + commit a screenshot**
    to `docs/` and link from README (~15 min). Removes the biggest UX
    judge tripwire and ticks the `BONUS-PLAN.md` mobile-perf item.
-4. **Re-run `bash scripts/e2e_smoke.sh` after fixes 1+2 land** and
-   regenerate and commit the redacted `evidence/e2e-sample.jsonl` (~10 min). Keep full `evidence/e2e-smoke-*.json` files local/gitignored unless explicitly cleared for secrets. Otherwise the
-   `ARCHITECTURE.md:131-141` "running totals" disagree with the
-   artefacts judges actually read.
+3. **Run one final fresh-clone / preflight pass** (~20 min). Execute the
+   no-token website/orchestrator checks, then `scripts/evaluator_preview.sh`
+   with `.env.local` populated and confirm the four preview scores still read
+   100/100.
+4. **Optional: add one live capacity-crunch evidence sample** (~15 min).
+   The accept branch is already committed and reject/custom branches are unit
+   tested; a live reject/owner-review tail would make the production story
+   harder to misread.
 5. **Final token-leak scan over full history** per
    `SUBMISSION.md:80`: `git log -p | grep -iE
    '(sbc_team_|Bearer [A-Za-z0-9]{20,})'` should print nothing. Do it
    right before pushing the final commit (~5 min). Single hardest
    failure mode — DQ if a real token slipped in.
 
-Wall-clock for all five: ~80 min. The May 10 09:00 CT dress rehearsal
+Wall-clock for all five: ~70 min. The May 10 09:00 CT dress rehearsal
 in `SUBMISSION.md:38` is the hard gate.
 
 ## Judge readme — verify the core vertical slice in 5 minutes
@@ -566,7 +503,7 @@ What you're verifying:
 | You see this | It means |
 |---|---|
 | `[1/7]` … `[7/7] PASS` | All four MCP scoring loops returned a non-error response |
-| `marketing : 100`, `pos_kitchen : 55-90`, `channels : 100`, `world : 100` | The four-loop preview matches our self-eval inputs |
+| `marketing : 100`, `pos_kitchen : 100`, `channels : 100`, `world : 100` | The four-loop preview matches our self-eval inputs |
 | `evidence/e2e-sample.jsonl` reflects a PASS run with average ≥80 | Score is high enough for full bonus eligibility (`BONUS-PLAN.md:7-14`) |
 
 What to read for the seven dimensions, fastest to slowest:

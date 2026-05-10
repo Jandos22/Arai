@@ -1,5 +1,9 @@
 # T-013 — Sales agent: complaint + custom-cake consultation flows
 
+> Status: completed. This card was moved from `tasks/INBOX/` to
+> `tasks/DONE/` during stale-doc cleanup; the original task brief and
+> acceptance checklist are preserved below.
+
 **Owner:** Claude Code
 **Dependencies:** T-005 done, ideally T-007 done first (so ops bot can also receive complaint escalations)
 **Estimated:** 60–90 min
