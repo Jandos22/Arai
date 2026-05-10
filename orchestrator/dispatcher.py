@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from .claude_runner import ClaudeRunner
+from .customers import CustomerStore
 from .evidence import EvidenceLogger
 from .mcp_client import MCPClient
 
@@ -27,6 +28,7 @@ class HandlerContext:
     ops_runner: ClaudeRunner | None = None
     marketing_runner: ClaudeRunner | None = None
     telegram_notifier: Any | None = None  # set by main.py if telegram is wired
+    customers: CustomerStore | None = None
 
 
 Handler = Callable[[dict[str, Any], HandlerContext], None]

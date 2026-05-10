@@ -22,6 +22,7 @@ from typing import Any
 
 from . import handlers
 from .claude_runner import ClaudeRunner
+from .customers import CustomerStore
 from .dispatcher import HandlerContext, Handler, make_dispatcher
 from .env import load_env
 from .evidence import EvidenceLogger
@@ -69,6 +70,9 @@ def build_routing_table() -> dict[str, Handler]:
         # Marketing trigger
         "marketing:tick": handlers.marketing.handle,
         "marketing:*": handlers.marketing.handle,
+        # Scheduler ticks (abandoned-cart scan)
+        "schedule:abandoned_tick": handlers.abandoned.handle,
+        "schedule:*": handlers.abandoned.handle,
     }
 
 
@@ -87,6 +91,7 @@ def build_handler_context(client: MCPClient, evidence: EvidenceLogger) -> Handle
     """Build the shared handler dependency bag."""
     sales, ops, marketing = build_runners(evidence)
     notifier = TelegramNotifier.from_env(evidence)
+    customers = CustomerStore()
     return HandlerContext(
         client=client,
         evidence=evidence,
@@ -94,6 +99,7 @@ def build_handler_context(client: MCPClient, evidence: EvidenceLogger) -> Handle
         ops_runner=ops,
         marketing_runner=marketing,
         telegram_notifier=notifier,
+        customers=customers,
     )
 
 
@@ -174,6 +180,7 @@ def cli(argv: list[str] | None = None) -> int:
 
     ctx = build_handler_context(client, evidence)
     dispatch = make_dispatcher(ctx, build_routing_table())
+    setattr(ctx, "_dispatcher", dispatch)
 
     if args.webhook_server:
         evidence.write(
@@ -188,6 +195,9 @@ def cli(argv: list[str] | None = None) -> int:
         return 0
 
     runner = ScenarioRunner(client, evidence, dispatch)
+    # Kick the abandoned-order scheduler once at startup so the scenario
+    # always emits at least one scan row before draining events.
+    dispatch({"channel": "schedule", "type": "abandoned_tick", "payload": {}})
 
     log.info("starting scenario %s", args.scenario)
     runner.start(args.scenario, seed=args.seed)

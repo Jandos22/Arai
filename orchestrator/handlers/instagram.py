@@ -9,7 +9,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from ..customers import is_greeting, propose_reorder
 from ..dispatcher import HandlerContext
+from .whatsapp import _maybe_upsert_profile, _safe_recent_orders, _send_proposed_reorder
 
 
 def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
@@ -60,6 +62,32 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
             event_keys=sorted(payload.keys()) if isinstance(payload, dict) else [],
         )
         return
+
+    # IG identity: prefer the @handle for profile keys (it's stable across
+    # threads), fall back to the threadId so we still get a profile row.
+    identity = (
+        payload.get("from")
+        or payload.get("user")
+        or payload.get("username")
+        or payload.get("igHandle")
+        or thread
+    )
+    recent_orders = _safe_recent_orders(ctx) if etype == "dm" else None
+    profile = _maybe_upsert_profile(ctx, "instagram", identity, payload, recent_orders)
+    if profile and etype == "dm" and is_greeting(body):
+        proposal = propose_reorder(profile)
+        if proposal:
+            ctx.evidence.write(
+                "repeat_customer_detected",
+                channel="instagram",
+                sender=str(identity),
+                threadId=thread,
+                favoriteSku=proposal["sku"],
+                priorOrders=proposal["count"],
+                evidenceSources=["customer_profile", "square_recent_orders"],
+            )
+            _send_proposed_reorder(ctx, recipient=thread or identity, proposal=proposal, channel="instagram")
+            return
 
     if ctx.sales_runner is None:
         ctx.evidence.write(

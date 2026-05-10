@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from ..customers import is_greeting, propose_reorder
 from ..dispatcher import HandlerContext
 from ..growth import build_pickup_follow_up_message, score_whatsapp_lead
 
@@ -39,6 +40,21 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         reasons=lead_score.reasons,
         evidenceSources=["whatsapp_inbound", "square_recent_orders"],
     )
+
+    profile = _maybe_upsert_profile(ctx, "whatsapp", sender, payload, recent_orders)
+    if profile and is_greeting(body):
+        proposal = propose_reorder(profile)
+        if proposal:
+            ctx.evidence.write(
+                "repeat_customer_detected",
+                channel="whatsapp",
+                sender=sender,
+                favoriteSku=proposal["sku"],
+                priorOrders=proposal["count"],
+                evidenceSources=["customer_profile", "square_recent_orders"],
+            )
+            _send_proposed_reorder(ctx, recipient=sender, proposal=proposal, channel="whatsapp")
+            return
 
     if ctx.sales_runner is None:
         ctx.evidence.write(
@@ -141,6 +157,94 @@ def handle_follow_up_due(event: dict[str, Any], ctx: HandlerContext) -> None:
         recipientKey="to",
         recipient=recipient,
         bodyPreview=str(message)[:240],
+    )
+
+
+def _maybe_upsert_profile(
+    ctx: HandlerContext,
+    channel: str,
+    identifier: Any,
+    payload: dict[str, Any],
+    recent_orders: Any,
+) -> dict[str, Any] | None:
+    """Upsert a customer profile if we have an identifier and a store."""
+    if ctx.customers is None or not identifier:
+        return None
+    name = payload.get("name") or payload.get("displayName") or payload.get("customerName")
+    try:
+        profile = ctx.customers.upsert_from_inbound(
+            channel=channel,
+            identifier=str(identifier),
+            name=name,
+            recent_orders=recent_orders,
+        )
+    except Exception as exc:  # noqa: BLE001
+        ctx.evidence.write(
+            "customer_profile_upsert_failed",
+            channel=channel,
+            identifier=str(identifier),
+            error=str(exc),
+        )
+        return None
+    ctx.evidence.write(
+        "customer_profile_upserted",
+        channel=channel,
+        identifier=str(identifier),
+        hasFavorite=bool(profile.get("favorite_product")),
+        hasSavedPayment=bool(profile.get("payment_token")),
+        hasSavedAddress=bool(profile.get("delivery_address")),
+        lastOrders=len(profile.get("last_orders") or []),
+        evidenceSources=["channel_inbound", "square_recent_orders"],
+    )
+    return profile
+
+
+def _send_proposed_reorder(
+    ctx: HandlerContext,
+    *,
+    recipient: Any,
+    proposal: dict[str, Any],
+    channel: str,
+) -> None:
+    """Send the one-tap reorder reply through the right channel tool."""
+    if not recipient:
+        return
+    tool = "whatsapp_send" if channel == "whatsapp" else "instagram_send_dm"
+    args: dict[str, Any] = (
+        {"to": str(recipient), "message": proposal["message"]}
+        if channel == "whatsapp"
+        else {"threadId": str(recipient), "message": proposal["message"]}
+    )
+    try:
+        result = ctx.client.call_tool(tool, args)
+    except Exception as exc:  # noqa: BLE001
+        ctx.evidence.mcp_call(tool, args=args, ok=False, error=str(exc))
+        ctx.evidence.write(
+            "proposed_reorder_failed",
+            channel=channel,
+            recipient=str(recipient),
+            error=str(exc),
+        )
+        return
+    ctx.evidence.mcp_call(tool, args=args, result_summary=result)
+    ctx.evidence.write(
+        "proposed_reorder",
+        channel=channel,
+        recipient=str(recipient),
+        sku=proposal["sku"],
+        priorOrders=proposal["count"],
+        savedPayment=proposal["saved_payment"],
+        savedAddress=proposal["saved_address"],
+        bodyPreview=str(proposal["message"])[:240],
+        evidenceSources=["customer_profile", tool],
+    )
+    ctx.evidence.write(
+        "channel_outbound",
+        label="proposed_reorder",
+        channel=channel,
+        tool=tool,
+        recipient=str(recipient),
+        bodyPreview=str(proposal["message"])[:240],
     )
 
 

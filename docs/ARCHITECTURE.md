@@ -125,9 +125,10 @@ orchestrator/
 ├── scenario.py        # world_start_scenario + world_next_event loop
 ├── webhook_server.py  # local Cloudflare/ngrok webhook ingress adapter
 ├── dispatcher.py      # channel:type → handler
-├── handlers/          # one module per channel
+├── handlers/          # one module per channel (incl. abandoned-cart scheduler)
 ├── claude_runner.py   # subprocess wrapper for `claude -p`
 ├── telegram_bot.py    # owner notifier + approval queue
+├── customers.py       # JSON-backed repeat-customer profile store
 ├── evidence.py        # JSONL append, token redaction
 ├── tests/             # mocked unit tests (no token needed)
 ├── pyproject.toml
