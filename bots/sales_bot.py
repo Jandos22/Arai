@@ -112,6 +112,8 @@ async def cmd_pos(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s | %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     app = build_app("TELEGRAM_BOT_TOKEN_SALES")
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("menu", cmd_menu))

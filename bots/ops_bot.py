@@ -113,6 +113,8 @@ async def cmd_pending_posts(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s | %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     app = build_app("TELEGRAM_BOT_TOKEN_OPS")
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("capacity", cmd_capacity))
