@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
         answer:
           "For custom birthday/design requests I need headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; I can still suggest ready-made Honey Cake or Milk Maiden if timing is tight.",
         escalation: { required: true, reason: "custom cake or allergy/design signal" },
+        endpoints: { catalog: "/api/catalog", policies: "/api/policies" },
         suggestedActions: ["Collect missing details", "Offer ready-made alternative", "Escalate to owner Telegram gate"],
       });
     }
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
         answer:
           "I’m sorry — we fix cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for replacement/refund decision before any irreversible action.",
         escalation: { required: true, reason: "complaint/remediation path" },
+        endpoints: { policies: "/api/policies" },
         suggestedActions: ["Collect photo", "Collect order name", "Owner-gated refund/replacement", "Follow up on WhatsApp"],
       });
     }
@@ -84,6 +86,7 @@ export async function POST(request: NextRequest) {
         answer:
           "For order status, share the order name and pickup time. In production I check Square/kitchen status; in this site prototype I hand off to the same POS/kitchen path and ask the owner only when status is unclear.",
         escalation: { required: false },
+        endpoints: { policies: "/api/policies" },
         suggestedActions: ["Ask for order name", "Ask for pickup time", "Check kitchen ticket", "Message customer with ETA"],
       });
     }

@@ -22,7 +22,7 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | Production or local deploy notes | [`/website/README.md`](../website/README.md), [`/orchestrator/README.md`](../orchestrator/README.md) | ✅ |
 | Business-impact hypothesis incl. $500 case | [`/docs/MARKETING.md`](MARKETING.md) | ✅ — `evaluator_score_marketing_loop` 100/100 |
 | Agent-friendly website notes | [`/docs/AGENT-NOTES.md`](AGENT-NOTES.md) | ✅ |
-| On-site assistant test script | [`/scripts/test_website.sh`](../scripts/test_website.sh), [`/api/assistant`](../website/app/api/assistant/route.ts) | ✅ — exercises custom-order escalation and exits 0 on green |
+| On-site assistant test script | [`/scripts/test_website.sh`](../scripts/test_website.sh), [`/api/assistant`](../website/app/api/assistant/route.ts) | ✅ — exercises custom order, complaint, status, escalation, and policy/catalog grounding; exits 0 on green |
 | List of Telegram bots and what each does | [`/bots/README.md`](../bots/README.md) + [`/docs/ARCHITECTURE.md`](ARCHITECTURE.md) | ✅ |
 | Post-hackathon real-adapter path | [`/docs/PRODUCTION-PATH.md`](PRODUCTION-PATH.md) | ✅ |
 | **Never commit secrets** | `.gitignore` blocks `.env*`, `*.token`, etc. Pre-flight check: `git diff --cached \| grep -iE 'sbc_team\|Bearer'` empty | ✅ |
