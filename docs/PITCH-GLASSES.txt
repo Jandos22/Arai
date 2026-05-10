@@ -1,0 +1,7 @@
+1. HappyCake: $15-20K/mo, all manual. Askhat = bottleneck.
+2. Slice: DM -> catalog -> order -> kitchen -> owner approval.
+3. Shape: orchestrator + 3 scoped agents + Telegram.
+4. Rules: CC CLI + Opus only. No frameworks. Sandbox MCP = truth.
+5. Proof: evidence JSONL. Marketing 100/100. 88 tests.
+6. Demo: cd agents/marketing && bash run.sh
+7. Close: Dumb glue. Scoped agents. One tap. In the log.
