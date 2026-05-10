@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/about`, lastModified, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/policies`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/sugar-land-custom-cakes`, lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${SITE_URL}/happy-path`, lastModified, changeFrequency: "weekly", priority: 0.7 },
   ];
 
   const productRoutes: MetadataRoute.Sitemap = catalog.items.map((item) => ({

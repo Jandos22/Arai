@@ -153,6 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="font-medium">Order</p>
               <ul className="mt-2 space-y-1">
                 <li><a href="/menu" className="hover:text-happy-blue-500">Menu</a></li>
+                <li><a href="/happy-path" className="hover:text-happy-blue-500">Happy Path · truck route</a></li>
                 <li><a href="/order" className="hover:text-happy-blue-500">Website order intent</a></li>
                 <li><a href="/assistant" className="hover:text-happy-blue-500">On-site assistant</a></li>
                 <li><a href="/agents" className="hover:text-happy-blue-500">Agent guide</a></li>
