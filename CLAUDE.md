@@ -29,7 +29,7 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 - Owner UI = **Telegram bots only**. No email, no web dashboard for the owner.
 - Inbound webhooks tunnel home via Cloudflare Tunnel (ngrok fallback) to a local wrapper, then `claude -p "<prompt>"` headless. Sandbox `world_next_event` / WA+IG inject tools remain the evaluator/dev source of truth and feed the same dispatcher.
 - Sandbox MCP is the source of truth. No real Square/WA/IG/payment credentials.
-- **NEVER commit `STEPPE_MCP_TOKEN`** or any secret. Token lives only in `.env.local` on the MacBook. `.env.example` ships placeholders.
+- **NEVER commit `STEPPE_MCP_TOKEN`** or any secret. Load secrets through `scripts/load_env.sh`; shared worktree env lives at `~/.config/arai/env.local`, with repo-local `.env.local` only as an override/fallback. `.env.example` ships placeholders.
 
 ## Architecture intent (subject to evolution; keep ARCHITECTURE.md authoritative)
 
@@ -52,7 +52,13 @@ Sub-systems:
 ## MCP
 
 - Endpoint: `https://www.steppebusinessclub.com/api/mcp`
-- Auth: `X-Team-Token` header, value from `STEPPE_MCP_TOKEN` env var (loaded from `.env.local`).
+- Auth: `X-Team-Token` header, value from `STEPPE_MCP_TOKEN`.
+- Before any live MCP smoke/test, prefer shared env loading:
+  ```bash
+  source scripts/load_env.sh && arai_load_env "$PWD"
+  echo ${#STEPPE_MCP_TOKEN}  # expected: 41; never echo the token value
+  ```
+- `arai_load_env` checks `ARAI_ENV_FILE`, then repo `.env.local`, then `~/.config/arai/env.local`.
 - Tools available: see `docs/MCP-TOOLS.md` (Hermes will populate from launch-kit info).
 
 ## Coordination protocol

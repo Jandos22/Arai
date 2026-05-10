@@ -58,6 +58,9 @@ type RawItem = {
   variations?: Array<{ id: string; name: string; priceUsd: number; available?: boolean }>;
   leadTimeMinutes?: number;
   allergens?: string[];
+  variationId?: string;
+  priceCents?: number;
+  kitchenProductId?: string;
 };
 
 async function main() {
@@ -66,15 +69,28 @@ async function main() {
     return;
   }
   console.log(`Snapshotting catalog from ${url} ...`);
-  const catalog = await callTool<{ items: RawItem[] }>("square_list_catalog", {});
-  const items = (catalog.items ?? []).map((raw) => ({
+  const catalog = await callTool<{ items?: RawItem[]; catalog?: RawItem[] }>("square_list_catalog", {});
+  const rows = catalog.items ?? catalog.catalog ?? [];
+  const items = rows.map((raw) => ({
     id: raw.id,
     slug: slugify(raw.name),
     name: raw.name,
     description: raw.description ?? "",
     category: raw.category ?? "signature",
     imageUrl: raw.imageUrl,
-    variations: raw.variations ?? [],
+    kitchenProductId: raw.kitchenProductId,
+    variations:
+      raw.variations ??
+      (raw.variationId
+        ? [
+            {
+              id: raw.variationId,
+              name: raw.name,
+              priceUsd: Number(((raw.priceCents ?? 0) / 100).toFixed(2)),
+              available: true,
+            },
+          ]
+        : []),
     leadTimeMinutes: raw.leadTimeMinutes,
     allergens: raw.allergens,
   }));
