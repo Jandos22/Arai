@@ -1,7 +1,7 @@
 # CLAUDE.md — Ops Agent (HappyCake US)
 
 > Auto-loaded when Claude Code runs from `agents/ops/`. Root `Arai/CLAUDE.md`
-> (team contract) and `docs/PLAN.md` still apply.
+> (team contract) and `docs/hackathon/PLAN.md` still apply.
 
 ## Role
 

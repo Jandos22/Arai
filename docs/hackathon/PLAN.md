@@ -62,7 +62,6 @@ Why we're not allowed SDK/n8n: judges want to read the architecture. We help the
 ```
 Arai/
 ├── CLAUDE.md                 ← team contract (root)
-├── PLAN.md                   ← this file
 ├── TASKS.md                  ← live dashboard
 ├── README.md                 ← fresh-clone bring-up
 ├── .env.example              ← placeholders only
@@ -93,7 +92,9 @@ Arai/
 │   ├── MCP-SETUP.md          ← T-004
 │   ├── MARKETING.md          ← $500 case (T-006)
 │   ├── DEMO.md               ← evaluator + human walkthrough (T-009)
-│   ├── HACKATHON_BRIEF.md    ← ✅ archived
+│   ├── hackathon/
+│   │   ├── PLAN.md           ← this file
+│   │   └── HACKATHON_BRIEF.md ← ✅ archived
 │   └── brand/HCU_BRANDBOOK.md ← ✅ archived
 ├── evidence/                 ← JSONL runtime logs (gitignored)
 └── tasks/                    ← INBOX → DOING → DONE

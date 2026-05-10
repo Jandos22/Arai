@@ -1,7 +1,7 @@
 # CLAUDE.md — Marketing Agent (HappyCake US)
 
 > Auto-loaded by Claude Code when running from `agents/marketing/`.
-> The root `Arai/CLAUDE.md` (team contract) and `docs/PLAN.md` still apply.
+> The root `Arai/CLAUDE.md` (team contract) and `docs/hackathon/PLAN.md` still apply.
 
 ## Role
 

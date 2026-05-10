@@ -2,7 +2,7 @@
 
 > One-pass shadow self-eval against the official weighted judging passes
 > listed on the public hackathon page (see
-> [`HACKATHON-AUDIT.md`](HACKATHON-AUDIT.md) §"Critical finding").
+> [`docs/hackathon/HACKATHON-AUDIT.md`](hackathon/HACKATHON-AUDIT.md) §"Critical finding").
 > Honest. Conservative. Each pass cites real files in this repo and real
 > evidence in `evidence/`. Numbers are *plausible* — the actual judges
 > are independent AI agents we can't simulate exactly. We score where we
@@ -338,7 +338,7 @@ useful to Askhat, not just technically plausible.
 
 - **Lead routing has logic but no scoring.** Owner sees one lead at a
   time without "this lead is 8/10 vs 4/10" context — would matter at any
-  scale (BONUS-PLAN.md:58).
+  scale (`docs/hackathon/BONUS-PLAN.md:58`).
 - **No closed-loop attribution from marketing → revenue.** Simulator
   numbers exist but the orchestrator doesn't tie a `marketing_route_lead`
   to a downstream `square_create_order`.
@@ -350,7 +350,7 @@ useful to Askhat, not just technically plausible.
 
 ### One actionable fix (≤30 min)
 
-Ship lead scoring in the marketing agent (`BONUS-PLAN.md:73`, item C5).
+Ship lead scoring in the marketing agent (`docs/hackathon/BONUS-PLAN.md:73`, item C5).
 Score 0–100 based on channel, intent strength, repeat-customer inference,
 and order urgency so the business analyst can see prioritization logic.
 
@@ -375,7 +375,7 @@ of reasoning and edge-case handling.
   `agents/marketing/.mcp.json`). Three Telegram bots in `bots/` give
   each agent its own owner-chat surface.
 - **T-013 complaint + custom-cake bonus paths shipped**
-  (commit `eeabb4f`) — `docs/BONUS-PLAN.md` bucket A items (real
+  (commit `eeabb4f`) — `docs/hackathon/BONUS-PLAN.md` bucket A items (real
   business pain) covered for both. Allergen routing always
   owner-gated, severity field auto-set on illness language.
 - **Kitchen-aware allergen flag** — sales agent refuses to promise
@@ -390,11 +390,11 @@ of reasoning and edge-case handling.
 
 ### Risks / gaps
 
-- **Bucket C (Growth) is mostly unbuilt** per `BONUS-PLAN.md:58-63`:
+- **Bucket C (Growth) is mostly unbuilt** per `docs/hackathon/BONUS-PLAN.md:58-63`:
   no lead scoring, no referrals, no WhatsApp follow-up cron, no
   upsell logic. Marketing budget optimization is the only green tick
   (and that's T-006, not bonus).
-- **No abandoned-orders detection.** ❌ in `BONUS-PLAN.md:51`.
+- **No abandoned-orders detection.** ❌ in `docs/hackathon/BONUS-PLAN.md:51`.
 - **Self-eval pipeline (this very document) is partial.** T-014 v1
   spec'd 7 shadow-judge agents + 2 adversarial scenarios; v2 is just
   a hand-written self-eval. Defensible, but a less innovative artefact
@@ -404,7 +404,7 @@ of reasoning and edge-case handling.
 
 ### One actionable fix (≤30 min)
 
-Ship lead scoring in the marketing agent (`BONUS-PLAN.md:73`, item C5).
+Ship lead scoring in the marketing agent (`docs/hackathon/BONUS-PLAN.md:73`, item C5).
 Score 0–100 based on channel, intent strength, repeat-customer
 inference. Already partially implied by current routing logic — make
 it explicit in `marketing_route_lead` evidence. Single 30-min change
@@ -452,7 +452,7 @@ In rank order by points-per-minute:
    misread.
 2. **Run Lighthouse mobile against the website + commit a screenshot**
    to `docs/` and link from README (~15 min). Removes the biggest
-   on-site assistant / storefront tripwire and ticks the `BONUS-PLAN.md`
+   on-site assistant / storefront tripwire and ticks the `docs/hackathon/BONUS-PLAN.md`
    mobile-perf item.
 3. **Run one final fresh-clone / preflight pass** (~20 min). Execute the
    no-token website/orchestrator checks, then `scripts/evaluator_preview.sh`
@@ -508,7 +508,7 @@ What to read for the seven official passes, fastest to slowest:
 | Code reviewer | `docs/ARCHITECTURE.md`, `orchestrator/tests/`, `.env.example`, `scripts/git-hooks/pre-commit` |
 | Operator simulator | `orchestrator/telegram_bot.py`, `bots/README.md`, `orchestrator/handlers/square.py` |
 | Business analyst | `docs/MARKETING.md:147-160` (real MCP chain) + `docs/PRODUCTION-PATH.md` |
-| Innovation/depth spotter | `docs/BONUS-PLAN.md` for the inventory; `agents/*/CLAUDE.md` for what's actually wired |
+| Innovation/depth spotter | `docs/hackathon/BONUS-PLAN.md` for the inventory; `agents/*/CLAUDE.md` for what's actually wired |
 
 The four `evaluator_score_*` MCP tools are a **preview**, not the
 seven weighted judging passes. Treat them as a fast pulse check; the real

@@ -31,7 +31,7 @@ explicit evidence boundaries for assets and remaining gaps:
 |---|---|---|
 | `/hackathon` | Public judging model, registration/brief/team links | Network log shows the route loaded successfully at 2026-05-09 21:06 CT. |
 | `/hackathon/register` | Registration route exists and is linked | The re-check only needed route coverage; no private registration payload is copied here. |
-| `/hackathon/brief` | Current brief text and links to sandbox/assets | `docs/HACKATHON_BRIEF.md` remains the repo copy for source alignment. |
+| `/hackathon/brief` | Current brief text and links to sandbox/assets | `docs/hackathon/HACKATHON_BRIEF.md` remains the repo copy for source alignment. |
 | `/hackathon/brief/sandbox` | Sandbox modules, runtime rules, MCP/evaluator preview framing | This continues to support the architecture decision that the MCP sandbox is source of truth. |
 | `/hackathon/brief/assets` | Rendered HappyCake asset inventory page | This page, plus `metadata.json`, is the safe evidence source for asset counts and rules. |
 | `/hackathon-assets/happy-cake/metadata.json` | Private source inventory metadata | Browser history shows the metadata URL was opened; repo copy records 562 source images, 2 zips, and the curated export rules. |

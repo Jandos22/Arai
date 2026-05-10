@@ -9,7 +9,7 @@ on-site assistant.
 This page maps every item the brief asks for to where it lives in the repo,
 so judges (and future-us at 9:50 CT) can verify completeness in one pass.
 
-Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
+Brief reference: [`docs/hackathon/HACKATHON_BRIEF.md`](hackathon/HACKATHON_BRIEF.md) §8 + §12.
 
 ## Repo deliverables (brief §8)
 
@@ -75,7 +75,7 @@ Bonus functions can add up to +15 points after the 100-point core score:
 core 80+ is eligible for up to +15, core 60–79 is capped at +5, and core
 below 60 gets no bonus. Maximum total score: 115.
 
-See [`BONUS-PLAN.md`](BONUS-PLAN.md) for additional differentiators and
+See [`docs/hackathon/BONUS-PLAN.md`](hackathon/BONUS-PLAN.md) for additional differentiators and
 [`SELF-EVAL.md`](SELF-EVAL.md) for the weighted shadow evaluation.
 
 ### Preview scoring loops

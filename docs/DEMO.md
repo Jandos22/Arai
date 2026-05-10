@@ -300,7 +300,7 @@ If you have an extra 5 minutes, these are the most informative pokes:
   requirement to a file.
 - [`docs/AGENT-NOTES.md`](AGENT-NOTES.md) — the agent-friendly website
   contract design.
-- [`docs/PLAN.md`](PLAN.md) — the actual plan we worked from, with
+- [`docs/hackathon/PLAN.md`](hackathon/PLAN.md) — the actual plan we worked from, with
   decision log and risk register.
 - [`tasks/`](../tasks) — every task brief Hermes (build-time PM/helper, not the judged runtime) wrote
   for Claude Code, in the exact format CC executed.
