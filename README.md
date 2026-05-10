@@ -17,7 +17,12 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and [`CLAUDE.m
 ```bash
 git clone https://github.com/Jandos22/Arai.git
 cd Arai
+
+# Secrets: pick one.
+# Per-worktree:
 cp .env.example .env.local
+# Shared across all worktrees:
+mkdir -p ~/.config/arai && cp .env.example ~/.config/arai/env.local
 # → fill in STEPPE_MCP_TOKEN (from your team launch kit) and Telegram bot tokens
 
 # website (Next.js storefront + /order + /assistant)
@@ -30,7 +35,7 @@ cd ../orchestrator
 uv venv --python 3.12 .venv
 uv pip install -r requirements.txt
 PYTHONPATH=.. .venv/bin/python -m orchestrator.main --dry-run   # smoke
-set -a; source ../.env.local; set +a
+source ../scripts/load_env.sh && arai_load_env ..
 PYTHONPATH=.. .venv/bin/python -m orchestrator.main --scenario launch-day-revenue-engine
 
 # (Optional) dedicated per-agent Telegram bots — one chat per role
@@ -62,4 +67,4 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders 
 
 ## Security
 
-**Never commit** `.env.local`, `STEPPE_MCP_TOKEN`, Telegram bot tokens, or any secret. `.gitignore` blocks the obvious. If a token leaks, ping organizers immediately for rotation.
+**Never commit** `.env.local`, `~/.config/arai/env.local`, `STEPPE_MCP_TOKEN`, Telegram bot tokens, or any secret. `.gitignore` blocks repo-local env files. If a token leaks, ping organizers immediately for rotation.

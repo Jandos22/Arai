@@ -31,26 +31,35 @@ Verified by: `evidence/T-004-cc-mcp-smoke.txt`.
 - Tools surface inside Claude Code as `mcp__happycake__<toolname>` (e.g.
   `mcp__happycake__marketing_get_budget`).
 
-## One-time setup on a fresh clone
+## One-time setup on a fresh clone or worktree
 
-1. Copy `.env.example` to `.env.local`:
+1. For one worktree, copy `.env.example` to `.env.local`:
    ```bash
    cp .env.example .env.local
    ```
-2. Paste the team token (from `STEPPE_MCP_TOKEN` in the launch kit) into
-   `.env.local`. Leave `STEPPE_MCP_URL` at its default.
-3. Verify `.env.local` is gitignored — `git status` should not list it.
+   For all worktrees on the same machine, prefer one shared file:
+   ```bash
+   mkdir -p ~/.config/arai
+   cp .env.example ~/.config/arai/env.local
+   ```
+2. Paste the team token (from `STEPPE_MCP_TOKEN` in the launch kit) into the
+   env file. Leave `STEPPE_MCP_URL` at its default.
+3. Verify repo-local `.env.local` is gitignored — `git status` should not list it.
 
 ## Running `claude -p` with the MCP
 
-Claude Code does **not** auto-load `.env.local`. You must export the vars
-into the shell before invoking `claude`:
+Claude Code does **not** auto-load env files. Export the vars into the shell
+before invoking `claude`:
 
 ```bash
 cd /path/to/Arai
-set -a && source .env.local && set +a
+source scripts/load_env.sh && arai_load_env "$PWD"
 claude -p "Use happycake MCP. List available tools."
 ```
+
+Env lookup order is `ARAI_ENV_FILE`, repo `.env.local`, then
+`~/.config/arai/env.local`. Never echo token values; use
+`echo ${#STEPPE_MCP_TOKEN}` to check presence by length only.
 
 For non-interactive runs (the bot wrappers, evaluators), pre-allow the
 specific tools you intend to call so no permission prompt blocks the run:
@@ -70,7 +79,7 @@ is what actually constrains the surface.
 
 ```bash
 cd /path/to/Arai
-set -a && source .env.local && set +a
+source scripts/load_env.sh && arai_load_env "$PWD"
 echo "Use the happycake MCP server. Call the marketing_get_budget tool with no arguments. Reply with ONLY the parsed JSON result — no prose, no code fences." \
   | claude -p \
       --permission-mode bypassPermissions \
@@ -104,7 +113,7 @@ Prefer option 1 unless an agent needs to *exclude* tools the others use.
 ## Troubleshooting
 
 - **`Unauthorized` / 401** — `STEPPE_MCP_TOKEN` not in shell env. Re-run
-  `set -a && source .env.local && set +a` and confirm with
+  `source scripts/load_env.sh && arai_load_env "$PWD"` and confirm with
   `echo ${#STEPPE_MCP_TOKEN}` (length only — never echo the value).
 - **No `mcp__happycake__*` tools listed** — Claude Code didn't load
   `.mcp.json`. Make sure you launched `claude` from the repo root (or pass

@@ -138,16 +138,64 @@ assert intent["handoff"]["kitchen"]["tool"] == "kitchen_create_ticket"
 print("api/order-intent OK")
 ' || { red "/api/order-intent FAILED"; failures=$((failures+1)); }
 
-# 6. On-site assistant API covers evaluator-driving paths
-assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon"}')
-echo "$assistant" | python3 -c '
+# 6. On-site assistant API covers required consultation scenarios without MCP.
+custom_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"I need a custom birthday cake tomorrow afternoon with a soccer theme"}')
+echo "$custom_assistant" | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
 assert d["ok"] is True
 assert d["intent"] == "custom_order"
 assert d["escalation"]["required"] is True
-print("api/assistant OK")
-' || { red "/api/assistant FAILED"; failures=$((failures+1)); }
+assert d["endpoints"]["catalog"] == "/api/catalog"
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "headcount" in answer and "pickup time" in answer and "allergy" in answer
+assert "owner-gated" in answer
+print("api/assistant custom_order OK")
+' || { red "/api/assistant custom_order FAILED"; failures=$((failures+1)); }
+
+complaint_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"My pickup was late and the cake was wrong. I want to make a complaint."}')
+echo "$complaint_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "complaint"
+assert d["escalation"]["required"] is True
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "photo" in answer and "order name" in answer
+assert "owner review" in answer
+assert "automatic refund" not in answer and "guaranteed refund" not in answer
+print("api/assistant complaint OK")
+' || { red "/api/assistant complaint FAILED"; failures=$((failures+1)); }
+
+status_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"Can you check my order status for pickup?"}')
+echo "$status_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "status"
+assert d["escalation"]["required"] is False
+assert d["endpoints"]["policies"] == "/api/policies"
+answer = d["answer"].lower()
+assert "share the order name" in answer and "pickup time" in answer
+assert "ready now" not in answer and "completed" not in answer and "paid" not in answer
+print("api/assistant status OK")
+' || { red "/api/assistant status FAILED"; failures=$((failures+1)); }
+
+policy_assistant=$(curl -sS -X POST "${BASE}/api/assistant" -H 'Content-Type: application/json' --data '{"message":"What is your delivery policy?"}')
+echo "$policy_assistant" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["ok"] is True
+assert d["intent"] == "policy"
+assert d["escalation"]["required"] is False
+assert d["endpoints"]["policies"] == "/api/policies"
+assert d["endpoints"]["catalog"] == "/api/catalog"
+answer = d["answer"].lower()
+assert "limited/case-by-case" in answer
+print("api/assistant policy grounding OK")
+' || { red "/api/assistant policy grounding FAILED"; failures=$((failures+1)); }
 
 # 7. Static pages render (not 404)
 for path in "/" "/menu" "/about" "/policies" "/order" "/assistant"; do
