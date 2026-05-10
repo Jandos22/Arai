@@ -13,12 +13,12 @@ manual. The hackathon brief asks for an AI-assisted sales + ops system
 that fixes four channels (website, WhatsApp, Instagram, $500/mo
 marketing) and is owner-driven via Telegram only.
 
-**Arai** is the Jan Solo team's submission. One Python orchestrator drives
-a `world_next_event` loop against the sandbox MCP, dispatches each event
-to a per-channel handler, and delegates LLM reasoning to `claude -p` in
-per-role Claude Code projects (`agents/sales/`, `agents/marketing/`,
-`agents/ops/`). Owner UI is Telegram. Every decision and tool call is
-logged to `evidence/*.jsonl`.
+**Arai** is the Jan Solo team's AI-assisted sales and operations system
+for small businesses, built here for Happy Cake US. In this repo,
+`orchestrator/` drives a `world_next_event` loop against the sandbox MCP,
+`agents/` holds the per-role Claude Code projects, and `website/` is the
+storefront and agent-readable surface. Owner UI is Telegram. Every
+decision and tool call is logged to `evidence/*.jsonl`.
 
 See [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) for the diagram.
 

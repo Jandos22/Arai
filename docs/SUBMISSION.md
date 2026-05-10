@@ -1,5 +1,10 @@
 # Submission checklist — Arai
 
+Arai is an AI-assisted sales and operations system for small businesses,
+built for Happy Cake US. The repo name is the product: `orchestrator/` is
+the Python spine, `agents/` are role-scoped Claude Code projects, and
+`website/` is the storefront/agent surface.
+
 This page maps every item the brief asks for to where it lives in the repo,
 so judges (and future-us at 9:50 CT) can verify completeness in one pass.
 
