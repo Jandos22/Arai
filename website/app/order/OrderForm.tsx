@@ -95,7 +95,7 @@ export default function OrderForm({ items, initialSlug, initialAttribution }: Pr
           <label className="text-sm font-medium text-happy-blue-900">Notes</label>
           <textarea className="mt-2 w-full rounded-xl border border-cream-300 bg-white px-4 py-3" rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Occasion, allergy concerns, name-on-cake, or complaint context" />
         </div>
-        <button className="rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium disabled:opacity-60" disabled={loading}>
+        <button type="submit" className="rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium disabled:opacity-60" disabled={loading}>
           {loading ? "Capturing..." : "Capture website order intent"}
         </button>
       </form>

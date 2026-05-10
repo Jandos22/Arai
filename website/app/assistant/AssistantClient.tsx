@@ -44,7 +44,7 @@ export default function AssistantClient() {
         </div>
         <form onSubmit={ask} className="space-y-3">
           <textarea className="w-full rounded-2xl border border-cream-300 bg-white px-4 py-3" rows={5} value={message} onChange={(e) => setMessage(e.target.value)} />
-          <button className="rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium disabled:opacity-60" disabled={loading}>{loading ? "Thinking..." : "Ask assistant"}</button>
+          <button type="submit" className="rounded-full bg-happy-blue-700 text-cream-50 px-6 py-3 hover:bg-happy-blue-900 font-medium disabled:opacity-60" disabled={loading}>{loading ? "Thinking..." : "Ask assistant"}</button>
         </form>
       </section>
 
