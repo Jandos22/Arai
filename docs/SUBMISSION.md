@@ -54,18 +54,18 @@ Bonus gating:
 
 See [`BONUS-PLAN.md`](BONUS-PLAN.md) for the bonus-points strategy and ranked targets.
 
-### Core: preview scoring loops + official seven-pass judging
+### Core: preview scoring loops + official weighted-pass judging
 
-The four `evaluator_score_*` MCP tools are **preview checks** teams can run against the sandbox. They are not the whole leaderboard grade; the official judging uses seven AI dimensions documented in `docs/HACKATHON-AUDIT.md` and summarized in `docs/SELF-EVAL.md`. We still run and cite these preview loops because they expose the concrete sandbox state judges are likely to inspect:
+The four `evaluator_score_*` MCP tools are **preview checks** teams can run against the sandbox. They are not the whole leaderboard grade; the official judging uses seven weighted AI passes documented in `docs/HACKATHON-AUDIT.md` and summarized in `docs/SELF-EVAL.md`: functional scenario tester (20), agent-friendliness auditor (15), on-site assistant evaluator (15), code reviewer (10), operator simulator (15), business analyst (15), and innovation/depth spotter (10). We still run and cite these preview loops because they expose the concrete sandbox state judges are likely to inspect:
 
 | Loop | What it scores | Where we cover it |
 |---|---|---|
 | `evaluator_score_marketing_loop` | $500 → $5K demand engine | T-006 — `agents/marketing/` + `docs/MARKETING.md` |
-| `evaluator_score_pos_kitchen_flow` | Order intake → kitchen handoff | Website `/api/order-intent` + seeded Square handler + T-005 sales |
+| `evaluator_score_pos_kitchen_flow` | Order intake → capacity-aware kitchen handoff | Website `/api/order-intent` + seeded Square handler + T-005 sales |
 | `evaluator_score_channel_response` | WA / IG / GMB reply quality | T-005 (sales side) + T-007 (ops side) |
 | `evaluator_score_world_scenario` | Deterministic scenario + audit log | T-003 orchestrator + T-008 e2e smoke |
 
-Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T004907Z`: M:100 / POS:100 / Ch:100 / W:100, including `kitchen_get_capacity` + `square_capacity_decision`. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across Functional, Depth, Impact, UX, Architecture, Production-readiness, and Innovation.
+Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T004907Z`: M:100 / POS:100 / Ch:100 / W:100. The POS/kitchen evidence includes `kitchen_get_capacity` + `square_capacity_decision` on the live accept path; reject/custom/unmapped branches are covered by `orchestrator/tests/test_square_capacity.py`, not by a second committed live evidence tail. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across the seven weighted passes above.
 
 ## Pre-submission ritual
 

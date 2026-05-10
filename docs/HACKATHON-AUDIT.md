@@ -15,31 +15,47 @@
 | `/hackathon/teams` | Find a team | Team list — Jan Solo confirmed (captain: Jandos Meirkhan, onsite, 1/3) |
 | `/hackathon/teams/<id>/kit` | Team launch kit | **MCP token displayed**, build targets, submission checklist |
 | `/hackathon/submit` | Submit | Captain enters repo URL + optional evaluator notes |
-| `/hackathon/leaderboard` | Live leaderboard | Empty until 10:00 CT May 10 — **scores 7 dimensions** |
+| `/hackathon/leaderboard` | Live leaderboard | Empty until 10:00 CT May 10 — **scores 7 weighted passes** |
 
 All pages saved as JSON in `/tmp/sbc_audit/*.json` on the Mac mini for re-check.
 
-## Critical finding: leaderboard scores **seven** dimensions, not four
+## Critical finding: official judging has **seven weighted passes**, not four
 
-The leaderboard table header is:
+The public hackathon page lists the official AI judging passes as:
 
-> # · Team · **Functional** · **Depth** · **Impact** · **UX** · **Arch** · **Prod** · **Inn** · **Total**
+| Official pass | Weight |
+|---|---:|
+| Functional scenario tester | 20 |
+| Agent-friendliness auditor | 15 |
+| On-site assistant evaluator | 15 |
+| Code reviewer | 10 |
+| Operator simulator | 15 |
+| Business analyst | 15 |
+| Innovation/depth spotter | 10 |
+| **Total** | **100** |
 
-This matches the moderator's description of "7 AI passes" exactly. Our prior assumption — that the 4 `evaluator_score_*` MCP tools (`marketing_loop`, `pos_kitchen_flow`, `channel_response`, `world_scenario`) WERE the scoring loops — was wrong.
+This matches the moderator's description of "7 AI passes" exactly. Our prior
+assumption — that the 4 `evaluator_score_*` MCP tools (`marketing_loop`,
+`pos_kitchen_flow`, `channel_response`, `world_scenario`) WERE the scoring
+loops — was wrong.
 
-The `evaluator_score_*` MCP tools are **what teams use to preview** their work. The actual judging pipeline is 7 AI agents scoring 7 different dimensions each:
+The `evaluator_score_*` MCP tools are **what teams use to preview** their
+work. The actual judging pipeline is 7 weighted AI passes:
 
-| Dimension | What it likely covers (inferred) |
+| Official pass | What it likely covers (inferred) |
 |---|---|
-| **Functional** | Does each channel work end-to-end? (Square→kitchen, WA, IG, marketing) |
-| **Depth** | Sophistication of agent reasoning, edge-case handling |
-| **Impact** | Business value — would Askhat actually use this? |
-| **UX** | Customer-facing channel quality + owner-facing Telegram UX |
-| **Arch** | System decomposition, visibility, MCP usage, owner-bot mapping |
-| **Prod** | Production readiness — clean repo, deploy notes, env model, no secrets |
-| **Inn** | Innovation — bonus-style differentiators |
+| **Functional scenario tester** | Does each channel work end-to-end? Square→kitchen, WA, IG, marketing, world scenario |
+| **Agent-friendliness auditor** | Agent-readable storefront, catalog/policies APIs, autonomous order path, clean tool surfaces |
+| **On-site assistant evaluator** | Website assistant behavior: consultation, custom order, complaint, status, escalation |
+| **Code reviewer** | Repo structure, tests, security hygiene, no secrets, maintainable adapter boundary |
+| **Operator simulator** | Owner controls, Telegram approvals, capacity/ticket visibility, operational failure handling |
+| **Business analyst** | $500→$5K plan, ROAS math, business fit, production-adapter path |
+| **Innovation/depth spotter** | Prompt depth, edge cases, bonus paths, novel agent-readable commerce surface |
 
-This means our current scoring dashboard (one MCP loop = 100/100) is a **partial** signal, not the full grade. Bonus-plan items map directly into Prod (audit trail, mobile perf, failure handling) and Inn (lead scoring, referrals, follow-ups).
+This means our current scoring dashboard (one MCP loop = 100/100) is a
+**partial** signal, not the full grade. Bonus-plan items map directly into
+Code reviewer / Operator simulator (audit trail, mobile perf, failure
+handling) and Innovation/depth spotter (lead scoring, referrals, follow-ups).
 
 **Action:** update SUBMISSION.md, ARCHITECTURE.md, and BONUS-PLAN.md to reflect this. Don't promise a 4-loop max — the real ceiling is broader.
 

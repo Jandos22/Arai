@@ -1,7 +1,9 @@
-# SELF-EVAL.md — seven-pass shadow evaluation (T-014)
+# SELF-EVAL.md — official weighted-pass shadow evaluation (T-014)
 
-> One-pass shadow self-eval against the leaderboard's 7 judging dimensions
-> (Functional, Depth, Impact, UX, Arch, Prod, Inn — see
+> One-pass shadow self-eval against the official 7 weighted AI judging passes
+> (functional scenario tester, agent-friendliness auditor, on-site assistant
+> evaluator, code reviewer, operator simulator, business analyst, and
+> innovation/depth spotter — see
 > [`HACKATHON-AUDIT.md`](HACKATHON-AUDIT.md) §"Critical finding").
 > Honest. Conservative. Each pass cites real files in this repo and real
 > evidence in `evidence/`. Numbers are *plausible* — the actual judges
@@ -12,16 +14,16 @@
 
 | Item | Value |
 |---|---|
-| Eval commit | `2756932` (`docs: reframe Arai as product system`) |
+| Eval commit | `a12b5ec` (pre-issue-5 docs sync base) |
 | Branch | current fork/worktree |
 | Latest committed e2e evidence | [`evidence/e2e-sample.jsonl`](../evidence/e2e-sample.jsonl) — redacted tail from the 20260510T004907Z PASS run; full `evidence/e2e-smoke-*.json` files are local/gitignored by design |
 | 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **100**, channels **100**, world **100** — average **100.0** |
 | Repo URL on submission | `https://github.com/Jandos22/Arai` |
 
 The four `evaluator_score_*` MCP tools are a **preview** — they are not the
-seven judges. The seven judges read the repo, the website, and the evidence
-JSONL. So this self-eval is what we think a reasonable judge sees, given
-what's actually committed.
+official weighted grade. The seven judging passes read the repo, the website,
+and the evidence JSONL. So this self-eval is what we think a reasonable judge
+sees, given what's actually committed.
 
 ## Methodology — what makes this honest, not a pep talk
 
@@ -36,18 +38,18 @@ what's actually committed.
   real-adapter swap moves the dial. Hackathon-only fixes are flagged
   separately under "Top 5 final fixes".
 
-## Score summary
+## Official weighted score summary
 
-| # | Dimension | Likely score | Confidence | One-line read |
-|---|---|---:|---|---|
-| 1 | Functional | **86** | medium | All four loops now preview 100; capacity-aware Square→kitchen evidence is present; channel outbound counters are still worth polishing |
-| 2 | Depth | **78** | medium-low | 5 owner-gate triggers + complaint + custom-cake paths shipped; per-call agent reasoning is opaque to evaluator beyond `claude_run` markers |
-| 3 | Impact | **88** | medium | $500 case is real-data math (`MARKETING.md:5-44`); ROAS 13.27× simulator; production path concrete; POS now checks capacity before accepting |
-| 4 | UX | **78** | medium-low | Website JSON-LD + `/agent.json` + real photos shipped; no Lighthouse number on file; Telegram owner UX is solid but undocumented in screenshots |
-| 5 | Arch | **88** | high | Plain-Python orchestrator, single MCP chokepoint, no SDK/n8n, swap path drawn in `PRODUCTION-PATH.md:19-40` |
-| 6 | Prod | **76** | medium | Pre-commit hook + `.env.example` clean + evidence redaction in place; no CI, no Lighthouse, no health-check pipe |
-| 7 | Inn | **76** | medium-low | `/agent.json`, per-agent scoped MCPs, T-013 bonus paths, allergen owner-gate; bucket C bonus items mostly unbuilt (lead scoring, referrals, follow-up) |
-| | **Mean (equal weights)** | **82** | | Plausibly 78–87 depending on judge calibration |
+| # | Official pass | Weight | Likely score | Weighted points | Confidence | One-line read |
+|---|---|---:|---:|---:|---|---|
+| 1 | Functional scenario tester | 20 | **86** | **17.2** | medium | All four preview loops are 100; capacity-aware Square→kitchen evidence is present; channel outbound counters are still worth polishing |
+| 2 | Agent-friendliness auditor | 15 | **84** | **12.6** | medium | `/agent.json`, catalog/policies APIs, product JSON-LD, and order deeplinks are shipped; assistant status coverage is thinner |
+| 3 | On-site assistant evaluator | 15 | **78** | **11.7** | medium-low | Assistant/custom-order surface exists; no committed transcript proving consultation, complaint, status, and escalation together |
+| 4 | Code reviewer | 10 | **86** | **8.6** | high | Plain-Python orchestrator, single MCP chokepoint, scoped agent projects, tests, redaction, and clean env model; no CI |
+| 5 | Operator simulator | 15 | **82** | **12.3** | medium | Telegram owner gates, `/capacity`, `/tickets`, and capacity-aware POS flow are documented; screenshots/live reject evidence are thin |
+| 6 | Business analyst | 15 | **84** | **12.6** | medium | $500 case is real-data math; ROAS 13.27× simulator; production path concrete; attribution from campaign lead to order is not closed |
+| 7 | Innovation/depth spotter | 10 | **76** | **7.6** | medium-low | Agent-readable storefront, scoped MCPs, custom-cake/complaint/allergen gates shipped; growth bonus items remain mostly unbuilt |
+| | **Weighted estimate** | **100** | | **82.6 / 100** | | Plausibly 78–87 depending on judge calibration |
 
 Below 80 only if judges heavily discount sandbox previews and require richer
 human-visible UX proof. Above 85 if they reward the agent-readable storefront,
@@ -55,22 +57,25 @@ owner-gate safety, and production-adapter path as real product surface.
 
 ---
 
-## Pass 1 — Functional
+## Pass 1 — Functional Scenario Tester (20 pts)
 
 **Likely score: 86 / 100. Confidence: medium.**
 
-What the dimension covers: does each channel work end-to-end? Does the
-order intent → kitchen handoff close? Does the marketing loop run?
+What the pass covers: does each channel work end-to-end? Does the order intent
+→ kitchen handoff close? Does the marketing loop run? Does the world scenario
+produce audit evidence?
 
 ### Evidence in repo / logs
 
 - All four MCP loops report a 100/100 preview in the latest committed
   evidence summary: marketing 100, pos_kitchen 100, channels 100, world 100.
-- Walk-in order **completes the production lifecycle**:
-  `square_create_order` → `kitchen_create_ticket` → `kitchen_accept_ticket`
-  → `kitchen_mark_ready` → `square_update_order_status` —
-  see `orchestrator/handlers/square.py:42-111` and the corresponding
-  `mcp_call` rows preserved in the committed `evidence/e2e-sample.jsonl` tail.
+- Walk-in order **completes the capacity-aware production lifecycle**:
+  `square_create_order` → `kitchen_create_ticket` →
+  `kitchen_get_capacity` / `kitchen_get_menu_constraints` →
+  `square_capacity_decision` → `kitchen_accept_ticket` →
+  `kitchen_mark_ready` → `square_update_order_status` — see
+  `orchestrator/handlers/square.py:42-111` and the corresponding rows
+  preserved in the committed `evidence/e2e-sample.jsonl` tail.
 - Marketing demand engine end-to-end chain captured at
   `docs/MARKETING.md:147-160` and reproduced fresh in three independent
   runs (`MARKETING.md:165-313`).
@@ -88,8 +93,8 @@ order intent → kitchen handoff close? Does the marketing loop run?
   live evidence across both branches would be more convincing.
 - **No real customer loop ever round-trips.** All inbound is from
   `world_*` injects or `whatsapp_inject_inbound` — there is no real WA
-  webhook. We're transparent about this in the brief, but a Functional
-  judge could mark it.
+  webhook. We're transparent about this in the brief, but a functional
+  scenario tester could mark it.
 
 ### One actionable fix (≤30 min)
 
@@ -99,15 +104,18 @@ already have the right tool permissions; this is mostly evidence shape.
 
 ---
 
-## Pass 2 — Depth
+## Pass 2 — Agent-Friendliness Auditor (15 pts)
 
-**Likely score: 78 / 100. Confidence: medium-low.**
+**Likely score: 84 / 100. Confidence: medium.**
 
-What the dimension covers: sophistication of agent reasoning, edge-case
-handling, "would Askhat trust this with one of his customers."
+What the pass covers: can an external agent or judge read the storefront,
+catalog, policies, order path, and tool boundaries without scraping a human UI?
 
 ### Evidence in repo / logs
 
+- **Agent-readable storefront shipped** via `/agent.json`, `/api/catalog`,
+  `/api/policies`, per-product pages, and JSON-LD; these are the surfaces an
+  autonomous buyer or evaluator can consume without visual browsing.
 - **Five inbound paths** classified agent-side, not by the orchestrator —
   `agents/sales/CLAUDE.md:18-44`: inquiry / order / high-value / complaint
   / custom-cake. Routing is "complaint > custom > owner-gate
@@ -128,36 +136,39 @@ handling, "would Askhat trust this with one of his customers."
 
 ### Risks / gaps
 
+- **Assistant/status coverage is thinner than catalog coverage.** The static
+  storefront APIs are strong; the full consultation/status/escalation behavior
+  is less directly visible in committed transcripts.
 - **The agent's actual reply text is not in the evidence.** The orchestrator
   logs `claude_run` start/end markers and the dispatcher logs
   `channel_inbound`, but the model's response body isn't preserved in
-  `evidence/orchestrator-run-*.jsonl`. A Depth judge reading evidence
-  alone has to take it on faith.
+  `evidence/orchestrator-run-*.jsonl`. A judge reading evidence alone has
+  to take it on faith.
 - **No injected-error / edge-case scenario in the smoke.** The 12-event
   smoke is "happy path with seeded inbounds" — no out-of-stock, no
   capacity-full, no allergen confusion, no last-minute custom. T-014's
   v1 light red-team was descoped; only the document remains.
 - **Agent prompts are static.** They don't read `evidence/` themselves to
   reason about prior context inside a session. (Probably out of scope for
-  the brief — flagging because Depth judges read code.)
+  the brief — flagging because innovation/depth spotters read prompts.)
 
 ### One actionable fix (≤20 min)
 
 In `orchestrator/handlers/whatsapp.py:48-49`, capture
 `response[:500]` (with token redaction already in `evidence.py`) into a
 `channel_outbound` evidence row alongside the existing `claude_run`
-markers. This costs <20 lines and gives Depth judges visible
+markers. This costs <20 lines and gives agent-friendliness judges visible
 agent-reply evidence — the single biggest jump in defensibility for the
-dimension.
+pass.
 
 ---
 
-## Pass 3 — Impact
+## Pass 3 — Business Analyst (15 pts)
 
 **Likely score: 84 / 100. Confidence: medium.**
 
-What the dimension covers: business value. Would Askhat use this on
-Monday? Does the math hold up?
+What the pass covers: business value. Would Askhat use this on Monday? Does
+the $500→$5K math hold up?
 
 ### Evidence in repo / logs
 
@@ -202,13 +213,13 @@ shows both accept and reject/owner-review behavior.
 
 ---
 
-## Pass 4 — UX
+## Pass 4 — On-Site Assistant Evaluator (15 pts)
 
 **Likely score: 78 / 100. Confidence: medium-low.**
 
-What the dimension covers: customer-facing channel quality + owner-facing
-Telegram UX. Look-and-feel of the storefront (which the brief flags as a
-production candidate).
+What the pass covers: website assistant behavior, customer-facing channel
+quality, consultation/custom-order handling, complaint/status/escalation
+behavior, and the storefront feel around that assistant.
 
 ### Evidence in repo / logs
 
@@ -230,8 +241,9 @@ production candidate).
 ### Risks / gaps
 
 - **No Lighthouse score on file.** "Mobile performance 🟡 untested" in
-  `BONUS-PLAN.md:54`. A UX judge running Lighthouse themselves *and*
-  finding a problem we didn't pre-empt is asymmetric downside.
+  `BONUS-PLAN.md:54`. An on-site assistant evaluator running Lighthouse
+  themselves *and* finding a problem we didn't pre-empt is asymmetric
+  downside.
 - **No screenshots of the Telegram owner flow** anywhere in `docs/`. The
   approve/reject flow is real and good; the judge can't see it without
   setting up a bot.
@@ -249,16 +261,16 @@ Run Lighthouse mobile against the local dev server and drop the score
 plus the screenshot into `docs/UX.md` (or append to README). This is the
 top item in `BONUS-PLAN.md:75` (high-leverage low-cost adds, #7) — 15
 minutes for a defensible "mobile: 90+" claim, which removes the single
-biggest UX-judge tripwire.
+biggest on-site-assistant judge tripwire.
 
 ---
 
-## Pass 5 — Arch
+## Pass 5 — Code Reviewer (10 pts)
 
-**Likely score: 88 / 100. Confidence: high.**
+**Likely score: 86 / 100. Confidence: high.**
 
-What the dimension covers: system decomposition, visibility, MCP usage,
-owner-bot mapping. "Is this a black box or can we see the seams?"
+What the pass covers: system decomposition, visibility, MCP usage, tests,
+security hygiene, maintainability, and whether the repo is reviewable.
 
 ### Evidence in repo / logs
 
@@ -287,14 +299,14 @@ owner-bot mapping. "Is this a black box or can we see the seams?"
 
 - **Agent CLAUDE.md files are long.** `agents/sales/CLAUDE.md` is 280+
   lines. Defensible (six owner-gate triggers, brand voice, JSON shape) —
-  but an Arch judge skimming code might flag prompt size as load-bearing
+  but a code reviewer skimming code might flag prompt size as load-bearing
   in a way the architecture diagram doesn't surface.
 - **No automated test that the routing table matches the `.mcp.json`
   scopes.** A future commit could add `gb_*` to sales' MCP config without
   the orchestrator catching it.
 - **Pre-commit hook installation is manual** (`scripts/git-hooks/pre-commit`
   has a one-line `ln -sf` install in its docstring). Robust enough for
-  a solo team; an Arch-pedant judge could ask for a `make install-hooks`.
+  a solo team; a code reviewer could ask for a `make install-hooks`.
 
 ### One actionable fix (≤10 min)
 
@@ -305,15 +317,22 @@ unique-selling-point should not require clicking through.
 
 ---
 
-## Pass 6 — Prod
+## Pass 6 — Operator Simulator (15 pts)
 
-**Likely score: 76 / 100. Confidence: medium.**
+**Likely score: 82 / 100. Confidence: medium.**
 
-What the dimension covers: production readiness — clean repo, deploy
-notes, env model, no secrets, audit trail, failure handling.
+What the pass covers: whether an owner/operator can use the system under a
+real business day: approval queues, capacity pressure, ticket visibility,
+fallbacks, and failure handling.
 
 ### Evidence in repo / logs
 
+- **Telegram owner surface exists** via `orchestrator/telegram_bot.py` and
+  the role-specific bots in `bots/`: `/budget`, `/capacity`, `/tickets`, and
+  inline approve/reject actions.
+- **Capacity-aware POS flow now checks kitchen load before accepting.** The
+  committed live evidence proves the accept path; unit tests cover reject,
+  custom, and unmapped product branches.
 - **Pre-commit hook with three regex patterns** for known leak shapes
   (`scripts/git-hooks/pre-commit:18-26`): `sbc_team_<8+>`, `Bearer
   <20+>`, Telegram bot tokens. Documented allow-list for placeholders.
@@ -337,17 +356,20 @@ notes, env model, no secrets, audit trail, failure handling.
 
 ### Risks / gaps
 
-- **No CI.** Pre-commit is local. A Prod-judge might dock for "no GitHub
-  Actions running tests on every push." Defensible (hackathon scope) but
-  worth being explicit about.
+- **No screenshots of the Telegram owner flow** anywhere in `docs/`. The
+  approve/reject flow is real and good; the judge can't see it without
+  setting up a bot.
 - **No live monitoring or health-check.** `PRODUCTION-PATH.md:220` says
   "monitoring: orchestrator process alive check + Telegram heartbeat
   every 6h" — spec'd, not built.
+- **No CI.** Pre-commit is local. A code-reviewer might dock for "no GitHub
+  Actions running tests on every push." Defensible (hackathon scope) but
+  worth being explicit about.
 - **No `prod_smoke.sh` yet** despite `SUBMISSION.md` referring to one
   (`PRODUCTION-PATH.md:194` "TBW post-hackathon").
 - **`evidence/e2e-sample.jsonl` is committed** (the only JSONL allowed
   by `.gitignore:13`). It's redacted via `e2e_smoke.sh:266-272` but a
-  paranoid Prod-judge will grep for `sbc_team` themselves; we're clean.
+  paranoid code reviewer will grep for `sbc_team` themselves; we're clean.
 
 ### One actionable fix (≤15 min)
 
@@ -355,16 +377,17 @@ Add a simple `scripts/preflight.sh` that runs the 5-step
 pre-submission ritual from `SUBMISSION.md:67-86` end-to-end and
 exits non-zero if any step fails. Even without CI, this gives the
 submitter (Jandos at 09:00 CT) a one-command "ready to ship?" gate
-and gives Prod-judges a visible artefact to point at.
+and gives operator/code-review judges a visible artefact to point at.
 
 ---
 
-## Pass 7 — Inn
+## Pass 7 — Innovation/Depth Spotter (10 pts)
 
 **Likely score: 76 / 100. Confidence: medium-low.**
 
-What the dimension covers: bonus-style differentiators not asked for
-in the brief.
+What the pass covers: bonus-style differentiators, agent reasoning depth,
+edge-case handling, and whether the project has a novel product angle beyond
+the baseline brief.
 
 ### Evidence in repo / logs
 
@@ -411,16 +434,16 @@ Ship lead scoring in the marketing agent (`BONUS-PLAN.md:73`, item C5).
 Score 0–100 based on channel, intent strength, repeat-customer
 inference. Already partially implied by current routing logic — make
 it explicit in `marketing_route_lead` evidence. Single 30-min change
-that ticks one Inn bonus item with concrete evidence. Bigger win than
+that ticks one innovation/depth bonus item with concrete evidence. Bigger win than
 adding any new doc.
 
 ---
 
-## Why POS/kitchen is now 100
+## Why POS/kitchen preview is now 100/100
 
 The earlier self-eval was written after the first Square fix but before the
-capacity-aware handoff landed. At that point POS/kitchen had moved from 0 to
-55 because the orchestrator finally carried a seeded walk-in order through:
+capacity-aware handoff landed. At that point the docs only described the basic
+seeded walk-in order lifecycle:
 
 ```
 square_create_order → kitchen_create_ticket → kitchen_accept_ticket
@@ -453,10 +476,10 @@ In rank order by points-per-minute:
    `channel_outbound` evidence rows** in `handlers/whatsapp.py` and
    `handlers/instagram.py` (~20 min). Closes the
    "channels=100 but outbound proof is indirect" credibility gap, and lifts
-   Functional and Depth defensibility.
+   functional-scenario and innovation/depth defensibility.
 2. **Run Lighthouse mobile against the website + commit a screenshot**
-   to `docs/` and link from README (~15 min). Removes the biggest UX
-   judge tripwire and ticks the `BONUS-PLAN.md` mobile-perf item.
+   to `docs/` and link from README (~15 min). Removes the biggest
+   on-site-assistant tripwire and ticks the `BONUS-PLAN.md` mobile-perf item.
 3. **Run one final fresh-clone / preflight pass** (~20 min). Execute the
    no-token website/orchestrator checks, then `scripts/evaluator_preview.sh`
    with `.env.local` populated and confirm the four preview scores still read
@@ -506,20 +529,20 @@ What you're verifying:
 | `marketing : 100`, `pos_kitchen : 100`, `channels : 100`, `world : 100` | The four-loop preview matches our self-eval inputs |
 | `evidence/e2e-sample.jsonl` reflects a PASS run with average ≥80 | Score is high enough for full bonus eligibility (`BONUS-PLAN.md:7-14`) |
 
-What to read for the seven dimensions, fastest to slowest:
+What to read for the seven official passes, fastest to slowest:
 
-| Dimension | Read this first |
+| Official pass | Read this first |
 |---|---|
-| Functional | `evidence/e2e-sample.jsonl` plus a fresh local `bash scripts/e2e_smoke.sh` run if desired |
-| Depth | `agents/sales/CLAUDE.md` — five inbound paths, six owner-gate triggers |
-| Impact | `docs/MARKETING.md:147-160` (real MCP chain) + `docs/PRODUCTION-PATH.md` |
-| UX | `website/app/agent.json/route.ts` + `/api/catalog` + `BONUS-PLAN.md` for what's still TBD |
-| Arch | `docs/ARCHITECTURE.md` (one-pager: diagram + routing + entry points) |
-| Prod | `.env.example`, `.gitignore`, `scripts/git-hooks/pre-commit`, `docs/SUBMISSION.md:67-86` |
-| Inn | `docs/BONUS-PLAN.md` for the inventory; `agents/*/CLAUDE.md` for what's actually wired |
+| Functional scenario tester | `evidence/e2e-sample.jsonl` plus a fresh local `bash scripts/e2e_smoke.sh` run if desired |
+| Agent-friendliness auditor | `website/app/agent.json/route.ts`, `/api/catalog`, `/api/policies`, and `docs/AGENT-NOTES.md` |
+| On-site assistant evaluator | `website/app/assistant/`, `/api/assistant`, and `scripts/test_website.sh` |
+| Code reviewer | `docs/ARCHITECTURE.md`, `orchestrator/`, tests, `.env.example`, `.gitignore`, `scripts/git-hooks/pre-commit` |
+| Operator simulator | `orchestrator/telegram_bot.py`, `bots/`, `orchestrator/handlers/square.py`, `evidence/e2e-sample.jsonl` |
+| Business analyst | `docs/MARKETING.md:147-160` (real MCP chain) + `docs/PRODUCTION-PATH.md` |
+| Innovation/depth spotter | `docs/BONUS-PLAN.md` for the inventory; `agents/*/CLAUDE.md` for what's actually wired |
 
 The four `evaluator_score_*` MCP tools are a **preview**, not the
-seven judges. Treat them as a fast pulse check; the real grade is in
+official weighted grade. Treat them as a fast pulse check; the real grade is in
 the code, the evidence, and the docs above.
 
 If you want to run the full e2e (5 min wall-clock, drives all four
@@ -535,6 +558,6 @@ It self-times-out at 7 min, redacts tokens before writing
 ---
 
 *Last revised 2026-05-09. This is a one-pass shadow eval — the actual
-seven judges run independently at 10:00 CT May 10. Numbers above are
+seven official passes run independently at 10:00 CT May 10. Numbers above are
 honest best-guesses, written to surface fixable gaps, not to predict
 the leaderboard.*

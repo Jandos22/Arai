@@ -131,13 +131,13 @@ run there.
 
 ## What's actually shipped (running totals)
 
-The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. The official leaderboard uses seven AI judging dimensions (Functional, Depth, Impact, UX, Architecture, Production-readiness, Innovation). See `docs/SELF-EVAL.md` for the current seven-pass risk register.
+The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. The official judging uses seven weighted AI passes: functional scenario tester (20), agent-friendliness auditor (15), on-site assistant evaluator (15), code reviewer (10), operator simulator (15), business analyst (15), and innovation/depth spotter (10). See `docs/SELF-EVAL.md` for the current weighted risk register.
 
 
 | Loop | Status | Evidence |
 |---|---|---|
 | Marketing $500 → $5K | ✅ preview score 100/100 — demand-engine campaigns + routed leads + owner reports | `agents/marketing/`, `docs/MARKETING.md`, `evidence/marketing-sample.jsonl`, `evidence/e2e-sample.jsonl` |
-| POS + kitchen | ✅ preview score 100/100 after capacity-aware Square→kitchen handoff — order, ticket, capacity check, accept/ready, POS status update | `orchestrator/handlers/square.py`, `orchestrator/tests/test_square_capacity.py`, `evidence/e2e-sample.jsonl` |
+| POS + kitchen | ✅ preview score 100/100 after capacity-aware Square→kitchen handoff — committed live evidence shows the accept path: order, ticket, capacity check, accept/ready, POS status update; unit tests cover reject/custom/unmapped branches | `orchestrator/handlers/square.py`, `orchestrator/tests/test_square_capacity.py`, `evidence/e2e-sample.jsonl` |
 | Channel response (WA / IG / GMB) | ✅ preview score 100/100; evidence includes channel inbounds + agent response previews, with remaining polish around explicit outbound-action counters | `agents/sales/`, `agents/ops/`, `orchestrator/handlers/`, `evidence/e2e-sample.jsonl` |
 | World scenario | ✅ preview score 100/100 — deterministic launch-day scenario runs through `world_start_scenario` / `world_next_event` | `orchestrator/`, `evidence/e2e-sample.jsonl` |
 | Owner UI | ✅ Approval queue (T-003) + 3 dedicated bots (`bots/marketing_bot`, `ops_bot`, `sales_bot`) | `orchestrator/telegram_bot.py`, `bots/` |
