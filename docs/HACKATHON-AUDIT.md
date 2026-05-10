@@ -109,6 +109,30 @@ Token: `<redacted>` (full token visible only on the kit page; lives in MacBook `
 
 This **confirms our approach end-to-end** — every tool we already use is the right one. No surprises.
 
+## Adversarial check: implement Cloudflare Tunnel webhook path
+
+Issue #9 challenged whether skipping ngrok could be a hidden DQ or scoring
+risk because current brief §04 says "Every team will end up with something
+like this" and shows "WhatsApp / IG webhook hits ngrok URL" as step 1.
+Strongest case against us: the channel-behavior criterion might expect a
+public webhook path, and a judge doing a literal read of §04 could mark a
+sandbox-polling loop as less faithful to the standard runtime pattern.
+
+Updated decision after re-reading current brief §03 screenshot: implement a
+thin Cloudflare Tunnel webhook path before submission. §03 includes "Inbound
+webhooks tunnel home" under hard rules and says violations are disqualified.
+Even though real WhatsApp/Instagram production access remains forbidden and §06
+keeps the sandbox as source of truth, we should demonstrate the required
+runtime shape with sandbox/test webhook payloads.
+
+Scope: add a local HTTP wrapper, expose it through Cloudflare Tunnel, and route
+`POST /webhooks/whatsapp` and `POST /webhooks/instagram` into the existing
+orchestrator dispatcher. The adapter should log evidence, support a dry-run
+health endpoint, and be registerable with the sandbox MCP
+`whatsapp_register_webhook` / `instagram_register_webhook` tools once a public
+Tunnel URL exists. No real Meta credentials or production customer messages are
+needed.
+
 ## Submission checklist — verbatim from kit page
 
 - [x] Public GitHub repo with final commit before deadline

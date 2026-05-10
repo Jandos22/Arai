@@ -8,7 +8,7 @@
 # Usage:
 #   agents/marketing/run.sh
 # Requirements:
-#   - .env.local at repo root with STEPPE_MCP_URL + STEPPE_MCP_TOKEN
+#   - .env.local, ARAI_ENV_FILE, or ~/.config/arai/env.local with STEPPE_MCP_TOKEN
 #   - claude CLI on PATH (Claude Code v2.x)
 
 set -euo pipefail
@@ -16,16 +16,20 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/../.." && pwd)"
 
-if [ ! -f "$REPO_ROOT/.env.local" ]; then
-  echo "error: $REPO_ROOT/.env.local missing — copy .env.example and fill STEPPE_MCP_TOKEN" >&2
+if [ ! -f "$REPO_ROOT/scripts/load_env.sh" ]; then
+  echo "error: env helper missing at $REPO_ROOT/scripts/load_env.sh" >&2
   exit 1
 fi
 
 # shellcheck disable=SC1091
-set -a; source "$REPO_ROOT/.env.local"; set +a
+source "$REPO_ROOT/scripts/load_env.sh"
+if ! arai_load_env "$REPO_ROOT"; then
+  echo "error: env missing — create .env.local or ~/.config/arai/env.local with STEPPE_MCP_TOKEN" >&2
+  exit 1
+fi
 
 if [ -z "${STEPPE_MCP_TOKEN:-}" ]; then
-  echo "error: STEPPE_MCP_TOKEN not set after sourcing .env.local" >&2
+  echo "error: STEPPE_MCP_TOKEN not set after loading env" >&2
   exit 1
 fi
 
