@@ -34,17 +34,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _load_env_local() -> None:
-    env = REPO_ROOT / ".env.local"
-    if not env.exists():
-        return
-    for line in env.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        key = key.strip()
-        val = val.strip().strip('"').strip("'")
-        os.environ.setdefault(key, val)
+    from orchestrator.env import load_env
+
+    load_env(REPO_ROOT)
 
 
 _load_env_local()

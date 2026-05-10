@@ -27,7 +27,7 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 
 - Runtime = **Claude Code CLI + Opus 4.7** only. No Claude Agent SDK. No LangGraph, CrewAI, n8n.
 - Owner UI = **Telegram bots only**. No email, no web dashboard for the owner.
-- Pattern: WhatsApp/Instagram webhook → ngrok/Cloudflare Tunnel → bot wrapper → `claude -p "<prompt>"` headless → response back to channel.
+- Inbound webhooks tunnel home via Cloudflare Tunnel (ngrok fallback) to a local wrapper, then `claude -p "<prompt>"` headless. Sandbox `world_next_event` / WA+IG inject tools remain the evaluator/dev source of truth and feed the same dispatcher.
 - Sandbox MCP is the source of truth. No real Square/WA/IG/payment credentials.
 - **NEVER commit `STEPPE_MCP_TOKEN`** or any secret. Token lives only in `.env.local` on the MacBook. `.env.example` ships placeholders.
 
@@ -35,8 +35,8 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 
 Vertical slice we are building:
 
-1. Customer DMs Instagram OR messages WhatsApp.
-2. Webhook → bot wrapper (Python) → `claude -p` with project context.
+1. Customer DMs Instagram OR messages WhatsApp in the sandbox/world scenario or webhook demo path.
+2. Cloudflare/ngrok webhook, sandbox event, or test inject → orchestrator/bot wrapper (Python) → `claude -p` with project context.
 3. Agent uses MCP tools (catalog, inventory, policies, kitchen, orders) to answer in Happy Cake brand voice.
 4. Order intent captured → kitchen handoff card created in sandbox.
 5. Owner gets Telegram message with inline approve/reject buttons for custom or high-value orders.

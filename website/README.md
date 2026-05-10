@@ -19,8 +19,8 @@ build time (or shipped as a fixture for cold-start dev).
 ## Catalog snapshot from sandbox
 
 ```bash
-# from the website/ folder, with .env.local at repo root populated
-set -a; source ../.env.local; set +a
+# from the website/ folder, with repo .env.local or ~/.config/arai/env.local populated
+source ../scripts/load_env.sh && arai_load_env ..
 npm run snapshot:catalog
 ```
 

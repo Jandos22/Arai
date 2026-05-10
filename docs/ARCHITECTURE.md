@@ -57,8 +57,11 @@ operator usefulness, business analysis, and innovation and depth.
 
 ## Event flow
 
-1. Orchestrator calls `world_start_scenario('launch-day-revenue-engine')`.
-2. Loop: `world_next_event` → returns `{channel, type, payload}`.
+1. Orchestrator calls `world_start_scenario('launch-day-revenue-engine')`
+   for evaluator/dev runs, or receives tunneled test webhooks through
+   `webhook_server`.
+2. `world_next_event` or `POST /webhooks/*` returns/normalizes
+   `{channel, type, payload}`.
 3. `dispatcher.make_dispatcher` looks up `channel:type` (or `channel:*`,
    then `*`) in the routing table.
 4. Handler builds a structured prompt and shells `claude -p` against the
@@ -90,6 +93,7 @@ operator usefulness, business analysis, and innovation and depth.
 | Claude Code CLI + Opus 4.7 only | All agent reasoning lives in `agents/<role>/`, invoked via `claude -p`; orchestrator is dumb glue, not an LLM framework |
 | No SDK / LangGraph / CrewAI / n8n | Orchestrator is plain Python. Routing is a dict. No agent-framework DSL. |
 | Owner UI = Telegram only | `telegram_bot` is the only owner channel. No emails, no dashboards. |
+| Inbound webhooks tunnel home | `webhook_server` exposes local WA/IG endpoints for Cloudflare Tunnel/ngrok and feeds the same dispatcher. |
 | Sandbox is source of truth | `mcp_client` is the only network egress to the sandbox. |
 | Evaluator readability | Every decision logged to `evidence/orchestrator-<runId>.jsonl` with redaction. `evaluator_get_evidence_summary` sees the same shape. |
 
@@ -99,6 +103,8 @@ operator usefulness, business analysis, and innovation and depth.
 |---|---|
 | `python -m orchestrator.main --dry-run` | Validate wiring, no live calls |
 | `python -m orchestrator.main --list-scenarios` | List sandbox scenarios |
+| `python -m orchestrator.main --webhook-server --port 8787` | Serve local WA/IG webhook endpoints for Cloudflare Tunnel |
+| `python -m orchestrator.main --register-webhooks https://...` | Register tunneled webhook URLs with sandbox MCP |
 | `python -m orchestrator.main --scenario launch-day-revenue-engine` | Live run |
 
 ## Files
@@ -108,6 +114,7 @@ orchestrator/
 ├── main.py            # CLI entry point
 ├── mcp_client.py      # JSON-RPC client (X-Team-Token), envelope unwrap
 ├── scenario.py        # world_start_scenario + world_next_event loop
+├── webhook_server.py  # local Cloudflare/ngrok webhook ingress adapter
 ├── dispatcher.py      # channel:type → handler
 ├── handlers/          # one module per channel
 ├── claude_runner.py   # subprocess wrapper for `claude -p`
