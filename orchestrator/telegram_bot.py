@@ -100,7 +100,15 @@ class TelegramNotifier:
             context=context or {},
         )
         if self.enabled:
-            text = f"⚠️ *Approval needed*\n\n{summary}\n\n_Draft reply:_\n{draft}"
+            lead_chip = ""
+            ls = (context or {}).get("lead_score") if context else None
+            if isinstance(ls, dict) and ls.get("segment"):
+                seg = str(ls.get("segment", "")).upper()
+                score = ls.get("score")
+                reasons = ls.get("reasons") or []
+                top = ", ".join(str(r) for r in reasons[:3])
+                lead_chip = f"_Lead:_ *{seg}* ({score}/100) — {top}\n\n" if top else f"_Lead:_ *{seg}* ({score}/100)\n\n"
+            text = f"⚠️ *Approval needed*\n\n{summary}\n\n{lead_chip}_Draft reply:_\n{draft}"
             keyboard = {
                 "inline_keyboard": [
                     [

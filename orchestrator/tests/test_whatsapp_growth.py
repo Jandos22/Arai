@@ -90,6 +90,67 @@ def test_whatsapp_inbound_writes_lead_score_from_square_evidence():
     assert "square_recent_orders" in scores[0]["evidenceSources"]
 
 
+def test_follow_up_due_respects_explicit_message_no_referral_pitch(tmp_path, monkeypatch):
+    # Explicit caller-provided message must not be overridden with the pitch.
+    from orchestrator import handlers
+    from orchestrator.referrals import ReferralStore
+
+    monkeypatch.setattr(
+        handlers.whatsapp,
+        "_REFERRALS",
+        ReferralStore(path=tmp_path / "referrals.json"),
+    )
+    mcp = _FakeMCP(
+        {
+            "square_recent_orders": {"orders": []},
+            "whatsapp_send": {"ok": True},
+        }
+    )
+    ev = _RecordingEvidence()
+
+    whatsapp_handler.handle_follow_up_due(
+        {
+            "channel": "whatsapp",
+            "type": "follow_up_due",
+            "payload": {
+                "to": "+12815550123",
+                "message": "Custom abandoned-cart copy from caller.",
+            },
+        },
+        _ctx(mcp, ev),
+    )
+    sent = next(args for name, args in mcp.calls if name == "whatsapp_send")
+    assert sent["message"] == "Custom abandoned-cart copy from caller."
+    assert not any(e["kind"] == "referral_issued" for e in ev.entries)
+
+
+def test_inbound_self_redemption_marked_not_matched(tmp_path, monkeypatch):
+    from orchestrator import handlers
+    from orchestrator.referrals import ReferralStore, code_for
+
+    store = ReferralStore(path=tmp_path / "referrals.json")
+    sender = "+12815550123"
+    issued = store.issue(sender)
+    monkeypatch.setattr(handlers.whatsapp, "_REFERRALS", store)
+
+    mcp = _FakeMCP({"square_recent_orders": {"orders": []}})
+    ev = _RecordingEvidence()
+
+    whatsapp_handler.handle(
+        {
+            "channel": "whatsapp",
+            "type": "inbound_message",
+            "payload": {"from": sender, "message": f"my code is {issued['code']}"},
+        },
+        _ctx(mcp, ev, _FakeRunner()),
+    )
+    redeems = [e for e in ev.entries if e["kind"] == "referral_redeemed"]
+    assert len(redeems) == 1
+    assert redeems[0]["selfRedeem"] is True
+    assert redeems[0]["matched"] is False
+    assert code_for(sender) == issued["code"]  # sanity
+
+
 def test_follow_up_due_checks_square_then_sends_whatsapp():
     mcp = _FakeMCP(
         {

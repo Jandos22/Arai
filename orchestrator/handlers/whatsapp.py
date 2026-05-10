@@ -13,6 +13,18 @@ from typing import Any
 from ..customers import is_greeting, propose_reorder
 from ..dispatcher import HandlerContext
 from ..growth import build_pickup_follow_up_message, score_whatsapp_lead
+from ..referrals import ReferralStore, detect_codes, referral_pitch
+
+
+_REFERRALS: ReferralStore | None = None
+
+
+def _referrals() -> ReferralStore:
+    """Lazy-init the referral store so `import` has no filesystem side effects."""
+    global _REFERRALS
+    if _REFERRALS is None:
+        _REFERRALS = ReferralStore()
+    return _REFERRALS
 
 
 def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
@@ -27,6 +39,21 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         bodyPreview=body[:200],
     )
 
+    for redemption_code in detect_codes(body):
+        issuer = _referrals().redeem(code=redemption_code, redeemer=str(sender or ""), channel="whatsapp")
+        # Self-redemption (sender types their own code) is not a real referral.
+        is_self = bool(issuer and issuer.get("identifier") == str(sender or ""))
+        ctx.evidence.write(
+            "referral_redeemed",
+            channel="whatsapp",
+            redeemer=str(sender or ""),
+            code=redemption_code,
+            matched=bool(issuer) and not is_self,
+            selfRedeem=is_self,
+            issuer=(issuer or {}).get("identifier"),
+            evidenceSources=["whatsapp_inbound", "referrals_store"],
+        )
+
     recent_orders = _safe_recent_orders(ctx)
     lead_score = score_whatsapp_lead(payload, recent_orders)
     ctx.evidence.write(
@@ -40,6 +67,12 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
         reasons=lead_score.reasons,
         evidenceSources=["whatsapp_inbound", "square_recent_orders"],
     )
+    lead_score_ctx = {
+        "score": lead_score.score,
+        "segment": lead_score.segment,
+        "route": lead_score.route,
+        "reasons": lead_score.reasons,
+    }
 
     profile = _maybe_upsert_profile(ctx, "whatsapp", sender, payload, recent_orders)
     if profile and is_greeting(body):
@@ -109,6 +142,7 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
                         "request_details": decoded.get("request_details"),
                         "kitchen_constraints": decoded.get("kitchen_constraints"),
                         "trigger": decoded.get("trigger"),
+                        "lead_score": lead_score_ctx,
                     },
                 )
         except (ValueError, json.JSONDecodeError):
@@ -128,7 +162,22 @@ def handle_follow_up_due(event: dict[str, Any], ctx: HandlerContext) -> None:
         return
 
     recent_orders = _safe_recent_orders(ctx)
-    message = payload.get("message") or build_pickup_follow_up_message(payload, recent_orders)
+    explicit = payload.get("message")
+    base_message = explicit or build_pickup_follow_up_message(payload, recent_orders)
+    # Only auto-append the referral pitch when we generated the message
+    # ourselves. If the caller passed a custom message, respect it.
+    if explicit:
+        message = base_message
+    else:
+        issued = _referrals().issue(str(recipient), channel="whatsapp")
+        ctx.evidence.write(
+            "referral_issued",
+            channel="whatsapp",
+            recipient=str(recipient),
+            code=issued["code"],
+            evidenceSources=["referrals_store"],
+        )
+        message = f"{base_message} {referral_pitch(issued['code'])}"
     args = {"to": recipient, "message": message}
     try:
         result = ctx.client.call_tool("whatsapp_send", args)
