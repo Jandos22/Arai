@@ -262,7 +262,7 @@ If you have an extra 5 minutes, these are the most informative pokes:
    `whatsapp_inject_inbound(from="+12815550000", message="Do you have
    honey cake today for tomorrow?")` and watch the agent reply.
 2. **Read a product agent-side** — `curl
-   https://localhost:3000/p/medovik-honey-cake | grep -A 30
+   https://localhost:3000/products/medovik-honey-cake | grep -A 30
    application/ld+json` — full schema.org Product on every page.
 3. **Look at a campaign adjustment** — `jq 'select(.tool ==
    "marketing_adjust_campaign")' evidence/marketing-sample.jsonl` — every

@@ -54,7 +54,7 @@ export default async function Menu() {
               return (
                 <a
                   key={item.id}
-                  href={`/p/${item.slug}`}
+                  href={`/products/${item.slug}`}
                   className="group rounded-2xl bg-cream-100 p-5 hover:bg-cream-200 transition"
                 >
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-happy-blue-200 mb-4">

@@ -36,7 +36,7 @@ export const metadata = {
 };
 
 export default function OfficeBoxesPage() {
-  const whatsappHref = `https://wa.me/12815551234?text=${encodeURIComponent(whatsappText)}`;
+  const whatsappHref = `https://wa.me/12819798320?text=${encodeURIComponent(whatsappText)}`;
   const instagramHref = "https://instagram.com/happycakeus";
 
   return (

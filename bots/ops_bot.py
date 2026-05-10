@@ -2,9 +2,12 @@
 
 Slash commands:
     /start          — sanity check
+    /status         — orchestrator health snapshot from latest evidence run
+    /audit <id>     — full evidence chain for one approval id
     /capacity       — current kitchen capacity / load
     /tickets        — list active kitchen tickets
     /reviews        — latest GMB reviews (top 5)
+    /pending        — unresolved owner approval requests from evidence
     /pending_posts  — IG posts waiting for owner approval
 
 Run with:
@@ -21,7 +24,8 @@ from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from orchestrator.evidence import EvidenceLogger  # noqa: E402
+from orchestrator.evidence import EvidenceLogger, unresolved_approval_requests  # noqa: E402
+from orchestrator.health import audit_trail, format_health, health_snapshot  # noqa: E402
 from orchestrator.mcp_client import MCPClient, MCPError  # noqa: E402
 
 from bots._common import build_app, owner_only, run_polling  # noqa: E402
@@ -39,9 +43,12 @@ async def cmd_start(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
     await update.effective_message.reply_text(
         "🍳 HappyCake Ops Bot online.\n\n"
         "Commands:\n"
+        "/status — orchestrator health snapshot\n"
+        "/audit <id> — full evidence chain for one approval\n"
         "/capacity — kitchen capacity right now\n"
         "/tickets — active kitchen tickets\n"
         "/reviews — latest GMB reviews\n"
+        "/pending — unresolved owner approvals\n"
         "/pending_posts — IG posts waiting for your approval"
     )
 
@@ -111,15 +118,94 @@ async def cmd_pending_posts(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> 
     )
 
 
+@owner_only
+async def cmd_pending(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    data = unresolved_approval_requests()
+    pending = data["pending"]
+    if not pending:
+        await update.effective_message.reply_text(
+            "No unresolved owner approvals in the latest orchestrator run."
+        )
+        return
+
+    rows = []
+    for row in pending[:10]:
+        rows.append(
+            {
+                "approvalId": row.get("approvalId"),
+                "ts": row.get("ts"),
+                "summary": row.get("summary"),
+                "context": row.get("context", {}),
+            }
+        )
+    await update.effective_message.reply_text(
+        "⏳ *Pending approvals*\n"
+        f"source: `{data['path']}`\n"
+        "```\n"
+        + _fmt(rows)
+        + "\n```",
+        parse_mode="Markdown",
+    )
+
+
+@owner_only
+async def cmd_status(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    snapshot = health_snapshot()
+    text = format_health(snapshot)
+    if snapshot.get("path"):
+        text += f"\nsource: `{snapshot['path']}`"
+    await update.effective_message.reply_text(text, parse_mode="Markdown")
+
+
+@owner_only
+async def cmd_audit(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    args = ctx.args or []
+    if not args:
+        await update.effective_message.reply_text(
+            "Usage: /audit <approvalId>\nGet ids from /pending."
+        )
+        return
+    approval_id = args[0].strip()
+    chain = audit_trail(approval_id)
+    rows = chain["rows"]
+    if not rows:
+        await update.effective_message.reply_text(
+            f"No evidence rows for approval `{approval_id}`.", parse_mode="Markdown"
+        )
+        return
+    summary = [
+        {
+            "ts": row.get("ts"),
+            "kind": row.get("kind"),
+            "subkind": row.get("subkind"),
+            "agent": row.get("agent"),
+            "action": row.get("action"),
+            "summary": row.get("summary"),
+            "decision": row.get("decision"),
+        }
+        for row in rows
+    ]
+    await update.effective_message.reply_text(
+        f"🧾 *Audit trail* `{approval_id}`\n"
+        f"source: `{chain['path']}`\n"
+        f"rows: {len(rows)}\n"
+        "```\n" + _fmt(summary) + "\n```",
+        parse_mode="Markdown",
+    )
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s | %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
     app = build_app("TELEGRAM_BOT_TOKEN_OPS")
     app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CommandHandler("status", cmd_status))
+    app.add_handler(CommandHandler("audit", cmd_audit))
     app.add_handler(CommandHandler("capacity", cmd_capacity))
     app.add_handler(CommandHandler("tickets", cmd_tickets))
     app.add_handler(CommandHandler("reviews", cmd_reviews))
+    app.add_handler(CommandHandler("pending", cmd_pending))
     app.add_handler(CommandHandler("pending_posts", cmd_pending_posts))
     run_polling(app)
 

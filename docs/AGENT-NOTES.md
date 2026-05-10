@@ -40,7 +40,7 @@ Shape (see `website/app/agent.json/route.ts` for the live source):
     "policies": "/api/policies",
     "assistant": "/api/assistant",
     "orderIntent": "/api/order-intent",
-    "productPage": "/p/{slug}",
+    "productPage": "/products/{slug}",
     "menu": "/menu",
     "orderPage": "/order?product={slug}",
     "assistantPage": "/assistant"
@@ -91,7 +91,7 @@ closest catalog item.
 
 ## Contract #4 — JSON-LD `Product` schema on every product page
 
-Every `/p/<slug>` page emits `<script type="application/ld+json">` with the
+Every `/products/<slug>` page emits `<script type="application/ld+json">` with the
 canonical `schema.org/Product` shape:
 
 ```json
@@ -262,6 +262,6 @@ GET /api/catalog    # current products, prices, lead times
 GET /api/policies   # delivery, allergens, refunds, voice
 ```
 
-Plus JSON-LD on every `/p/<slug>` page. Verified by
+Plus JSON-LD on every `/products/<slug>` page. Verified by
 `scripts/test_website.sh`. Mirrors the sandbox MCP catalog so agents can
 choose either delivery path.

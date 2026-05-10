@@ -13,6 +13,7 @@ evidence/e2e-smoke-*.json
 evidence/evaluator-preview-*.json
 !evidence/T-*-*.txt
 !evidence/*-sample.jsonl
+!evidence/orchestrator-run-human-reject-smoke.jsonl
 
 # website snapshot is regenerated from MCP — keep fixture in repo, not snapshot
 website/data/catalog.json
@@ -51,4 +52,11 @@ venv/
 
 # local Claude Code sessions/worktrees (not submission artifacts)
 .claude/
+!.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/arai-self-eval/
+.claude/skills/arai-self-eval/*
+!.claude/skills/arai-self-eval/SKILL.md
 .gstack/

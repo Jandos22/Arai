@@ -72,7 +72,7 @@ git history.
 |---|---|
 | `/` | Storefront home with hero imagery, featured cakes, availability copy, and order CTAs |
 | `/menu` | Full catalog grouped by category with prices and lead times |
-| `/p/[slug]` | Product page with JSON-LD Product schema |
+| `/products/[slug]` | Product page with JSON-LD Product schema |
 | `/about` | Brand story (from `docs/brand/HCU_BRANDBOOK.md`) |
 | `/policies` | Pickup, delivery, allergens, returns |
 | `/order` | Website order-intent form; accepts optional `?product=<slug>` |

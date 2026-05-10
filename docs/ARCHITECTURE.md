@@ -27,7 +27,7 @@ operator usefulness, business analysis, and innovation and depth.
    │                  │     claude -p in agents/<role>/   │  /agent.json         │
    │  ┌───────────┐   │                                  │  /api/catalog        │
    │  │ scenario  │   │                                  │  /api/policies       │
-   │  │ runner    │   │     ┌─────────────────────────┐   │  /p/[slug] + JSON-LD│
+   │  │ runner    │   │     ┌─────────────────────────┐   │ /products/[slug] + JSON-LD│
    │  └─────┬─────┘   │     │  agents/sales/           │  └──────────────────────┘
    │        ▼         │     │  agents/marketing/       │
    │  ┌───────────┐   │     │  agents/ops/             │

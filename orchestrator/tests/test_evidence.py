@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from orchestrator.evidence import EvidenceLogger, _redact
+from orchestrator.evidence import EvidenceLogger, _redact, read_jsonl_tail, unresolved_approval_requests
 
 
 def test_redacts_sbc_team_token():
@@ -70,3 +70,76 @@ def test_logger_writes_growth_bonus_rows(tmp_path):
     assert rows[0]["kind"] == "lead_score"
     assert rows[0]["evidenceSources"] == ["whatsapp_inbound", "square_recent_orders"]
     assert rows[1]["kind"] == "whatsapp_follow_up_sent"
+
+
+def test_read_jsonl_tail_skips_bad_lines(tmp_path):
+    path = tmp_path / "orchestrator-run-tail.jsonl"
+    path.write_text(
+        '{"kind":"one"}\nnot json\n{"kind":"two"}\n',
+        encoding="utf-8",
+    )
+
+    assert read_jsonl_tail(path, limit=2) == [{"kind": "two"}]
+
+
+def test_unresolved_approval_requests_lists_only_pending_latest_run(tmp_path):
+    older = tmp_path / "orchestrator-run-old.jsonl"
+    older.write_text(
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "ts": "2026-05-10T01:00:00Z",
+                        "kind": "owner_msg",
+                        "subkind": "approval_request",
+                        "approvalId": "old",
+                        "summary": "old pending",
+                    }
+                )
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    latest = tmp_path / "orchestrator-run-new.jsonl"
+    latest.write_text(
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "ts": "2026-05-10T02:00:00Z",
+                        "kind": "owner_msg",
+                        "subkind": "approval_request",
+                        "approvalId": "resolved",
+                        "summary": "already resolved",
+                    }
+                ),
+                json.dumps(
+                    {
+                        "ts": "2026-05-10T02:01:00Z",
+                        "kind": "owner_msg",
+                        "subkind": "approval_resolution",
+                        "approvalId": "resolved",
+                        "verdict": "approve",
+                    }
+                ),
+                json.dumps(
+                    {
+                        "ts": "2026-05-10T02:02:00Z",
+                        "kind": "owner_msg",
+                        "subkind": "approval_request",
+                        "approvalId": "pending",
+                        "summary": "needs owner",
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = unresolved_approval_requests(tmp_path)
+
+    assert result["path"] == str(latest)
+    assert [row["approvalId"] for row in result["pending"]] == ["pending"]

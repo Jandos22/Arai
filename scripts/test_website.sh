@@ -70,6 +70,8 @@ assert d["name"] == "HappyCake US", "agent.json: wrong name"
 assert "capabilities" in d and len(d["capabilities"]) >= 3
 assert d["endpoints"]["catalog"] == "/api/catalog"
 assert d["endpoints"]["policies"] == "/api/policies"
+assert d["endpoints"]["productPage"] == "/products/{slug}"
+assert d["contact"]["whatsapp"].endswith("12819798320")
 print("agent.json OK")
 ' || { red "/agent.json FAILED"; failures=$((failures+1)); }
 
@@ -83,6 +85,7 @@ assert d["source"] in ("fixture", "mcp-snapshot")
 assert len(d["items"]) >= 1
 assert d["_availabilityEndpoint"] == "/api/availability"
 assert "availability" in d["_orderPath"]["notes"].lower()
+assert d["_orderPath"]["whatsapp"].endswith("12819798320")
 for item in d["items"]:
     for k in ("id", "slug", "name", "variations"):
         assert k in item, f"item missing {k}"
@@ -126,11 +129,11 @@ import json, sys
 d = json.load(sys.stdin)
 print(d["items"][0]["slug"])
 ')
-prod=$(curl -sS "${BASE}/p/${slug}")
+prod=$(curl -sS "${BASE}/products/${slug}")
 if echo "$prod" | grep -q 'application/ld+json'; then
-  green "JSON-LD on /p/${slug} OK"
+  green "JSON-LD on /products/${slug} OK"
 else
-  red "JSON-LD missing on /p/${slug}"
+  red "JSON-LD missing on /products/${slug}"
   failures=$((failures+1))
 fi
 
@@ -239,6 +242,7 @@ assert d["endpoints"]["policies"] == "/api/policies"
 answer = d["answer"].lower()
 assert "headcount" in answer and "pickup time" in answer and "allergy" in answer
 assert "owner-gated" in answer
+assert "happycake" in answer and "cake \"honey\"" in answer and "medovik" in answer
 print("api/assistant custom_order OK")
 ' || { red "/api/assistant custom_order FAILED"; failures=$((failures+1)); }
 
@@ -253,6 +257,7 @@ assert d["endpoints"]["policies"] == "/api/policies"
 answer = d["answer"].lower()
 assert "photo" in answer and "order name" in answer
 assert "owner review" in answer
+assert "happycake" in answer and "sugar land" in answer
 assert "automatic refund" not in answer and "guaranteed refund" not in answer
 print("api/assistant complaint OK")
 ' || { red "/api/assistant complaint FAILED"; failures=$((failures+1)); }
@@ -268,6 +273,7 @@ assert d["endpoints"]["policies"] == "/api/policies"
 assert d["endpoints"]["availability"] == "/api/availability"
 answer = d["answer"].lower()
 assert "share the order name" in answer and "pickup time" in answer
+assert "happycake" in answer and "sugar land" in answer and "cake \"honey\"" in answer
 assert "ready now" not in answer and "completed" not in answer and "paid" not in answer
 print("api/assistant status OK")
 ' || { red "/api/assistant status FAILED"; failures=$((failures+1)); }
@@ -285,6 +291,7 @@ assert d["endpoints"]["availability"] == "/api/availability"
 answer = d["answer"].lower()
 assert "limited/case-by-case" in answer
 assert "never guaranteed" in answer
+assert "happycake" in answer and "cake \"honey\"" in answer and "medovik" in answer and "nauryz" in answer
 print("api/assistant policy grounding OK")
 ' || { red "/api/assistant policy grounding FAILED"; failures=$((failures+1)); }
 

@@ -107,7 +107,7 @@ export default async function Home() {
             return (
               <a
                 key={item.id}
-                href={`/p/${item.slug}`}
+                href={`/products/${item.slug}`}
                 className="group rounded-2xl bg-cream-100 p-4 hover:bg-cream-200 transition"
               >
                 <div className="relative aspect-square rounded-xl overflow-hidden bg-happy-blue-200 mb-4">
