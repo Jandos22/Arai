@@ -27,7 +27,9 @@ evidence/self-eval-*
 website/data/catalog.json
 
 # python venvs / caches
+# (both directory and symlink-to-venv forms — worktrees use the symlink)
 **/.venv/
+**/.venv
 **/__pycache__/
 **/.pytest_cache/
 **/.mypy_cache/
