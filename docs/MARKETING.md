@@ -376,6 +376,67 @@ CTRs land at 4.20% across all three (simulator parity); lead→order ranges
 `marketing_report_to_owner`):**
 30 campaigns, 90 leads, $66,192 projected revenue.
 
+## Bonus capability — Food-truck weekly route
+
+A separate marketing-agent capability that does not consume the $500/mo
+budget but reuses the same brand voice, the same evidence shape, and
+the same owner-approval flow. The pitch is unit-economics, not flavour:
+HappyCake operates one Sugar Land storefront, so most customers cap at
+roughly one order per month because the drive is too far to repeat. A
+weekly food-truck stop within ~5 miles of a customer's home removes
+that friction. The agent clusters delivery addresses geographically,
+proposes a Mon–Fri route (one neighbourhood cluster per weekday,
+3:00 PM – 7:00 PM window so people grab a cake on the way home from
+school pickup or work), drafts an Instagram post for each stop and a
+personalised WhatsApp message for each customer in the cluster, and
+projects the resulting incremental orders and revenue per month.
+
+The capability is implemented as a deterministic Python module
+(`orchestrator/food_truck_route.py`, pure stdlib, 14 pytest cases) that
+the marketing agent can invoke through its existing `Read` / `Bash`
+tools — the same way it loads any other reference data. A standalone
+driver (`scripts/food_truck_route.py`) exposes the same pipeline so the
+artifact is reproducible without an LLM call:
+
+```
+python scripts/food_truck_route.py \
+  --stem food-truck-route-sample \
+  --at 2026-05-10T08:00:00Z
+```
+
+**Sample run** against the 25-customer demo fixture
+(`orchestrator/fixtures/food_truck_customers.json`, addresses spread
+across First Colony, Telfair, Sienna, Stafford, Aliana, and Pearland):
+
+| Day | Anchor | Customers | Hero | Δ orders/mo | Δ revenue/mo |
+|---|---|---:|---|---:|---:|
+| Mon | Telfair | 9 | cake "Honey" | 7.40 | $278.20 |
+| Tue | Silverlake | 5 | cake "Honey" | 2.89 | $119.09 |
+| Wed | Stafford | 5 | cake "Napoleon" | 4.50 | $283.05 |
+| Thu | Sienna | 4 | cake "Honey" | 3.32 | $140.08 |
+| Fri | Aliana | 2 | cake "Milk Maiden" | 1.62 | $71.83 |
+| **Totals** |  | **25** |  | **+19.73** | **+$892.25** |
+
+Lift factor `×1.85` is applied only to customers within 5 miles of the
+stop centroid; outliers stay at baseline frequency. The constant is
+intentionally modest — the demo's value is the geography clustering
+and brand-voice content, not the choice of multiplier; once real route
+data exists the constant gets replaced by an empirical fit.
+
+**Brand-voice rules verified by tests** for every generated post and
+template: HappyCake one word, cake names in straight quotes after the
+word *cake*, slogan *the original taste of happiness* in IG copy, CTA
+tail *Order on the site at happycake.us or send a message on WhatsApp*,
+no emoji, no *amazing / awesome / incredible* or exclamation chains.
+
+**Owner-approval flow** is identical to the rest of the system: the
+agent posts the artifact to Askhat in Telegram with inline approve /
+reject buttons, and on approve, the per-customer drafts queue into the
+existing channel handlers. No real food-truck logistics, no geocoding
+API call, no real send — every draft sits in `evidence/` for review.
+See `evidence/food-truck-route-sample.md` for the latest sample run and
+`evidence/food-truck-route-smoke.md` for the smoke summary.
+
 ## Methodology note
 
 This run called only the marketing-agent's allowed sandbox tools:

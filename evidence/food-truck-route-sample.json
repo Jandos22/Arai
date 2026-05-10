@@ -1,0 +1,311 @@
+{
+  "kind": "marketing.food_truck_weekly_route",
+  "agent": "marketing",
+  "generatedAt": "2026-05-10T08:00:00Z",
+  "evidenceSources": [
+    "customer_fixture",
+    "deterministic_kmeans"
+  ],
+  "summary": {
+    "stops": 5,
+    "customers": 25,
+    "baselineOrdersMonth": 23.2,
+    "projectedOrdersMonth": 42.93,
+    "incrementalOrdersMonth": 19.73,
+    "incrementalRevenueMonthUsd": 892.25,
+    "liftFactor": 1.85,
+    "nearRadiusMiles": 5.0
+  },
+  "stops": [
+    {
+      "weekday": "Mon",
+      "window": "3:00 PM \u2013 7:00 PM",
+      "cluster": {
+        "label": "A",
+        "anchorNeighborhood": "Telfair",
+        "centroid": {
+          "lat": 29.581,
+          "lng": -95.6422
+        },
+        "customerCount": 9,
+        "customerIds": [
+          "+12815550111",
+          "+12815550112",
+          "+12815550113",
+          "@diana_cake",
+          "+12815550115",
+          "@farah_eats",
+          "+12815550141",
+          "+12815550142",
+          "+12815550145"
+        ]
+      },
+      "heroSku": "honey-whole",
+      "heroCopy": "cake \"Honey\"",
+      "instagramPost": "HappyCake on the road \u2014 Mon afternoon in Telfair.\ncake \"Honey\" fresh from the kitchen, plus the ready-made line \u2014 the original taste of happiness.\nWe park 3:00 PM \u2013 7:00 PM; come grab a cake on the way home.\nOrder on the site at happycake.us or send a message on WhatsApp.",
+      "whatsappDrafts": [
+        {
+          "customerId": "+12815550111",
+          "channel": "whatsapp",
+          "body": "Hi Aaliyah! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550112",
+          "channel": "whatsapp",
+          "body": "Hi Bilqis! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Pistachio Roll\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550113",
+          "channel": "whatsapp",
+          "body": "Hi Carmen! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "@diana_cake",
+          "channel": "instagram",
+          "body": "Hi Diana! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Milk Maiden\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550115",
+          "channel": "whatsapp",
+          "body": "Hi Esra! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Napoleon\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "@farah_eats",
+          "channel": "instagram",
+          "body": "Hi Farah! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Honey\" by the slice too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550141",
+          "channel": "whatsapp",
+          "body": "Hi Priya! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550142",
+          "channel": "whatsapp",
+          "body": "Hi Qadira! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Pistachio Roll\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550145",
+          "channel": "whatsapp",
+          "body": "Hi Tara! The HappyCake truck will be in Telfair this Mon, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Napoleon\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        }
+      ],
+      "projection": {
+        "baselineOrdersMonth": 8.7,
+        "projectedOrdersMonth": 16.1,
+        "incrementalOrdersMonth": 7.4,
+        "incrementalRevenueMonthUsd": 278.2,
+        "liftFactor": 1.85,
+        "nearRadiusMiles": 5.0
+      }
+    },
+    {
+      "weekday": "Tue",
+      "window": "3:00 PM \u2013 7:00 PM",
+      "cluster": {
+        "label": "B",
+        "anchorNeighborhood": "Silverlake",
+        "centroid": {
+          "lat": 29.557,
+          "lng": -95.2934
+        },
+        "customerCount": 5,
+        "customerIds": [
+          "+12815550151",
+          "+12815550152",
+          "@warda_h",
+          "+12815550154",
+          "+12815550155"
+        ]
+      },
+      "heroSku": "honey-whole",
+      "heroCopy": "cake \"Honey\"",
+      "instagramPost": "HappyCake on the road \u2014 Tue afternoon in Silverlake.\ncake \"Honey\" fresh from the kitchen, plus the ready-made line \u2014 the original taste of happiness.\nWe park 3:00 PM \u2013 7:00 PM; come grab a cake on the way home.\nOrder on the site at happycake.us or send a message on WhatsApp.",
+      "whatsappDrafts": [
+        {
+          "customerId": "+12815550151",
+          "channel": "whatsapp",
+          "body": "Hi Ulla! The HappyCake truck will be in Silverlake this Tue, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550152",
+          "channel": "whatsapp",
+          "body": "Hi Vesna! The HappyCake truck will be in Silverlake this Tue, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Pistachio Roll\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "@warda_h",
+          "channel": "instagram",
+          "body": "Hi Warda! The HappyCake truck will be in Silverlake this Tue, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Milk Maiden\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550154",
+          "channel": "whatsapp",
+          "body": "Hi Xenia! The HappyCake truck will be in Silverlake this Tue, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Napoleon\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550155",
+          "channel": "whatsapp",
+          "body": "Hi Yara! The HappyCake truck will be in Silverlake this Tue, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        }
+      ],
+      "projection": {
+        "baselineOrdersMonth": 3.4,
+        "projectedOrdersMonth": 6.29,
+        "incrementalOrdersMonth": 2.89,
+        "incrementalRevenueMonthUsd": 119.09,
+        "liftFactor": 1.85,
+        "nearRadiusMiles": 5.0
+      }
+    },
+    {
+      "weekday": "Wed",
+      "window": "3:00 PM \u2013 7:00 PM",
+      "cluster": {
+        "label": "C",
+        "anchorNeighborhood": "Stafford",
+        "centroid": {
+          "lat": 29.6166,
+          "lng": -95.5739
+        },
+        "customerCount": 5,
+        "customerIds": [
+          "+12815550124",
+          "+12815550131",
+          "@maya_bakes",
+          "+12815550133",
+          "+12815550134"
+        ]
+      },
+      "heroSku": "napoleon",
+      "heroCopy": "cake \"Napoleon\"",
+      "instagramPost": "HappyCake on the road \u2014 Wed afternoon in Stafford.\ncake \"Napoleon\" fresh from the kitchen, plus the ready-made line \u2014 the original taste of happiness.\nWe park 3:00 PM \u2013 7:00 PM; come grab a cake on the way home.\nOrder on the site at happycake.us or send a message on WhatsApp.",
+      "whatsappDrafts": [
+        {
+          "customerId": "+12815550124",
+          "channel": "whatsapp",
+          "body": "Hi Jasmin! The HappyCake truck will be in Stafford this Wed, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Napoleon\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550131",
+          "channel": "whatsapp",
+          "body": "Hi Lina! The HappyCake truck will be in Stafford this Wed, 3:00 PM \u2013 7:00 PM. We'll have cake \"Napoleon\" fresh and the ready-made line \u2014 your usual office dessert box too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "@maya_bakes",
+          "channel": "instagram",
+          "body": "Hi Maya! The HappyCake truck will be in Stafford this Wed, 3:00 PM \u2013 7:00 PM. We'll have cake \"Napoleon\" fresh and the ready-made line \u2014 your usual cake \"Honey\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550133",
+          "channel": "whatsapp",
+          "body": "Hi Noor! The HappyCake truck will be in Stafford this Wed, 3:00 PM \u2013 7:00 PM. We'll have cake \"Napoleon\" fresh and the ready-made line \u2014 your usual cake \"Milk Maiden\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550134",
+          "channel": "whatsapp",
+          "body": "Hi Olya! The HappyCake truck will be in Stafford this Wed, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Napoleon\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        }
+      ],
+      "projection": {
+        "baselineOrdersMonth": 5.3,
+        "projectedOrdersMonth": 9.8,
+        "incrementalOrdersMonth": 4.5,
+        "incrementalRevenueMonthUsd": 283.05,
+        "liftFactor": 1.85,
+        "nearRadiusMiles": 5.0
+      }
+    },
+    {
+      "weekday": "Thu",
+      "window": "3:00 PM \u2013 7:00 PM",
+      "cluster": {
+        "label": "D",
+        "anchorNeighborhood": "Sienna",
+        "centroid": {
+          "lat": 29.517,
+          "lng": -95.5343
+        },
+        "customerCount": 4,
+        "customerIds": [
+          "+12815550121",
+          "+12815550122",
+          "@ines_h",
+          "+12815550125"
+        ]
+      },
+      "heroSku": "honey-whole",
+      "heroCopy": "cake \"Honey\"",
+      "instagramPost": "HappyCake on the road \u2014 Thu afternoon in Sienna.\ncake \"Honey\" fresh from the kitchen, plus the ready-made line \u2014 the original taste of happiness.\nWe park 3:00 PM \u2013 7:00 PM; come grab a cake on the way home.\nOrder on the site at happycake.us or send a message on WhatsApp.",
+      "whatsappDrafts": [
+        {
+          "customerId": "+12815550121",
+          "channel": "whatsapp",
+          "body": "Hi Gabriela! The HappyCake truck will be in Sienna this Thu, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550122",
+          "channel": "whatsapp",
+          "body": "Hi Hadia! The HappyCake truck will be in Sienna this Thu, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Milk Maiden\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "@ines_h",
+          "channel": "instagram",
+          "body": "Hi Ines! The HappyCake truck will be in Sienna this Thu, 3:00 PM \u2013 7:00 PM. We'll have cake \"Honey\" fresh and the ready-made line \u2014 your usual cake \"Pistachio Roll\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550125",
+          "channel": "whatsapp",
+          "body": "Hi Kamila! The HappyCake truck will be in Sienna this Thu, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Honey\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        }
+      ],
+      "projection": {
+        "baselineOrdersMonth": 3.9,
+        "projectedOrdersMonth": 7.22,
+        "incrementalOrdersMonth": 3.32,
+        "incrementalRevenueMonthUsd": 140.08,
+        "liftFactor": 1.85,
+        "nearRadiusMiles": 5.0
+      }
+    },
+    {
+      "weekday": "Fri",
+      "window": "3:00 PM \u2013 7:00 PM",
+      "cluster": {
+        "label": "E",
+        "anchorNeighborhood": "Aliana",
+        "centroid": {
+          "lat": 29.6412,
+          "lng": -95.7336
+        },
+        "customerCount": 2,
+        "customerIds": [
+          "@rumi_cake",
+          "+12815550144"
+        ]
+      },
+      "heroSku": "milk-maiden",
+      "heroCopy": "cake \"Milk Maiden\"",
+      "instagramPost": "HappyCake on the road \u2014 Fri afternoon in Aliana.\ncake \"Milk Maiden\" fresh from the kitchen, plus the ready-made line \u2014 the original taste of happiness.\nWe park 3:00 PM \u2013 7:00 PM; come grab a cake on the way home.\nOrder on the site at happycake.us or send a message on WhatsApp.",
+      "whatsappDrafts": [
+        {
+          "customerId": "@rumi_cake",
+          "channel": "instagram",
+          "body": "Hi Rumi! The HappyCake truck will be in Aliana this Fri, 3:00 PM \u2013 7:00 PM. We'll have cake \"Milk Maiden\" fresh and the ready-made line \u2014 your usual cake \"Honey\" too. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        },
+        {
+          "customerId": "+12815550144",
+          "channel": "whatsapp",
+          "body": "Hi Sofia! The HappyCake truck will be in Aliana this Fri, 3:00 PM \u2013 7:00 PM. We'll have your usual cake \"Milk Maiden\" fresh and the ready-made line. Reply if you'd like one set aside.\nOrder on the site at happycake.us or send a message on WhatsApp."
+        }
+      ],
+      "projection": {
+        "baselineOrdersMonth": 1.9,
+        "projectedOrdersMonth": 3.52,
+        "incrementalOrdersMonth": 1.62,
+        "incrementalRevenueMonthUsd": 71.83,
+        "liftFactor": 1.85,
+        "nearRadiusMiles": 5.0
+      }
+    }
+  ]
+}
