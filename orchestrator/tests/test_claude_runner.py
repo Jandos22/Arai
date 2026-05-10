@@ -76,7 +76,7 @@ def test_log_tool_use_writes_channel_outbound_for_whatsapp():
     evidence = _RecordingEvidence()
     runner = ClaudeRunner(Path("/tmp/agents/sales"), evidence, binary="/bin/echo")
 
-    runner._log_tool_use(
+    logged = runner._log_tool_use(
         {
             "name": "mcp__happycake__whatsapp_send",
             "input": {
@@ -87,9 +87,29 @@ def test_log_tool_use_writes_channel_outbound_for_whatsapp():
         label="whatsapp_inbound",
     )
 
+    assert logged is True
     assert evidence.entries[0]["kind"] == "agent_tool_use"
     outbound = evidence.entries[1]
     assert outbound["kind"] == "channel_outbound"
     assert outbound["channel"] == "whatsapp"
     assert outbound["recipient"] == "+12815550199"
     assert outbound["bodyPreview"] == "Honey cake is available today. Want me to hold one?"
+
+
+def test_log_tool_use_ignores_local_claude_tools():
+    evidence = _RecordingEvidence()
+    runner = ClaudeRunner(Path("/tmp/agents/marketing"), evidence, binary="/bin/echo")
+
+    logged = runner._log_tool_use(
+        {
+            "name": "Edit",
+            "input": {
+                "file_path": "/tmp/docs/MARKETING.md",
+                "new_string": "local doc edit",
+            },
+        },
+        label="marketing_trigger",
+    )
+
+    assert logged is False
+    assert evidence.entries == []

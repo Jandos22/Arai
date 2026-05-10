@@ -125,7 +125,7 @@ uv pip install -r requirements.txt
 PYTHONPATH=.. .venv/bin/python -m pytest tests
 ```
 
-23 tests cover `mcp_client`, `dispatcher`, `evidence`, Square capacity
+24 tests cover `mcp_client`, `dispatcher`, `evidence`, Square capacity
 branching, and Claude stream parsing — all deterministic, no token, no
 Telegram. The MacBook should also see green when these run there.
 

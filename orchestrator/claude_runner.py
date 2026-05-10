@@ -179,8 +179,10 @@ class ClaudeRunner:
             )
 
         response, tool_uses, result_meta = _parse_stream_json(proc.stdout)
+        logged_tool_uses = 0
         for tool_use in tool_uses:
-            self._log_tool_use(tool_use, label=label)
+            if self._log_tool_use(tool_use, label=label):
+                logged_tool_uses += 1
         self.evidence.write(
             "claude_run",
             label=label,
@@ -189,13 +191,16 @@ class ClaudeRunner:
             promptPreview=prompt[:200],
             responsePreview=response[:300],
             responseLen=len(response),
-            toolUseCount=len(tool_uses),
+            toolUseCount=logged_tool_uses,
             **result_meta,
         )
         return response
 
-    def _log_tool_use(self, tool_use: dict[str, Any], *, label: str) -> None:
+    def _log_tool_use(self, tool_use: dict[str, Any], *, label: str) -> bool:
         name = tool_use["name"]
+        if not name.startswith("mcp__happycake__"):
+            return False
+
         args = tool_use.get("input") if isinstance(tool_use.get("input"), dict) else {}
         self.evidence.write(
             "agent_tool_use",
@@ -207,7 +212,7 @@ class ClaudeRunner:
 
         outbound = _OUTBOUND_TOOL_MAP.get(name)
         if outbound is None:
-            return
+            return True
 
         channel, recipient_key, body_key = outbound
         self.evidence.write(
@@ -219,3 +224,4 @@ class ClaudeRunner:
             recipient=args.get(recipient_key),
             bodyPreview=_body_preview(args.get(body_key)),
         )
+        return True

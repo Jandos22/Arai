@@ -65,7 +65,7 @@ The four `evaluator_score_*` MCP tools are **preview checks** teams can run agai
 | `evaluator_score_channel_response` | WA / IG / GMB reply quality | T-005 (sales side) + T-007 (ops side) |
 | `evaluator_score_world_scenario` | Deterministic scenario + audit log | T-003 orchestrator + T-008 e2e smoke |
 
-Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T004907Z`: M:100 / POS:100 / Ch:100 / W:100, including `kitchen_get_capacity` + `square_capacity_decision`. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across Functional, Depth, Impact, UX, Architecture, Production-readiness, and Innovation.
+Combined preview report: `evaluator_generate_team_report({repoUrl})`. Latest committed redacted evidence sample is `evidence/e2e-sample.jsonl` from preview run `20260510T020747Z`: M:100 / POS:100 / Ch:100 / W:100, including `kitchen_get_capacity`, `square_capacity_decision`, `agent_tool_use`, and `channel_outbound` evidence. Full raw preview JSON files remain local/gitignored unless explicitly inspected for secrets. Official score is expected to combine this evidence with repo/docs/website review across Functional, Depth, Impact, UX, Architecture, Production-readiness, and Innovation.
 
 ## Pre-submission ritual
 
