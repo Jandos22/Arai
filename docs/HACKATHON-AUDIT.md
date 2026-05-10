@@ -92,7 +92,7 @@ This is a much stronger signal than "agent-friendly storefront." Our website nee
 
 ## Team kit — token + tool list confirmed
 
-Token: `sbc_team_18b…` (full token visible only on the kit page; lives in MacBook `.env.local`, never committed).
+Token: `<redacted>` (full token visible only on the kit page; lives in MacBook `.env.local`, never committed).
 
 **Tools listed in kit (from kit page narrative):**
 > Start your demand engine with `marketing_create_campaign`, then launch, generate leads, route them, adjust, and report back to the owner. Validate production promises with `kitchen_create_ticket`, capacity checks, accept/reject decisions, and ready-for-pickup status. Use `square_create_order` and `square_get_pos_summary` to prove your website and agents can drive POS-style orders. Run `world_start_scenario` and `world_next_event` to test against the same time-compressed business day as the evaluator. Use `evaluator_get_evidence_summary` and `evaluator_generate_team_report` to preview the evidence judges will inspect.
@@ -130,8 +130,8 @@ From `/hackathon/teams`:
 |---|---|---|---|
 | 1 | Pull asset pack into `website/public/brand/` | Hermes | ✅ done |
 | 2 | Save this audit doc | Hermes | ✅ this file |
-| 3 | Update SUBMISSION.md to reference 7 leaderboard dims | Hermes | TODO |
-| 4 | Update ARCHITECTURE.md: 4 MCP loops are PREVIEW, not all of grade | Hermes | TODO |
-| 5 | Wire real cake photos into website pages | Hermes | TODO (T-009b) |
-| 6 | Add "post-hackathon real-adapter path" doc | Hermes | TODO (T-009c) |
-| 7 | Add complaint / custom-cake consultation paths to sales | CC | TODO (bonus item) |
+| 3 | Update SUBMISSION.md to reference 7 leaderboard dims | Hermes | ✅ done |
+| 4 | Update ARCHITECTURE.md: 4 MCP loops are PREVIEW, not all of grade | Hermes | ✅ done |
+| 5 | Wire real cake photos into website pages | Hermes | ✅ done |
+| 6 | Add "post-hackathon real-adapter path" doc | Hermes | ✅ done |
+| 7 | Add complaint / custom-cake consultation paths to sales | CC | ✅ done |

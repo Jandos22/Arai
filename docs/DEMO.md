@@ -229,5 +229,5 @@ If you have an extra 5 minutes, these are the most informative pokes:
   contract design.
 - [`docs/PLAN.md`](PLAN.md) — the actual plan we worked from, with
   decision log and risk register.
-- [`tasks/`](../tasks) — every task brief Hermes (the team's PM-AI) wrote
+- [`tasks/`](../tasks) — every task brief Hermes (build-time PM/helper, not the judged runtime) wrote
   for Claude Code, in the exact format CC executed.

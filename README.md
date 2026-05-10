@@ -3,7 +3,7 @@
 AI sales + ops system for **Happy Cake US** (Sugar Land, TX).
 Built for the **Steppe Business Club Hackathon** — May 9–10, 2026.
 
-**Team:** Jan Solo — Jandos Meirkhan (captain), augmented by Hermes (project manager AI) and Claude Code (agent runtime).
+**Team:** Jan Solo — Jandos Meirkhan (captain), with Hermes as build-time project-management/documentation helper and Claude Code as the judged agent runtime. Runtime business decisions are made through `claude -p`, not Hermes/Codex/OpenAI.
 **Submission deadline:** May 10, 2026, 10:00 CT.
 
 ## What this is

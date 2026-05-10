@@ -21,7 +21,7 @@ This is a solo team **augmented by two AI collaborators**. Treat it as a 3-membe
 | **Hermes** | Project manager, scaffolding, docs, website, marketing math, repo hygiene | Mac mini (home), reachable via Telegram |
 | **Claude Code (you)** | Agent runtime — the system being judged. Builds and runs the live agents against the sandbox MCP. | MacBook |
 
-**Hermes is part of the team.** Hermes drives long-running build work in parallel: scaffolds files, writes docs, drafts code on branches, pushes to GitHub. You (Claude Code) and Hermes share this repo. Coordinate via branches and commit messages — never both edit the same file at once.
+**Hermes is a build-time collaborator, not the judged runtime.** Hermes drives planning/docs/scaffolding in parallel and pushes normal git commits. The judged business-agent runtime remains Claude Code CLI via `claude -p` plus this Python orchestrator. You (Claude Code) and Hermes share this repo; coordinate via branches and commit messages — never both edit the same file at once.
 
 ## Hard rules (DQ if violated)
 

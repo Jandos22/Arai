@@ -63,9 +63,11 @@ def build_routing_table() -> dict[str, Handler]:
         "instagram:dm": handlers.instagram.handle,
         "instagram:comment": handlers.instagram.handle,
         "instagram:*": handlers.instagram.handle,
-        # GMB
+        # GMB / Google Business (sandbox uses both channel names)
         "gmb:review_received": handlers.gmb.handle,
         "gmb:*": handlers.gmb.handle,
+        "gbusiness:review": handlers.gmb.handle,
+        "gbusiness:*": handlers.gmb.handle,
         # Kitchen
         "kitchen:ticket_pending_owner_approval": handlers.kitchen.handle,
         "kitchen:*": handlers.kitchen.handle,

@@ -9,6 +9,7 @@ secrets/
 evidence/*.jsonl
 evidence/*.db
 evidence/*.sqlite*
+evidence/e2e-smoke-*.json
 !evidence/T-*-*.txt
 !evidence/*-sample.jsonl
 
@@ -46,3 +47,6 @@ venv/
 
 # logs
 *.log
+
+# local Claude Code sessions/worktrees (not submission artifacts)
+.claude/

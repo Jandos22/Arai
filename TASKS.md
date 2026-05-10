@@ -14,8 +14,6 @@ _(none — pick from Queued)_
 |----|-------|-------|-------|
 | T-011 | LocalBusiness JSON-LD + Open Graph + sitemap on website (bonus +5 SEO/Prod) | Hermes | `tasks/INBOX/T-011-localbusiness-seo.md` |
 | T-012 | `docs/PRODUCTION-PATH.md` — post-hackathon real-adapter path (bonus +5 Prod) | Hermes | `tasks/INBOX/T-012-production-path.md` |
-| T-013 | Sales agent: complaint + custom-cake consultation flows (bonus +5 Real biz pain) | CC | `tasks/INBOX/T-013-sales-bonus-paths.md` |
-| T-014 | Self-eval agents — 7 shadow-judges (Functional/Depth/Impact/UX/Arch/Prod/Inn) + light red-team scoring our submission against the leaderboard rubric → `docs/SELF-EVAL.md` (bonus +5 Innovation/Prod, gated on core ≥ 80) | Both | `tasks/INBOX/T-014-self-eval-agents.md` |
 | T-009 | Final pass: README polish, DEMO.md, evidence sample commit, evaluator preview run | Hermes | TBD |
 | T-010 | Submission dress rehearsal: fresh-clone bring-up, evaluator score preview, push, submit | Both | TBD |
 
@@ -31,11 +29,13 @@ _(none — pick from Queued)_
 | T-006 | Marketing $500 → $5K demand-engine agent (3 campaigns, 9 leads routed, $6,636 projected — `evaluator_score_marketing_loop` 100/100) | aa6a3bf | CC |
 | T-005 | Sales agent — `agents/sales/`: WA + IG prompts, owner-gate triggers (custom decoration / allergy / >$80 / lead-time / emotional / requires_custom_work), end-to-end smoke PASS on both paths | c736d14 | CC |
 | T-007 | Ops agent — `agents/ops/`: GMB review-reply (rev_001 5★ → cake "Honey" Saturday-bake reply) + canonical IG post owner-gate (schedule → approve → publish, all three stages PASS) + kitchen state prompt + escalation rules | d211d43 | CC |
-| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — bounded scenario + WA/IG/GMB injects + four `evaluator_score_*` calls, total 212s wall-clock, scores M:100 / POS:0 / Ch:70 / W:97 (PASS), evidence sample committed | bd05f31 | CC |
+| T-008 | E2E smoke (`scripts/e2e_smoke.sh`) — latest committed PASS evidence average 88.75: M:100 / POS:55 / Ch:100 / W:100; full raw JSON remains local/gitignored, redacted sample committed | 0de1948 | CC + Hermes |
+| T-013 | Sales agent bonus paths — complaint handling + custom-cake consultation, both owner-gated | eeabb4f | CC |
+| T-014 | Self-eval agents — seven-pass shadow evaluation + final risk register in `docs/SELF-EVAL.md` | 988497f | CC + Hermes |
 
 ## Architecture intent (locked in by sandbox shape)
 
-Spine = **scenario-driven orchestrator** (Python, shipped in T-003) running `world_next_event` loop. Four scoring loops hang off it:
+Spine = **scenario-driven orchestrator** (Python, shipped in T-003) running `world_next_event` loop. Four preview/scenario loops hang off it (official judges still use seven broader dimensions):
 
 1. **POS + kitchen** — `square_create_order` → `kitchen_create_ticket` chain.
 2. **Channels** — WA/IG/GMB inbound → sales agent → outbound; IG posts go through `schedule → owner approval → publish` gate.
