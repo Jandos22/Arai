@@ -10,6 +10,7 @@ evidence/*.jsonl
 evidence/*.db
 evidence/*.sqlite*
 evidence/e2e-smoke-*.json
+evidence/evaluator-preview-*.json
 !evidence/T-*-*.txt
 !evidence/*-sample.jsonl
 

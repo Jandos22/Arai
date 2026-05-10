@@ -21,7 +21,7 @@
 #   bash agents/sales/scripts/smoke.sh
 #   bash agents/sales/scripts/smoke.sh "I want to order 2 whole honey cakes for tomorrow at 5pm"
 # Requirements:
-#   - .env.local at repo root with STEPPE_MCP_URL + STEPPE_MCP_TOKEN
+#   - .env.local, ARAI_ENV_FILE, or ~/.config/arai/env.local with STEPPE_MCP_TOKEN
 #   - claude CLI v2.x, curl, jq on PATH
 
 set -euo pipefail
@@ -30,15 +30,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 AGENT_DIR="$(cd "$HERE/.." && pwd)"
 REPO_ROOT="$(cd "$AGENT_DIR/../.." && pwd)"
 
-if [ ! -f "$REPO_ROOT/.env.local" ]; then
-  echo "error: $REPO_ROOT/.env.local missing" >&2
+# shellcheck disable=SC1091
+source "$REPO_ROOT/scripts/load_env.sh"
+if ! arai_load_env "$REPO_ROOT"; then
+  echo "error: env missing — create .env.local or ~/.config/arai/env.local with STEPPE_MCP_TOKEN" >&2
   exit 1
 fi
-# shellcheck disable=SC1091
-set -a; source "$REPO_ROOT/.env.local"; set +a
 
 if [ -z "${STEPPE_MCP_TOKEN:-}" ] || [ -z "${STEPPE_MCP_URL:-}" ]; then
-  echo "error: STEPPE_MCP_TOKEN / STEPPE_MCP_URL not set after sourcing .env.local" >&2
+  echo "error: STEPPE_MCP_TOKEN / STEPPE_MCP_URL not set after loading env" >&2
   exit 1
 fi
 
