@@ -130,7 +130,9 @@ export default function HappyPath() {
     "@graph": stopsWithDate.map((s) => ({
       "@type": "Event",
       name: `HappyCake truck — ${s.neighborhood}`,
-      description: `HappyCake food truck stop in ${s.neighborhood}, ${s.city}. Hero of the day: ${s.heroCopy}, plus the ready-made line. Pickup only — no pre-order required.`,
+      description: `HappyCake food truck stop in ${
+        s.neighborhood === s.city ? s.city : `${s.neighborhood}, ${s.city}`
+      }. Hero of the day: ${s.heroCopy}, plus the ready-made line. Pickup only — no pre-order required.`,
       startDate: `${s.date}T${WINDOW_LOCAL}`,
       endDate: `${s.date}T${WINDOW_END_LOCAL}`,
       eventSchedule: {
@@ -144,7 +146,7 @@ export default function HappyPath() {
       eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
       location: {
         "@type": "Place",
-        name: `${s.neighborhood}, ${s.city}`,
+        name: s.neighborhood === s.city ? s.city : `${s.neighborhood}, ${s.city}`,
         address: {
           "@type": "PostalAddress",
           addressLocality: s.city,
@@ -288,8 +290,17 @@ export default function HappyPath() {
                     <div className="text-xs text-ink/50">next: {s.date}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div>{s.neighborhood}</div>
-                    <div className="text-xs text-ink/60">{s.city}, TX</div>
+                    {s.neighborhood === s.city ? (
+                      <div>
+                        {s.city}
+                        <span className="text-xs text-ink/60">, TX</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div>{s.neighborhood}</div>
+                        <div className="text-xs text-ink/60">{s.city}, TX</div>
+                      </>
+                    )}
                   </td>
                   <td className="px-4 py-3">3:00 – 7:00 PM</td>
                   <td className="px-4 py-3 italic">{s.heroCopy}</td>
