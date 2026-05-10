@@ -57,7 +57,9 @@ Sub-systems:
 
 ## Coordination protocol
 
-- **Branches:** `feat/<area>` (e.g. `feat/website`, `feat/sales-agent`, `feat/bots`). No direct commits to `main`.
+- **Solo workflow:** Jandos is working solo. PRs are optional, not the default.
+- **Default shipping path:** for non-trivial work, use a short-lived branch, verify locally, merge/push to `main`, then delete the branch. Create a PR only when Jandos explicitly asks for one or when a GitHub review page is useful.
+- **Branches:** prefer `codex/<area>` for Codex work unless Jandos requests a different name.
 - **Sync:** `git pull --rebase` before every push.
 - **Cadence:** small commits, push every 15–30 min so the other side can pull.
 - **Ownership defaults:** Hermes owns `website/`, `docs/`, `bots/router.py`, `.env.example`, `.gitignore`. Claude Code owns `agents/*/`, `bots/*-bot.py` (per-agent runtime), MCP wiring code that needs the live token.
