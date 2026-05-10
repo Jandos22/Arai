@@ -282,11 +282,19 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
 
     delayed = ctx.client.call_tool(
         "square_update_order_status",
-        {"orderId": order_id, "status": "delayed_or_needs_owner_review", "note": reason},
+        {
+            "orderId": order_id,
+            "status": "open",
+            "note": f"Delayed / needs owner review: {reason}",
+        },
     )
     ctx.evidence.write(
         "mcp_call", tool="square_update_order_status", ok=True,
-        args={"orderId": order_id, "status": "delayed_or_needs_owner_review"},
+        args={
+            "orderId": order_id,
+            "status": "open",
+            "reviewStatus": "delayed_or_needs_owner_review",
+        },
         resultSummary=delayed,
     )
 

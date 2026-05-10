@@ -5,7 +5,25 @@
       "url": "${STEPPE_MCP_URL}",
       "headers": {
         "X-Team-Token": "${STEPPE_MCP_TOKEN}"
-      }
+      },
+      "enabledTools": [
+        "gb_list_reviews",
+        "gb_simulate_reply",
+        "gb_simulate_post",
+        "gb_get_metrics",
+        "gb_list_simulated_actions",
+        "instagram_schedule_post",
+        "instagram_approve_post",
+        "instagram_publish_post",
+        "instagram_register_webhook",
+        "kitchen_get_capacity",
+        "kitchen_get_menu_constraints",
+        "kitchen_list_tickets",
+        "kitchen_accept_ticket",
+        "kitchen_reject_ticket",
+        "kitchen_mark_ready",
+        "kitchen_get_production_summary"
+      ]
     }
   }
 }

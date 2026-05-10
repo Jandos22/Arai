@@ -5,7 +5,21 @@
       "url": "${STEPPE_MCP_URL}",
       "headers": {
         "X-Team-Token": "${STEPPE_MCP_TOKEN}"
-      }
+      },
+      "enabledTools": [
+        "marketing_get_budget",
+        "marketing_get_sales_history",
+        "marketing_get_margin_by_product",
+        "marketing_create_campaign",
+        "marketing_launch_simulated_campaign",
+        "marketing_get_campaign_metrics",
+        "marketing_generate_leads",
+        "marketing_route_lead",
+        "marketing_adjust_campaign",
+        "marketing_report_to_owner",
+        "square_recent_sales_csv",
+        "gb_get_metrics"
+      ]
     }
   }
 }
