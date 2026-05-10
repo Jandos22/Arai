@@ -2,13 +2,15 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import type { CatalogItem } from "@/lib/catalog";
+import type { CampaignAttributionInput } from "@/lib/order-intent";
 
 type Props = {
   items: CatalogItem[];
   initialSlug?: string;
+  initialAttribution?: CampaignAttributionInput;
 };
 
-export default function OrderForm({ items, initialSlug }: Props) {
+export default function OrderForm({ items, initialSlug, initialAttribution }: Props) {
   const [productSlug, setProductSlug] = useState(initialSlug ?? items[0]?.slug ?? "");
   const [variationId, setVariationId] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -31,7 +33,17 @@ export default function OrderForm({ items, initialSlug }: Props) {
     const response = await fetch("/api/order-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productSlug, variationId: chosenVariationId, quantity, customerName, contact, pickupDate, pickupTime, notes }),
+      body: JSON.stringify({
+        productSlug,
+        variationId: chosenVariationId,
+        quantity,
+        customerName,
+        contact,
+        pickupDate,
+        pickupTime,
+        notes,
+        attribution: initialAttribution,
+      }),
     });
     const json = await response.json();
     setResult(json);
@@ -92,6 +104,15 @@ export default function OrderForm({ items, initialSlug }: Props) {
         <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">Realtime handoff preview</p>
         <h2 className="font-display text-2xl text-happy-blue-900 mt-2">Website → cashier → kitchen</h2>
         <p className="text-sm text-ink/70 mt-3">This prototype captures a structured website order intent. In production, this payload feeds Square and the kitchen capacity-aware handoff used by the orchestrator.</p>
+        {initialAttribution ? (
+          <div className="mt-5 rounded-2xl bg-cream-100 p-4 text-sm text-ink/75">
+            <p className="font-medium text-happy-blue-900">Campaign attribution attached</p>
+            <p className="mt-1">
+              {initialAttribution.utm_campaign ?? initialAttribution.campaign ?? "campaign"} ·{" "}
+              {initialAttribution.utm_source ?? initialAttribution.channel ?? "source"}
+            </p>
+          </div>
+        ) : null}
         {result ? (
           <pre className="mt-5 max-h-[520px] overflow-auto rounded-2xl bg-happy-blue-900 text-cream-50 p-4 text-xs whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
         ) : (
