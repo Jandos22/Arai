@@ -77,7 +77,7 @@ export default function OfficeBoxesPage() {
         </div>
         <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-cream-100 shadow-xl">
           <Image
-            src="/brand/products/product-10.webp"
+            src="/brand/products/happy-cake-product-10.webp"
             alt="Layer cake slice prepared for sharing at an office dessert table."
             fill
             priority
