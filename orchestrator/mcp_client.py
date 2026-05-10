@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import random
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -41,6 +42,7 @@ class MCPClient:
     url: str = DEFAULT_URL
     token: str | None = None
     timeout: float = 30.0
+    max_retries: int = 2  # transient-error retries on 5xx / transport errors
     _client: httpx.Client | None = None
 
     @classmethod
@@ -117,10 +119,30 @@ class MCPClient:
             "method": method,
             "params": params,
         }
-        try:
-            resp = self._client.post(self.url, json=payload)
-        except httpx.HTTPError as exc:
-            raise MCPError(f"transport error calling {method}: {exc}") from exc
+        last_exc: Exception | None = None
+        last_resp: httpx.Response | None = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                resp = self._client.post(self.url, json=payload)
+            except httpx.HTTPError as exc:
+                last_exc = exc
+                last_resp = None
+                log.warning("transport error on %s (attempt %d): %s", method, attempt + 1, exc)
+            else:
+                last_exc = None
+                last_resp = resp
+                if resp.status_code < 500:
+                    break
+                log.warning(
+                    "transient %s on %s (attempt %d): %s",
+                    resp.status_code, method, attempt + 1, resp.text[:200],
+                )
+            if attempt < self.max_retries:
+                # 0.4s, 0.8s with small jitter — caps at ~1s tail latency.
+                time.sleep(0.4 * (2 ** attempt) + random.random() * 0.1)
+        if last_resp is None:
+            raise MCPError(f"transport error calling {method}: {last_exc}") from last_exc
+        resp = last_resp
         if resp.status_code >= 500:
             raise MCPError(f"{method} -> HTTP {resp.status_code}: {resp.text[:200]}")
         if resp.status_code == 401 or resp.status_code == 403:

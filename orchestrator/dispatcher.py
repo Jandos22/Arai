@@ -7,6 +7,7 @@ so unit tests are mechanical.
 from __future__ import annotations
 
 import logging
+import traceback
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -45,7 +46,29 @@ def make_dispatcher(ctx: HandlerContext, table: dict[str, Handler]) -> Callable[
             ctx.evidence.write("dispatch_drop", reason="no_handler", key=key, event=event)
             return
         log.info("dispatch %s -> %s", key, handler.__name__)
-        handler(event, ctx)
+        try:
+            handler(event, ctx)
+        except Exception as exc:  # noqa: BLE001 — boundary: log + continue
+            tb = traceback.format_exc(limit=8)
+            log.exception("handler %s failed for %s", handler.__name__, key)
+            ctx.evidence.write(
+                "handler_error",
+                key=key,
+                handler=handler.__name__,
+                error=f"{type(exc).__name__}: {exc}",
+                traceback=tb,
+                event=event,
+            )
+            notifier = getattr(ctx, "telegram_notifier", None)
+            if notifier is not None:
+                try:
+                    notifier.notify(
+                        f"⚠️ Handler error: {handler.__name__} on {key}\n"
+                        f"{type(exc).__name__}: {exc}",
+                        kind="handler_error",
+                    )
+                except Exception:  # noqa: BLE001 — never let notifier mask the original
+                    log.exception("telegram notify failed while reporting handler_error")
 
     return dispatch
 

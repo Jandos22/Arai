@@ -89,6 +89,44 @@ def test_list_tools(client):
 
 
 @respx.mock
+def test_transient_5xx_retries_then_succeeds(monkeypatch):
+    # Avoid sleeping during retries.
+    import orchestrator.mcp_client as mc
+    monkeypatch.setattr(mc.time, "sleep", lambda *_: None)
+
+    c = MCPClient(url="https://example.test/api/mcp", token="t", max_retries=2)
+    try:
+        route = respx.post("https://example.test/api/mcp").mock(
+            side_effect=[
+                httpx.Response(503, text="overloaded"),
+                httpx.Response(502, text="bad gateway"),
+                httpx.Response(200, json=_envelope({"ok": True})),
+            ]
+        )
+        out = c.call_tool("anything", {})
+        assert out == {"ok": True}
+        assert route.call_count == 3
+    finally:
+        c.close()
+
+
+@respx.mock
+def test_transient_5xx_gives_up_after_retries(monkeypatch):
+    import orchestrator.mcp_client as mc
+    monkeypatch.setattr(mc.time, "sleep", lambda *_: None)
+
+    c = MCPClient(url="https://example.test/api/mcp", token="t", max_retries=1)
+    try:
+        respx.post("https://example.test/api/mcp").mock(
+            return_value=httpx.Response(503, text="overloaded")
+        )
+        with pytest.raises(MCPError, match="HTTP 503"):
+            c.call_tool("anything", {})
+    finally:
+        c.close()
+
+
+@respx.mock
 def test_empty_content_returns_none(client):
     respx.post("https://example.test/api/mcp").mock(
         return_value=httpx.Response(
