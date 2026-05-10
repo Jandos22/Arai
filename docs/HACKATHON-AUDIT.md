@@ -15,33 +15,43 @@
 | `/hackathon/teams` | Find a team | Team list — Jan Solo confirmed (captain: Jandos Meirkhan, onsite, 1/3) |
 | `/hackathon/teams/<id>/kit` | Team launch kit | **MCP token displayed**, build targets, submission checklist |
 | `/hackathon/submit` | Submit | Captain enters repo URL + optional evaluator notes |
-| `/hackathon/leaderboard` | Live leaderboard | Empty until 10:00 CT May 10 — **scores 7 dimensions** |
+| `/hackathon/leaderboard` | Live leaderboard | Empty until 10:00 CT May 10 — **scores 7 official weighted passes** |
 
 All pages saved as JSON in `/tmp/sbc_audit/*.json` on the Mac mini for re-check.
 
-## Critical finding: leaderboard scores **seven** dimensions, not four
+## Critical finding: official judging is **seven weighted passes**, not four preview loops
 
-The leaderboard table header is:
+The public hackathon page lists seven official judging passes with weights:
 
-> # · Team · **Functional** · **Depth** · **Impact** · **UX** · **Arch** · **Prod** · **Inn** · **Total**
+| Official pass | Weight | What it covers for Arai |
+|---|---:|---|
+| **Functional tester** | **20** | Drives simulated customer scenarios across WhatsApp, Instagram, and the website. Public scenarios are practice; secret ones decide. |
+| **Agent-friendliness auditor** | **15** | Agent-readable website, structured catalog/policies, autonomous order-intent path, clear machine contracts |
+| **On-site assistant evaluator** | **15** | Consultation, custom order, complaint/status handling, escalation quality, owner/customer UX |
+| **Code reviewer** | **10** | Repo clarity, scoped agents, tests, security hygiene, readable architecture |
+| **Operator simulator** | **15** | Owner controls, Telegram approval flow, capacity decisions, operational usefulness during a live day |
+| **Business analyst** | **15** | $500-to-$5K case, campaign math, revenue impact, production adoption path |
+| **Innovation and depth spotter** | **10** | Differentiators beyond the brief: agent-readable storefront, scoped MCPs, safety gates, bonus paths |
 
-This matches the moderator's description of "7 AI passes" exactly. Our prior assumption — that the 4 `evaluator_score_*` MCP tools (`marketing_loop`, `pos_kitchen_flow`, `channel_response`, `world_scenario`) WERE the scoring loops — was wrong.
+Our prior assumption — that the 4 `evaluator_score_*` MCP tools (`marketing_loop`, `pos_kitchen_flow`, `channel_response`, `world_scenario`) WERE the scoring loops — was wrong.
 
-The `evaluator_score_*` MCP tools are **what teams use to preview** their work. The actual judging pipeline is 7 AI agents scoring 7 different dimensions each:
+The `evaluator_score_*` MCP tools are **what teams use to preview** their work. They are not the full grade. The official grade is a weighted 100-point total across the seven passes above:
 
-| Dimension | What it likely covers (inferred) |
-|---|---|
-| **Functional** | Does each channel work end-to-end? (Square→kitchen, WA, IG, marketing) |
-| **Depth** | Sophistication of agent reasoning, edge-case handling |
-| **Impact** | Business value — would Askhat actually use this? |
-| **UX** | Customer-facing channel quality + owner-facing Telegram UX |
-| **Arch** | System decomposition, visibility, MCP usage, owner-bot mapping |
-| **Prod** | Production readiness — clean repo, deploy notes, env model, no secrets |
-| **Inn** | Innovation — bonus-style differentiators |
+- Functional tester: 20%
+- Agent-friendliness auditor: 15%
+- On-site assistant evaluator: 15%
+- Code reviewer: 10%
+- Operator simulator: 15%
+- Business analyst: 15%
+- Innovation and depth spotter: 10%
 
-This means our current scoring dashboard (one MCP loop = 100/100) is a **partial** signal, not the full grade. Bonus-plan items map directly into Prod (audit trail, mobile perf, failure handling) and Inn (lead scoring, referrals, follow-ups).
+This means our current scoring dashboard (one MCP loop = 100/100) is a **partial** signal, not the full grade. Bonus-plan items map directly into operator usefulness, business analysis, and innovation/depth (audit trail, mobile perf, failure handling, lead scoring, referrals, follow-ups).
 
-**Action:** update SUBMISSION.md, ARCHITECTURE.md, and BONUS-PLAN.md to reflect this. Don't promise a 4-loop max — the real ceiling is broader.
+The public page also confirms the bonus model: 100 core points, up to +15
+bonus points, maximum total score 115. Core 80+ is eligible for up to +15,
+core 60–79 is capped at +5, and core below 60 gets no bonus.
+
+**Action:** keep SUBMISSION.md, SELF-EVAL.md, and ARCHITECTURE.md aligned to these official weighted passes. Don't promise a 4-loop max — the real ceiling is broader.
 
 ## Critical finding: build target #1 is "the website becomes the future production happycake.us"
 
@@ -130,7 +140,7 @@ From `/hackathon/teams`:
 |---|---|---|---|
 | 1 | Pull asset pack into `website/public/brand/` | Hermes | ✅ done |
 | 2 | Save this audit doc | Hermes | ✅ this file |
-| 3 | Update SUBMISSION.md to reference 7 leaderboard dims | Hermes | ✅ done |
+| 3 | Update SUBMISSION.md to reference 7 official weighted passes | Hermes | ✅ done |
 | 4 | Update ARCHITECTURE.md: 4 MCP loops are PREVIEW, not all of grade | Hermes | ✅ done |
 | 5 | Wire real cake photos into website pages | Hermes | ✅ done |
 | 6 | Add "post-hackathon real-adapter path" doc | Hermes | ✅ done |

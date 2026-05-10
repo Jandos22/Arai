@@ -2,8 +2,10 @@
 
 Arai is the whole AI-assisted sales and operations system for Happy Cake US.
 The orchestrator is one organ of it: a **scenario-driven Python spine** with
-four scoring loops attached. It runs the same `world_next_event` loop the
-evaluator drives, so what we test in dev = what's judged.
+four evaluator preview loops attached. Those loops are preview signals, not
+the full grade. The official judging is a weighted seven-pass review across
+functional testing, agent-friendliness, on-site assistant quality, code,
+operator usefulness, business analysis, and innovation and depth.
 
 ## High-level diagram
 
@@ -131,7 +133,19 @@ Telegram. The MacBook should also see green when these run there.
 
 ## What's actually shipped (running totals)
 
-The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. The official leaderboard uses seven AI judging dimensions (Functional, Depth, Impact, UX, Architecture, Production-readiness, Innovation). See `docs/SELF-EVAL.md` for the current seven-pass risk register.
+The four `evaluator_score_*` MCP tools are preview checks, not the whole grade. The official review uses seven weighted AI judging passes:
+
+| Official pass | Weight | Where this architecture supports it |
+|---|---:|---|
+| Functional tester | 20 | Scenario loop, channel handlers, Square→kitchen path, evidence JSONL |
+| Agent-friendliness auditor | 15 | `/agent.json`, `/api/catalog`, `/api/policies`, structured product pages |
+| On-site assistant evaluator | 15 | `/assistant`, `/api/assistant`, sales prompt escalation paths |
+| Code reviewer | 10 | Plain Python orchestrator, tests, scoped agents, redaction, env hygiene |
+| Operator simulator | 15 | Telegram owner gate, kitchen capacity checks, approval queue, bot commands |
+| Business analyst | 15 | Marketing demand engine, campaign evidence, production-adapter path |
+| Innovation and depth spotter | 10 | Machine-readable storefront, scoped MCP configs, complaint/custom/allergen safety paths |
+
+See `docs/SELF-EVAL.md` for the current weighted seven-pass risk register.
 
 
 | Loop | Status | Evidence |
