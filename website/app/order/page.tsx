@@ -4,7 +4,7 @@ import OrderForm from "./OrderForm";
 
 export const metadata = {
   title: "Order intent",
-  description: "Capture a HappyCake website order intent and route it toward cashier and kitchen handoff.",
+  description: "Capture a HappyCake pickup or delivery order intent and route it toward cashier and kitchen handoff.",
 };
 
 type OrderSearchParams = {
@@ -45,7 +45,7 @@ export default async function OrderPage({ searchParams }: { searchParams: Promis
       <div className="max-w-3xl">
         <p className="uppercase tracking-widest text-xs text-happy-blue-500 font-medium">Website order intake</p>
         <h1 className="font-display text-4xl text-happy-blue-900 mt-2">Start an order</h1>
-        <p className="mt-4 text-ink/75">Pick a cake and pickup window. The site captures a structured order intent with the exact POS/kitchen handoff contract, then owner-gates custom, allergy, complaint, or high-value cases.</p>
+        <p className="mt-4 text-ink/75">Pick a cake, choose pickup or delivery, and request a time now or later. The site captures a structured order intent with the exact POS/kitchen handoff contract, then owner-gates custom, allergy, complaint, incomplete delivery, or high-value cases.</p>
       </div>
       <OrderForm items={catalog.items} initialSlug={params.product} initialAttribution={attribution} />
     </div>

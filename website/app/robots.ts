@@ -8,9 +8,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Block agent endpoints from being indexed by search engines
-        // (they're for runtime AI agents, not SEO).
-        disallow: ["/api/", "/agent.json"],
+        // Keep mutating/runtime APIs out of search indexing while leaving
+        // the agent descriptor and llms.txt discoverable.
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

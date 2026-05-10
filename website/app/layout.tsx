@@ -51,7 +51,10 @@ const localBusinessJsonLd = {
   potentialAction: {
     "@type": "OrderAction",
     target: `${SITE_URL}/order`,
-    deliveryMethod: ["http://purl.org/goodrelations/v1#DeliveryModePickUp"],
+    deliveryMethod: [
+      "http://purl.org/goodrelations/v1#DeliveryModePickUp",
+      "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+    ],
   },
 };
 
@@ -152,6 +155,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <li><a href="/menu" className="hover:text-happy-blue-500">Menu</a></li>
                 <li><a href="/order" className="hover:text-happy-blue-500">Website order intent</a></li>
                 <li><a href="/assistant" className="hover:text-happy-blue-500">On-site assistant</a></li>
+                <li><a href="/agents" className="hover:text-happy-blue-500">Agent guide</a></li>
                 <li><a href="https://wa.me/12819798320" className="hover:text-happy-blue-500">WhatsApp</a></li>
                 <li><a href="https://instagram.com/happycakeus" className="hover:text-happy-blue-500">Instagram DM</a></li>
               </ul>
@@ -159,7 +163,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div>
               <p className="font-medium">For agents</p>
               <ul className="mt-2 space-y-1">
+                <li><a href="/agents" className="hover:text-happy-blue-500">/agents</a></li>
                 <li><a href="/agent.json" className="hover:text-happy-blue-500">/agent.json</a></li>
+                <li><a href="/llms.txt" className="hover:text-happy-blue-500">/llms.txt</a></li>
                 <li><a href="/api/catalog" className="hover:text-happy-blue-500">/api/catalog</a></li>
                 <li><a href="/api/policies" className="hover:text-happy-blue-500">/api/policies</a></li>
                 <li><a href="/api/assistant" className="hover:text-happy-blue-500">/api/assistant</a></li>

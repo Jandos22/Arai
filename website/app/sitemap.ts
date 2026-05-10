@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/office-boxes`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/order`, lastModified, changeFrequency: "daily", priority: 0.85 },
     { url: `${SITE_URL}/assistant`, lastModified, changeFrequency: "daily", priority: 0.85 },
+    { url: `${SITE_URL}/agents`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/about`, lastModified, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/policies`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/sugar-land-custom-cakes`, lastModified, changeFrequency: "monthly", priority: 0.85 },
