@@ -15,7 +15,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const item = findBySlug(slug);
   if (!item) return {};
-  const image = item.imageUrl ?? "/brand/hero/hero-04.webp";
+  const image = item.imageUrl ?? "/brand/hero/happy-cake-hero-04.webp";
   return {
     title: item.name,
     description: item.description,
