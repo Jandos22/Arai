@@ -21,26 +21,62 @@ MAX_BODY_BYTES = 1_000_000
 
 def normalize_whatsapp_payload(payload: dict[str, Any]) -> dict[str, Any]:
     """Return the dispatcher event shape for a WhatsApp webhook payload."""
+    normalized = payload
+    entries = payload.get("entry")
+    if isinstance(entries, list) and entries:
+        changes = entries[0].get("changes") if isinstance(entries[0], dict) else None
+        if isinstance(changes, list) and changes:
+            value = changes[0].get("value") if isinstance(changes[0], dict) else None
+            messages = value.get("messages") if isinstance(value, dict) else None
+            if isinstance(messages, list) and messages:
+                message = messages[0]
+                if isinstance(message, dict):
+                    normalized = {
+                        "from": message.get("from"),
+                        "message": ((message.get("text") or {}).get("body") if isinstance(message.get("text"), dict) else None)
+                        or message.get("body")
+                        or message.get("message")
+                        or "",
+                        "messageId": message.get("id"),
+                        "raw": payload,
+                    }
     return {
         "channel": "whatsapp",
         "type": "inbound_message",
-        "payload": payload,
+        "payload": normalized,
     }
 
 
 def normalize_instagram_payload(payload: dict[str, Any]) -> dict[str, Any]:
     """Return the dispatcher event shape for an Instagram webhook payload."""
-    explicit_type = payload.get("type")
+    normalized = payload
+    entries = payload.get("entry")
+    if isinstance(entries, list) and entries:
+        messaging = entries[0].get("messaging") if isinstance(entries[0], dict) else None
+        if isinstance(messaging, list) and messaging:
+            event = messaging[0]
+            if isinstance(event, dict):
+                message = event.get("message") if isinstance(event.get("message"), dict) else {}
+                sender = event.get("sender") if isinstance(event.get("sender"), dict) else {}
+                normalized = {
+                    "threadId": event.get("thread_id") or event.get("threadId"),
+                    "from": sender.get("id") or event.get("from"),
+                    "message": message.get("text") or event.get("text") or "",
+                    "messageId": message.get("mid"),
+                    "raw": payload,
+                }
+
+    explicit_type = normalized.get("type")
     if explicit_type in {"dm", "comment"}:
         etype = explicit_type
-    elif payload.get("comment") or payload.get("commentId") or payload.get("comment_id"):
+    elif normalized.get("comment") or normalized.get("commentId") or normalized.get("comment_id"):
         etype = "comment"
     else:
         etype = "dm"
     return {
         "channel": "instagram",
         "type": etype,
-        "payload": payload,
+        "payload": normalized,
     }
 
 

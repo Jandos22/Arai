@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/order" className="hover:text-happy-blue-500">Order</a>
               <a href="/policies" className="hidden hover:text-happy-blue-500 sm:inline">Policies</a>
               <a
-                href="https://wa.me/12815551234?text=Hi%20HappyCake%2C%20I%27d%20like%20to%20ask%20about%20a%20cake."
+                href="https://wa.me/12819798320?text=Hi%20HappyCake%2C%20I%27d%20like%20to%20ask%20about%20a%20cake."
                 className="whitespace-nowrap rounded-full bg-happy-blue-700 text-cream-50 px-4 py-1.5 hover:bg-happy-blue-900"
               >
                 WhatsApp
@@ -152,7 +152,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <li><a href="/menu" className="hover:text-happy-blue-500">Menu</a></li>
                 <li><a href="/order" className="hover:text-happy-blue-500">Website order intent</a></li>
                 <li><a href="/assistant" className="hover:text-happy-blue-500">On-site assistant</a></li>
-                <li><a href="https://wa.me/12815551234" className="hover:text-happy-blue-500">WhatsApp</a></li>
+                <li><a href="https://wa.me/12819798320" className="hover:text-happy-blue-500">WhatsApp</a></li>
                 <li><a href="https://instagram.com/happycakeus" className="hover:text-happy-blue-500">Instagram DM</a></li>
               </ul>
             </div>

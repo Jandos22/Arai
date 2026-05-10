@@ -109,3 +109,71 @@ def default_logger() -> EvidenceLogger:
     if run_id:
         return EvidenceLogger(run_id=run_id)
     return EvidenceLogger()
+
+
+def latest_evidence_file(
+    base_dir: Path | str = Path("evidence"),
+    pattern: str = "orchestrator-run-*.jsonl",
+) -> Path | None:
+    """Return the newest matching orchestrator evidence file, if any."""
+    root = Path(base_dir)
+    files = [p for p in root.glob(pattern) if p.is_file()]
+    if not files:
+        return None
+    return max(files, key=lambda p: (p.stat().st_mtime, p.name))
+
+
+def read_jsonl_tail(path: Path | str, *, limit: int = 1000) -> list[dict[str, Any]]:
+    """Read the tail of a JSONL evidence file, skipping malformed lines."""
+    file_path = Path(path)
+    try:
+        lines = file_path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    for line in lines[-limit:]:
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(row, dict):
+            rows.append(row)
+    return rows
+
+
+def unresolved_approval_requests(
+    base_dir: Path | str = Path("evidence"),
+    *,
+    pattern: str = "orchestrator-run-*.jsonl",
+    tail_lines: int = 1000,
+) -> dict[str, Any]:
+    """List approval_request rows in the latest run without a matching resolution."""
+    path = latest_evidence_file(base_dir, pattern)
+    if path is None:
+        return {"path": None, "pending": []}
+
+    rows = read_jsonl_tail(path, limit=tail_lines)
+    requests: dict[str, dict[str, Any]] = {}
+    resolved: set[str] = set()
+
+    for row in rows:
+        if row.get("kind") != "owner_msg":
+            continue
+        approval_id = row.get("approvalId")
+        if not isinstance(approval_id, str) or not approval_id:
+            continue
+        if row.get("subkind") == "approval_request":
+            requests[approval_id] = row
+        elif row.get("subkind") == "approval_resolution":
+            resolved.add(approval_id)
+
+    pending = [
+        row
+        for approval_id, row in requests.items()
+        if approval_id not in resolved
+    ]
+    pending.sort(key=lambda row: str(row.get("ts", "")))
+    return {"path": str(path), "pending": pending}

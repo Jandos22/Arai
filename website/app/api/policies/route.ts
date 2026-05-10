@@ -5,8 +5,8 @@ const policies = {
     name: "HappyCake US",
     location: "Sugar Land, TX (Houston metro)",
     contact: {
-      whatsapp: "+1-281-555-1234",
-      whatsappDeepLink: "https://wa.me/12815551234",
+      whatsapp: "+1-281-979-8320",
+      whatsappDeepLink: "https://wa.me/12819798320",
       instagram: "https://instagram.com/happycakeus",
       email: "hello@happycake.us",
     },

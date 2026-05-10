@@ -38,6 +38,38 @@ def test_normalize_whatsapp_phone_text():
     assert normalize_whatsapp_payload(payload)["payload"] == payload
 
 
+def test_normalize_whatsapp_steppe_webhook_envelope():
+    payload = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "changes": [
+                    {
+                        "field": "messages",
+                        "value": {
+                            "messages": [
+                                {
+                                    "from": "+12815550100",
+                                    "id": "wamid.test",
+                                    "text": {"body": "Need cake tomorrow"},
+                                    "type": "text",
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        ],
+    }
+
+    normalized = normalize_whatsapp_payload(payload)["payload"]
+
+    assert normalized["from"] == "+12815550100"
+    assert normalized["message"] == "Need cake tomorrow"
+    assert normalized["messageId"] == "wamid.test"
+    assert normalized["raw"] == payload
+
+
 def test_normalize_instagram_dm():
     payload = {"threadId": "ig-1", "from": "maya", "message": "Birthday cake?"}
 
@@ -52,6 +84,31 @@ def test_normalize_instagram_comment():
     payload = {"commentId": "c-1", "username": "maya", "comment": "Looks good"}
 
     assert normalize_instagram_payload(payload)["type"] == "comment"
+
+
+def test_normalize_instagram_steppe_webhook_envelope():
+    payload = {
+        "object": "instagram",
+        "entry": [
+            {
+                "messaging": [
+                    {
+                        "sender": {"id": "maya"},
+                        "thread_id": "ig-1",
+                        "message": {"mid": "m.test", "text": "Birthday cake?"},
+                    }
+                ]
+            }
+        ],
+    }
+
+    normalized = normalize_instagram_payload(payload)
+
+    assert normalized["type"] == "dm"
+    assert normalized["payload"]["threadId"] == "ig-1"
+    assert normalized["payload"]["from"] == "maya"
+    assert normalized["payload"]["message"] == "Birthday cake?"
+    assert normalized["payload"]["raw"] == payload
 
 
 def test_healthz_returns_ok():

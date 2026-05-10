@@ -11,7 +11,7 @@ const descriptor = {
   longDescription:
     "HappyCake US is a Sugar Land, Texas bakery selling hand-decorated traditional cakes — Medovik (honey), Napoleon, red velvet, chocolate truffle, vanilla birthday, carrot & walnut. We are not a custom-cake business; consistency is the value proposition. Order ahead by WhatsApp, Instagram, or this website; pick up at our kitchen or arrange local delivery.",
   contact: {
-    whatsapp: "https://wa.me/12815551234",
+    whatsapp: "https://wa.me/12819798320",
     instagram: "https://instagram.com/happycakeus",
     email: "hello@happycake.us",
   },
@@ -21,7 +21,7 @@ const descriptor = {
     policies: "/api/policies",
     assistant: "/api/assistant",
     orderIntent: "/api/order-intent",
-    productPage: "/p/{slug}",
+    productPage: "/products/{slug}",
     menu: "/menu",
     orderPage: "/order?product={slug}",
     assistantPage: "/assistant",

@@ -79,7 +79,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     ],
   };
 
-  const waUrl = `https://wa.me/12815551234?text=${encodeURIComponent(
+  const waUrl = `https://wa.me/12819798320?text=${encodeURIComponent(
     `Hi HappyCake! I'd like to order: ${item.name}.`
   )}`;
 

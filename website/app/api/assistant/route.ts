@@ -3,6 +3,7 @@ import { loadAvailability } from "@/lib/availability";
 import { createOrderIntent } from "@/lib/order-intent";
 import { Catalog, CatalogItem, loadCatalog, priceRange } from "@/lib/catalog";
 import { McpEvidence, isMcpConfigured, readMcpEvidence } from "@/lib/mcp";
+import { suggestUpsell } from "@/lib/upsell";
 
 export const dynamic = "force-dynamic";
 
@@ -253,16 +254,40 @@ export async function POST(request: NextRequest) {
         evidence.push(localEvidence("owner_gate", order.handoff.ownerGate));
       }
 
+      const catalogForUpsell = loadCatalog();
+      const itemForUpsell = catalogForUpsell.items.find(
+        (i) => i.id === order.product.id || i.slug === productSlug,
+      );
+      // Skip upsell on owner-gated paths — the order isn't accepted yet,
+      // pitching add-ons before owner approval is off-brand and confusing.
+      const upsell =
+        itemForUpsell && !order.handoff.ownerGate.required
+          ? suggestUpsell(itemForUpsell, catalogForUpsell.items, order.product.estimatedTotalUsd ?? 0)
+          : null;
+      if (upsell) {
+        evidence.push(
+          localEvidence("upsell_offered", {
+            productSlug: itemForUpsell?.slug,
+            kind: upsell.kind,
+            sku: upsell.sku,
+            priceUsd: upsell.priceUsd,
+            reason: upsell.reason,
+          }),
+        );
+      }
+      const answer =
+        `I captured this as a website order intent for ${order.product.name}. ` +
+        `Estimated total starts at $${order.product.estimatedTotalUsd}. ` +
+        `${order.nextStep}` +
+        (upsell ? ` ${upsell.message}` : "");
       return Response.json({
         ok: true,
         intent,
-        answer:
-          `I captured this as a website order intent for ${order.product.name}. ` +
-          `Estimated total starts at $${order.product.estimatedTotalUsd}. ` +
-          `${order.nextStep}`,
+        answer,
         escalation: order.handoff.ownerGate,
         orderIntent: order,
         mcpHandoff,
+        upsell,
         evidence,
         suggestedActions: ["Confirm pickup time", "Confirm allergy concerns", "Send to WhatsApp", "Owner review if gated"],
       });
@@ -277,7 +302,7 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "For custom birthday/design requests I need headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; I can still suggest ready-made Honey Cake or Milk Maiden if timing is tight.",
+          "For custom birthday/design requests, HappyCake needs headcount, flavor, theme/reference photo, exact pickup time, name-on-cake, and allergy notes. Custom work is owner-gated before we promise kitchen capacity; if timing is tight in Sugar Land, I can suggest ready-made cake \"Honey\" (medovik) or cake \"Milk Maiden\" instead.",
         escalation: { required: true, reason: "custom cake or allergy/design signal" },
         endpoints: { catalog: "/api/catalog", policies: "/api/policies", availability: "/api/availability" },
         availability: { endpoint: "/api/availability" },
@@ -299,7 +324,7 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "I’m sorry — we fix cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for replacement/refund decision before any irreversible action.",
+          "I’m sorry — HappyCake fixes cake issues fast. Please send the order name, pickup time, a photo, and what went wrong. I will route it to owner review for a replacement/refund decision before any irreversible action, with the Sugar Land pickup context included.",
         escalation: { required: true, reason: "complaint/remediation path" },
         endpoints: { policies: "/api/policies", availability: "/api/availability" },
         availability: { endpoint: "/api/availability" },
@@ -327,7 +352,7 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "For order status, share the order name and pickup time. I can read availability at /api/availability, but I do not mark anything ready unless Square/kitchen status confirms it.",
+          "For HappyCake order status, share the order name and pickup time. I can read availability at /api/availability for the Sugar Land kitchen, but I do not mark cake \"Honey\", cake \"Milk Maiden\", or any order ready unless Square/kitchen status confirms it.",
         escalation: { required: false },
         endpoints: { policies: "/api/policies", availability: "/api/availability" },
         evidence,
@@ -341,7 +366,7 @@ export async function POST(request: NextRequest) {
         ok: true,
         intent,
         answer:
-          "Pickup is the default path from Sugar Land. Local delivery is limited/case-by-case. Same-day pickup is never guaranteed without live inventory and kitchen capacity confirmation. Cakes can contain wheat, egg, dairy, and sometimes nuts/soy — tell us allergies before ordering. Same-day issues should be sent with a photo so the owner can approve replacement/refund.",
+          "Pickup is the default HappyCake path from Sugar Land. Local delivery is limited/case-by-case. Same-day pickup is never guaranteed without live inventory and kitchen capacity confirmation. Traditional cakes like cake \"Honey\" (medovik) can contain wheat, egg, dairy, and sometimes nuts/soy — tell us allergies before ordering, especially for Nauryz or family celebrations. Same-day issues should be sent with a photo so the owner can approve replacement/refund.",
         escalation: { required: false },
         endpoints: { policies: "/api/policies", catalog: "/api/catalog", availability: "/api/availability" },
         evidence: [
