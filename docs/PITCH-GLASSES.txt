@@ -4,11 +4,12 @@
 4. Constraints: CC + Opus, no frameworks, Telegram only.
 5. By design: no free chat. Owner only approves/rejects.
 6. Shape: orchestrator + 3 scoped agents + Telegram.
-7. Per agent: own CLAUDE.md (role) + .mcp.json (tools).
-8. Agents: Sales 12, Ops 16, Marketing 12 (scoped MCP).
-9. Owner gate: agent emits JSON, owner taps Telegram.
-10. Evidence: every tool call in JSONL. Judge-readable.
-11. Proof: marketing 100/100. 88 tests. Plain Python.
-12. v0 (now): polish agents + slash commands. Stable spine.
-13. v1 (next): fully conversational owner management.
-14. Close: Dumb glue. Scoped agents. One tap. In the log.
+7. Per agent: CLAUDE.md (role) + .mcp.json (tools).
+8. + PROMPTS, policies, scripts. Each = own CC project.
+9. Agents: Sales 12, Ops 16, Marketing 12 (scoped MCP).
+10. Owner gate: agent emits JSON, owner taps Telegram.
+11. Evidence: every tool call in JSONL. Judge-readable.
+12. Proof: marketing 100/100. 88 tests. Plain Python.
+13. v0 (now): polish agents + slash commands. Stable spine.
+14. v1 (next): fully conversational owner management.
+15. Close: Dumb glue. Scoped agents. One tap. In the log.
