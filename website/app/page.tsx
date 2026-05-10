@@ -8,6 +8,13 @@ export default async function Home() {
   const catalog = loadCatalog();
   const availability = await loadAvailability();
   const featured = catalog.items.filter((i) => i.imageUrl).slice(0, 4);
+  const homeImageByUrl: Record<string, string> = {
+    "/brand/hero/happy-cake-hero-04.webp": "/brand/home/happy-cake-hero-04-900.webp",
+    "/brand/products/happy-cake-product-10.webp": "/brand/home/happy-cake-product-10-720.webp",
+    "/brand/products/happy-cake-product-03.webp": "/brand/home/happy-cake-product-03-720.webp",
+    "/brand/products/happy-cake-product-04.webp": "/brand/home/happy-cake-product-04-720.webp",
+    "/brand/products/happy-cake-product-09.webp": "/brand/home/happy-cake-product-09-720.webp",
+  };
 
   return (
     <div className="space-y-16">
@@ -48,7 +55,7 @@ export default async function Home() {
         </div>
         <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-cream-100 shadow-xl">
           <Image
-            src="/brand/hero/happy-cake-hero-04.webp"
+            src={homeImageByUrl["/brand/hero/happy-cake-hero-04.webp"]}
             alt="Naked chocolate layer cake with piped cream pearls, ganache drip, and gold-accented chocolate decor."
             fill
             priority
@@ -106,7 +113,7 @@ export default async function Home() {
                 <div className="relative aspect-square rounded-xl overflow-hidden bg-happy-blue-200 mb-4">
                   {item.imageUrl ? (
                     <Image
-                      src={item.imageUrl}
+                      src={homeImageByUrl[item.imageUrl] ?? item.imageUrl}
                       alt={item.imageAlt ?? item.name}
                       fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

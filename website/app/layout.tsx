@@ -1,7 +1,21 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Fraunces, Inter } from "next/font/google";
 
 const SITE_URL = "https://happycake.us";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  axes: ["SOFT", "WONK", "opsz"],
+});
 
 // LocalBusiness/Bakery JSON-LD — agent + SEO discoverability.
 // Only production-confirmed public facts are emitted here. Specific phone,
@@ -97,14 +111,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
@@ -112,20 +120,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-cream-50 text-ink antialiased">
         <header className="border-b border-cream-200 bg-cream-50/95 backdrop-blur sticky top-0 z-10">
-          <div className="mx-auto max-w-6xl flex h-16 items-center justify-between px-6">
+          <div className="mx-auto max-w-6xl flex h-16 items-center justify-between px-4 sm:px-6">
             <a href="/" className="font-display text-xl font-bold text-happy-blue-700">
               HappyCake <span className="text-coral">·</span> US
             </a>
-            <nav className="flex gap-5 text-sm items-center">
+            <nav className="flex gap-3 text-sm items-center sm:gap-5">
               <a href="/menu" className="hover:text-happy-blue-500">Menu</a>
-              <a href="/assistant" className="hover:text-happy-blue-500">Assistant</a>
+              <a href="/assistant" className="hidden hover:text-happy-blue-500 sm:inline">Assistant</a>
               <a href="/order" className="hover:text-happy-blue-500">Order</a>
-              <a href="/policies" className="hover:text-happy-blue-500">Policies</a>
+              <a href="/policies" className="hidden hover:text-happy-blue-500 sm:inline">Policies</a>
               <a
                 href="https://wa.me/12815551234?text=Hi%20HappyCake%2C%20I%27d%20like%20to%20ask%20about%20a%20cake."
-                className="rounded-full bg-happy-blue-700 text-cream-50 px-4 py-1.5 hover:bg-happy-blue-900"
+                className="whitespace-nowrap rounded-full bg-happy-blue-700 text-cream-50 px-4 py-1.5 hover:bg-happy-blue-900"
               >
-                WhatsApp us
+                WhatsApp
               </a>
             </nav>
           </div>
