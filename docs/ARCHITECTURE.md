@@ -1,8 +1,9 @@
 # Arai — Architecture
 
-The system is a **scenario-driven orchestrator spine** with four scoring loops
-attached. The spine runs the same `world_next_event` loop the evaluator drives,
-so what we test in dev = what's judged.
+Arai is the whole AI-assisted sales and operations system for Happy Cake US.
+The orchestrator is one organ of it: a **scenario-driven Python spine** with
+four scoring loops attached. It runs the same `world_next_event` loop the
+evaluator drives, so what we test in dev = what's judged.
 
 ## High-level diagram
 

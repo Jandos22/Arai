@@ -1,6 +1,6 @@
 # Arai
 
-AI sales + ops system for **Happy Cake US** (Sugar Land, TX).
+**Arai is an AI-assisted sales and operations system for small businesses, built for Happy Cake US** (Sugar Land, TX).
 Built for the **Steppe Business Club Hackathon** — May 9–10, 2026.
 
 **Team:** Jan Solo — Jandos Meirkhan (captain), with Hermes as build-time project-management/documentation helper and Claude Code as the judged agent runtime. Runtime business decisions are made through `claude -p`, not Hermes/Codex/OpenAI.
@@ -8,7 +8,9 @@ Built for the **Steppe Business Club Hackathon** — May 9–10, 2026.
 
 ## What this is
 
-A vertical slice that takes a customer from interest → website/WhatsApp/Instagram order intent → POS/cashier → kitchen handoff → owner approval, plus an agent-readable storefront, browser-testable on-site assistant, and a $500/mo marketing plan. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and [`CLAUDE.md`](CLAUDE.md) for the team contract.
+Arai is the system: `orchestrator/` is the Python spine, `agents/` are role-scoped Claude Code projects, and `website/` is the agent-readable storefront plus `/order` and `/assistant` surface. Together they form a vertical slice that takes a customer from interest → website/WhatsApp/Instagram order intent → POS/cashier → kitchen handoff → owner approval, plus a $500/mo marketing loop for a real small business.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design and [`CLAUDE.md`](CLAUDE.md) for the team contract.
 
 ## Quickstart (fresh clone)
 
