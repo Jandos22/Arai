@@ -49,3 +49,24 @@ def test_logger_redacts_token_in_payload(tmp_path):
     line = json.loads(log.path.read_text().strip())
     assert "sbc_team_x" not in line["body"]
     assert "[REDACTED]" in line["body"]
+
+
+def test_logger_writes_growth_bonus_rows(tmp_path):
+    log = EvidenceLogger(run_id="growth-test", base_dir=tmp_path)
+    log.write(
+        "lead_score",
+        channel="whatsapp",
+        score=90,
+        segment="hot",
+        evidenceSources=["whatsapp_inbound", "square_recent_orders"],
+    )
+    log.write(
+        "whatsapp_follow_up_sent",
+        recipient="+12815550123",
+        evidenceSources=["square_recent_orders", "whatsapp_send"],
+    )
+
+    rows = [json.loads(line) for line in log.path.read_text().strip().splitlines()]
+    assert rows[0]["kind"] == "lead_score"
+    assert rows[0]["evidenceSources"] == ["whatsapp_inbound", "square_recent_orders"]
+    assert rows[1]["kind"] == "whatsapp_follow_up_sent"

@@ -19,18 +19,39 @@ approval-gated actions. Run these for owner ergonomics.
 
 ## Setup
 
-1. Talk to [@BotFather](https://t.me/BotFather) on Telegram, create three
-   bots (HappyCakeMarketing, HappyCakeOps, HappyCakeSales).
-2. Paste the tokens into `.env.local` next to `STEPPE_MCP_TOKEN`:
+1. Talk to [@BotFather](https://t.me/BotFather) on Telegram and create four
+   bots with `Arai`-prefixed display names:
+
+   | Display name | Suggested username | Env var |
+   |---|---|---|
+   | `Arai HappyCake Owner` | `@arai_tbot` | `TELEGRAM_BOT_TOKEN_OWNER` |
+   | `Arai HappyCake Sales` | `AraiHappyCakeSalesBot` | `TELEGRAM_BOT_TOKEN_SALES` |
+   | `Arai HappyCake Ops` | `AraiHappyCakeOpsBot` | `TELEGRAM_BOT_TOKEN_OPS` |
+   | `Arai HappyCake Marketing` | `AraiHappyCakeMarketingBot` | `TELEGRAM_BOT_TOKEN_MARKETING` |
+
+   If an exact username is unavailable, choose the nearest available
+   `Arai...Bot` variant and keep the display name role-specific.
+2. Paste the tokens into `.env.local` or `~/.config/arai/env.local` next to
+   `STEPPE_MCP_TOKEN`. Never commit these values.
    ```
+   TELEGRAM_BOT_TOKEN_OWNER=...
    TELEGRAM_BOT_TOKEN_MARKETING=...
    TELEGRAM_BOT_TOKEN_OPS=...
    TELEGRAM_BOT_TOKEN_SALES=...
    TELEGRAM_OWNER_CHAT_ID=<your numeric chat id>
    ```
-3. To find your chat id, message any of the bots once and run:
+3. Message each bot once from the owner's Telegram account.
+4. To find your chat id, run:
    ```bash
-   curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN_MARKETING/getUpdates" | jq '.result[].message.chat.id'
+   curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN_OWNER/getUpdates" | jq '.result[].message.chat.id'
+   ```
+5. Verify the tokens without printing secrets:
+   ```bash
+   bash scripts/verify_telegram_bots.sh
+   ```
+6. After the chat id is set, send one test message from each bot:
+   ```bash
+   bash scripts/verify_telegram_bots.sh --send-test
    ```
 
 ## Run
@@ -46,6 +67,13 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot
 ```
 
 Each runs in foreground; use `tmux`, `screen`, or three terminals.
+
+The owner approval bot is not a foreground process. It is used by the
+orchestrator through `orchestrator/telegram_bot.py`; when
+`TELEGRAM_BOT_TOKEN_OWNER` and `TELEGRAM_OWNER_CHAT_ID` are set, owner-gated
+actions send inline approve/reject cards to Telegram. If those variables are
+missing, the orchestrator keeps its dev/evaluator fallback and auto-approves
+so headless runs still move.
 
 ## Owner-only
 

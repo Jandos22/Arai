@@ -47,6 +47,7 @@ def build_routing_table() -> dict[str, Handler]:
     """
     return {
         # WhatsApp
+        "whatsapp:follow_up_due": handlers.whatsapp.handle_follow_up_due,
         "whatsapp:inbound_message": handlers.whatsapp.handle,
         "whatsapp:message": handlers.whatsapp.handle,
         "whatsapp:*": handlers.whatsapp.handle,

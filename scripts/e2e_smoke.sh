@@ -20,7 +20,7 @@
 #
 # Tunables (env):
 #   SMOKE_SCENARIO       (default launch-day-revenue-engine)
-#   SMOKE_MAX_EVENTS     (default 12 — covers 6 seeded + 4 injects + slack)
+#   SMOKE_MAX_EVENTS     (default 13 — covers 6 seeded + 5 injects + slack)
 #   SMOKE_ORCH_TIMEOUT   (default 420 — hard wall-clock kill, seconds)
 #   PYTHON               (default orchestrator/.venv/bin/python)
 #
@@ -32,7 +32,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 SCENARIO="${SMOKE_SCENARIO:-launch-day-revenue-engine}"
-MAX_EVENTS="${SMOKE_MAX_EVENTS:-12}"
+MAX_EVENTS="${SMOKE_MAX_EVENTS:-13}"
 ORCH_TIMEOUT="${SMOKE_ORCH_TIMEOUT:-420}"
 PYTHON="${PYTHON:-orchestrator/.venv/bin/python}"
 TS="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -166,7 +166,11 @@ inj_gmb=$(call_tool world_inject_event \
   "$(jq -nc --arg ts "$TS" '{channel:"gmb", type:"review_received", payload:{reviewId:("rev_smoke_"+$ts), rating:5, author:"Smoke Test", text:"Tried the honey cake — really tender. Will be back."}}')" | extract_text)
 plain "  GMB inject (review)  -> ${inj_gmb:-(empty)}" | head -c 200; plain ""
 
-green "  injected 4 events (1 order + 1 inquiry + 1 IG DM + 1 GMB review)"
+inj_wa_followup=$(call_tool world_inject_event \
+  "$(jq -nc --arg ts "$TS" '{channel:"whatsapp", type:"follow_up_due", payload:{to:"+12815550100", pickupAt:"tomorrow at 4pm", source:"growth_bonus_smoke"}}')" | extract_text)
+plain "  WA  inject (follow)  -> ${inj_wa_followup:-(empty)}" | head -c 200; plain ""
+
+green "  injected 5 events (1 order + 1 inquiry + 1 IG DM + 1 GMB review + 1 WA follow-up)"
 
 # ---------- 6. Wait for orchestrator with hard wall-clock kill ------------
 yellow "[6/7] Wait for orchestrator (hard timeout ${ORCH_TIMEOUT}s)"

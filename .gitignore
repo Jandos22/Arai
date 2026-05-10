@@ -51,3 +51,4 @@ venv/
 
 # local Claude Code sessions/worktrees (not submission artifacts)
 .claude/
+.gstack/

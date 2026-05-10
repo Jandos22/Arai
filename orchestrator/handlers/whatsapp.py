@@ -8,11 +8,13 @@ create order, kitchen ticket).
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from ..dispatcher import HandlerContext
+from ..growth import build_pickup_follow_up_message, score_whatsapp_lead
 
 
-def handle(event: dict[str, Any], ctx: HandlerContext) -> None:  # type: ignore[name-defined]
+def handle(event: dict[str, Any], ctx: HandlerContext) -> None:
     payload = event.get("payload") or event
     sender = payload.get("from") or payload.get("phone")
     body = payload.get("message") or payload.get("text") or ""
@@ -22,6 +24,20 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:  # type: ignore[
         channel="whatsapp",
         sender=sender,
         bodyPreview=body[:200],
+    )
+
+    recent_orders = _safe_recent_orders(ctx)
+    lead_score = score_whatsapp_lead(payload, recent_orders)
+    ctx.evidence.write(
+        "lead_score",
+        channel="whatsapp",
+        sender=sender,
+        score=lead_score.score,
+        segment=lead_score.segment,
+        route=lead_score.route,
+        followUpAfterMinutes=lead_score.follow_up_after_minutes,
+        reasons=lead_score.reasons,
+        evidenceSources=["whatsapp_inbound", "square_recent_orders"],
     )
 
     if ctx.sales_runner is None:
@@ -85,6 +101,57 @@ def handle(event: dict[str, Any], ctx: HandlerContext) -> None:  # type: ignore[
                 channel="whatsapp",
                 responsePreview=response[:200],
             )
+
+
+def handle_follow_up_due(event: dict[str, Any], ctx: HandlerContext) -> None:
+    """Send a scheduled WhatsApp pickup follow-up after checking Square."""
+    payload = event.get("payload") or event
+    recipient = payload.get("to") or payload.get("from") or payload.get("phone")
+    if not recipient:
+        ctx.evidence.write("whatsapp_follow_up_skipped", reason="missing_recipient", payload=payload)
+        return
+
+    recent_orders = _safe_recent_orders(ctx)
+    message = payload.get("message") or build_pickup_follow_up_message(payload, recent_orders)
+    args = {"to": recipient, "message": message}
+    try:
+        result = ctx.client.call_tool("whatsapp_send", args)
+    except Exception as exc:  # noqa: BLE001
+        ctx.evidence.mcp_call("whatsapp_send", args=args, ok=False, error=str(exc))
+        ctx.evidence.write(
+            "whatsapp_follow_up_failed",
+            recipient=recipient,
+            error=str(exc),
+            evidenceSources=["square_recent_orders", "whatsapp_send"],
+        )
+        return
+
+    ctx.evidence.mcp_call("whatsapp_send", args=args, result_summary=result)
+    ctx.evidence.write(
+        "whatsapp_follow_up_sent",
+        recipient=recipient,
+        bodyPreview=str(message)[:240],
+        evidenceSources=["square_recent_orders", "whatsapp_send"],
+    )
+    ctx.evidence.write(
+        "channel_outbound",
+        label="whatsapp_follow_up",
+        channel="whatsapp",
+        tool="whatsapp_send",
+        recipientKey="to",
+        recipient=recipient,
+        bodyPreview=str(message)[:240],
+    )
+
+
+def _safe_recent_orders(ctx: HandlerContext) -> Any:
+    try:
+        result = ctx.client.call_tool("square_recent_orders", {})
+    except Exception as exc:  # noqa: BLE001
+        ctx.evidence.mcp_call("square_recent_orders", args={}, ok=False, error=str(exc))
+        return None
+    ctx.evidence.mcp_call("square_recent_orders", args={}, result_summary=result)
+    return result
 
 
 def _extract_json(text: str) -> str:

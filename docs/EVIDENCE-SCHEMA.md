@@ -76,6 +76,27 @@ Convenience proof row emitted for customer-facing send tools.
  "bodyPreview":"Honey cake is available today..."}
 ```
 
+### `lead_score`
+Deterministic growth-bonus score for an inbound lead. The row cites the
+workflow evidence sources used by the score, typically the inbound channel
+event plus `square_recent_orders`.
+```json
+{"kind":"lead_score","channel":"whatsapp","sender":"+128...",
+ "score":90,"segment":"hot","route":"owner_review",
+ "followUpAfterMinutes":15,
+ "reasons":["order intent","repeat-customer Square evidence"],
+ "evidenceSources":["whatsapp_inbound","square_recent_orders"]}
+```
+
+### `whatsapp_follow_up_sent`
+Proof that a scheduled follow-up checked Square context before sending a
+WhatsApp reminder.
+```json
+{"kind":"whatsapp_follow_up_sent","recipient":"+128...",
+ "bodyPreview":"Quick Happy Cake reminder...",
+ "evidenceSources":["square_recent_orders","whatsapp_send"]}
+```
+
 ### `dispatch_drop`, `dispatch_error`
 Routing failures.
 
