@@ -14,7 +14,7 @@
 |---|---|
 | Eval commit | `0de1948` (`docs(evidence): capture 88.75 e2e smoke pass and marketing run logs`) |
 | Branch | `feat/self-eval` (this commit) |
-| Latest e2e smoke artefact | [`evidence/e2e-smoke-20260509T230201Z.json`](../evidence/e2e-smoke-20260509T230201Z.json) |
+| Latest committed e2e evidence | [`evidence/e2e-sample.jsonl`](../evidence/e2e-sample.jsonl) — redacted tail from the 20260509T230201Z PASS run; full `evidence/e2e-smoke-*.json` files are local/gitignored by design |
 | 4 MCP-loop scores (preview, not the grade) | marketing **100**, pos_kitchen **55**, channels **100**, world **100** — average **88.75** |
 | Repo URL on submission | `https://github.com/Jandos22/Arai` |
 
@@ -65,13 +65,13 @@ order intent → kitchen handoff close? Does the marketing loop run?
 ### Evidence in repo / logs
 
 - All four MCP loops report a non-error response in
-  `evidence/e2e-smoke-20260509T230201Z.json`. Marketing 100, channels 100,
+  `evidence/e2e-sample.jsonl` (redacted sample from the 20260509T230201Z PASS run). Marketing 100, channels 100,
   world 100, pos_kitchen 55.
 - Walk-in order **completes the production lifecycle**:
   `square_create_order` → `kitchen_create_ticket` → `kitchen_accept_ticket`
   → `kitchen_mark_ready` → `square_update_order_status` —
   see `orchestrator/handlers/square.py:42-111` and the corresponding
-  `mcp_call` rows in `evidence/orchestrator-run-954217ac.jsonl`.
+  `mcp_call` rows preserved in the committed `evidence/e2e-sample.jsonl` tail.
 - Marketing demand engine end-to-end chain captured at
   `docs/MARKETING.md:147-160` and reproduced fresh in three independent
   runs (`MARKETING.md:165-313`).
@@ -81,7 +81,7 @@ order intent → kitchen handoff close? Does the marketing loop run?
 ### Risks / gaps (be honest)
 
 - **Channels score = 100 but `whatsappOutbound = 0`** in the same payload
-  (`e2e-smoke-20260509T230201Z.json` evidence.counts). The evaluator
+  (20260509T230201Z PASS run evidence counts, summarized in `evidence/e2e-sample.jsonl`). The evaluator
   scored on world events delivered, not on outbound replies — if a
   Functional judge clicks one level deeper, the inconsistency reads as
   "score is generous". Same for Instagram (0 actions) and GMB (0
@@ -451,7 +451,7 @@ through `square_create_order` → `kitchen_create_ticket` →
 `1 Square/POS simulator order(s)` and `1 kitchen ticket(s)`, up from 0.
 
 The remaining gap, exactly as the evaluator reports it
-(`evidence/e2e-smoke-20260509T230201Z.json`):
+(latest 20260509T230201Z PASS run; redacted sample committed as `evidence/e2e-sample.jsonl`):
 
 > "gaps": ["No capacity-aware accept/reject decision"]
 
@@ -525,8 +525,7 @@ In rank order by points-per-minute:
    to `docs/` and link from README (~15 min). Removes the biggest UX
    judge tripwire and ticks the `BONUS-PLAN.md` mobile-perf item.
 4. **Re-run `bash scripts/e2e_smoke.sh` after fixes 1+2 land** and
-   commit the new `evidence/e2e-smoke-*.json` + the regenerated
-   `evidence/e2e-sample.jsonl` (~10 min). Otherwise the
+   regenerate and commit the redacted `evidence/e2e-sample.jsonl` (~10 min). Keep full `evidence/e2e-smoke-*.json` files local/gitignored unless explicitly cleared for secrets. Otherwise the
    `ARCHITECTURE.md:131-141` "running totals" disagree with the
    artefacts judges actually read.
 5. **Final token-leak scan over full history** per
@@ -568,13 +567,13 @@ What you're verifying:
 |---|---|
 | `[1/7]` … `[7/7] PASS` | All four MCP scoring loops returned a non-error response |
 | `marketing : 100`, `pos_kitchen : 55-90`, `channels : 100`, `world : 100` | The four-loop preview matches our self-eval inputs |
-| `evidence/e2e-smoke-*.json` exists with `team_report.score ≥ 80` | Score is high enough for full bonus eligibility (`BONUS-PLAN.md:7-14`) |
+| `evidence/e2e-sample.jsonl` reflects a PASS run with average ≥80 | Score is high enough for full bonus eligibility (`BONUS-PLAN.md:7-14`) |
 
 What to read for the seven dimensions, fastest to slowest:
 
 | Dimension | Read this first |
 |---|---|
-| Functional | `evidence/e2e-smoke-20260509T230201Z.json` (or your fresh run) |
+| Functional | `evidence/e2e-sample.jsonl` plus a fresh local `bash scripts/e2e_smoke.sh` run if desired |
 | Depth | `agents/sales/CLAUDE.md` — five inbound paths, six owner-gate triggers |
 | Impact | `docs/MARKETING.md:147-160` (real MCP chain) + `docs/PRODUCTION-PATH.md` |
 | UX | `website/app/agent.json/route.ts` + `/api/catalog` + `BONUS-PLAN.md` for what's still TBD |
