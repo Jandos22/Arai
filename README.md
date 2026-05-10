@@ -61,6 +61,47 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders 
 - [`docs/MARKETING.md`](docs/MARKETING.md) — $500/mo marketing case (T-006, 100/100)
 - [`tasks/`](tasks) — task briefs (INBOX → DONE)
 
+## Daily reports
+
+A nightly summarizer reads that day's `evidence/orchestrator-*.jsonl` files,
+asks `claude -p` for highlights + lowlights + metrics, writes
+`evidence/daily-<date>.json`, and (optionally) posts a digest to the owner's
+Telegram with an inline "Open audit" button.
+
+Manual run (judges + demo path):
+
+```bash
+PYTHONPATH=. orchestrator/.venv/bin/python -m orchestrator.daily_report \
+  --date "$(TZ=America/Chicago date +%F)" \
+  --post-telegram \
+  --audit-url-template "https://<your-tunnel>/audit/{date}"
+```
+
+Cron line for production-style usage (host crontab on the runtime machine):
+
+```
+0 21 * * *  cd /Users/jandos/dev/Arai && PYTHONPATH=. orchestrator/.venv/bin/python -m orchestrator.daily_report --date "$(TZ=America/Chicago date +\%F)" --post-telegram --audit-url-template "https://<your-tunnel>/audit/{date}" >> ~/.cache/arai-daily.log 2>&1
+```
+
+The audit page is served by the orchestrator's existing webhook server
+(`orchestrator/webhook_server.py`) over the same Cloudflare tunnel that
+ingests inbound webhooks. Two surfaces:
+
+- `GET /audit/<YYYY-MM-DD>` (default) → inline HTML view (highlights,
+  lowlights, metrics table, evidence-ref list).
+- `GET /audit/<YYYY-MM-DD>` with `Accept: application/json` *or*
+  `?format=json` → raw `daily-<date>.json` for agents and judge tooling.
+- Missing date → 404 JSON `{"ok": false, "error": "no_daily_report", "date": "<date>"}`.
+
+The "portal" the agents read for follow-up questions is just
+`evidence/daily-<date>.json` itself. Bots open it with the shared helper
+`orchestrator.daily_report.daily_report_path(date)` rather than recomputing
+from raw JSONL.
+
+Tests: `orchestrator/tests/test_daily_report.py` (24 cases) and the audit
+endpoint cases in `orchestrator/tests/test_webhook_server.py` (6 cases) —
+17-row coverage matrix per `~/.gstack/projects/Jandos22-Arai/jandos-main-eng-review-test-plan-20260510-021302.md`.
+
 ## Verification scripts
 
 - [`scripts/test_website.sh`](scripts/test_website.sh) — build + smoke website routes, order-intent API, assistant API, and agent-readable surface (no token needed)

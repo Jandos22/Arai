@@ -16,6 +16,9 @@ evidence/*.json.tmp
 orchestrator/evidence/
 evidence/e2e-smoke-*.json
 evidence/evaluator-preview-*.json
+evidence/daily-*.json
+evidence/customers.json
+evidence/self-eval-*
 !evidence/T-*-*.txt
 !evidence/*-sample.jsonl
 !evidence/orchestrator-run-human-reject-smoke.jsonl

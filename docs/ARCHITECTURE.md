@@ -116,6 +116,42 @@ normalizes each body into a dispatcher event, and `dispatcher.make_dispatcher`
 routes `whatsapp:inbound_message`, `instagram:dm`, or `instagram:comment` to
 the channel handlers.
 
+## Daily report loop
+
+Out-of-band from the live scenario/webhook flow, a one-shot CLI rolls up
+each day's evidence into a single JSON artifact that the agents read for
+follow-ups and judges read to verify the system runs.
+
+```
+host cron (21:00 CT, --post-telegram)
+        │
+        ▼
+orchestrator/daily_report.py  ──►  evidence/orchestrator-*.jsonl
+        │                             (filtered by ts within the CT day)
+        │
+        ├── claude -p (highlights/lowlights/metrics, JSON only)
+        │       ↓
+        │   non-JSON / timeout / exit≠0 → deterministic Python fallback
+        │
+        ▼
+evidence/daily-<date>.json  ─────►  bots/marketing_bot.py /report (read)
+        │                       ─►  GET /audit/<date>            (read)
+        ▼
+TelegramNotifier.notify(...)        served by orchestrator/webhook_server.py
+   + inline "Open audit" button     over the existing Cloudflare tunnel
+```
+
+Why a one-shot CLI instead of `JobQueue`: the orchestrator's main process
+is scenario-driven (`runner.run(max_events=200)` and exits in `main.py`).
+There's no event loop to host an in-process scheduler. External `cron`
+invokes the report on its own schedule and decouples report generation
+from orchestrator lifetime, which also gives judges a one-line manual
+demo: `python -m orchestrator.daily_report --date 2026-05-09`.
+
+The "portal" the agents read for trend recall is `evidence/daily-<date>.json`
+itself. No SQLite, no separate analytics database for the POC — the JSON
+file IS the analytics layer.
+
 ## Files
 
 ```
@@ -123,11 +159,12 @@ orchestrator/
 ├── main.py            # CLI entry point
 ├── mcp_client.py      # JSON-RPC client (X-Team-Token), envelope unwrap
 ├── scenario.py        # world_start_scenario + world_next_event loop
-├── webhook_server.py  # local Cloudflare/ngrok webhook ingress adapter
+├── webhook_server.py  # local Cloudflare/ngrok webhook ingress + GET /audit/<date>
 ├── dispatcher.py      # channel:type → handler
 ├── handlers/          # one module per channel (incl. abandoned-cart scheduler)
 ├── claude_runner.py   # subprocess wrapper for `claude -p`
 ├── telegram_bot.py    # owner notifier + approval queue
+├── daily_report.py    # one-shot daily summarizer, audit JSON writer
 ├── customers.py       # JSON-backed repeat-customer profile store
 ├── evidence.py        # JSONL append, token redaction
 ├── tests/             # mocked unit tests (no token needed)
@@ -144,9 +181,11 @@ uv pip install -r requirements.txt
 PYTHONPATH=.. .venv/bin/python -m pytest tests
 ```
 
-24 tests cover `mcp_client`, `dispatcher`, `evidence`, Square capacity
-branching, and Claude stream parsing — all deterministic, no token, no
-Telegram. The MacBook should also see green when these run there.
+88 tests cover `mcp_client`, `dispatcher`, `evidence`, Square capacity
+branching, Claude stream parsing, the daily-report pipeline (24 cases on
+`daily_report.py`), and the audit endpoint (6 cases on
+`webhook_server.py`) — all deterministic, no token, no Telegram. The
+MacBook should also see green when these run there.
 
 ## What's actually shipped (running totals)
 

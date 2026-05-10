@@ -5,6 +5,9 @@ Slash commands:
     /budget         — print this month's budget + target effect
     /campaigns      — list active simulated campaigns
     /report         — call marketing_report_to_owner and post the summary
+                      (prefaced with yesterday's daily highlights/lowlights
+                       if a daily report exists)
+    /digest [date]  — show yesterday's (or any day's) daily report
     /run            — kick off the full demand-engine chain (long-running)
 
 Runs the marketing Claude Code project in the background for /run; for
@@ -20,6 +23,7 @@ import asyncio
 import json
 import logging
 import sys
+from datetime import date as date_cls, datetime, timedelta
 from pathlib import Path
 
 from telegram import Update
@@ -28,6 +32,7 @@ from telegram.ext import CommandHandler, ContextTypes
 # orchestrator package available because pyproject.toml lives in orchestrator/
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from orchestrator.claude_runner import ClaudeRunner  # noqa: E402
+from orchestrator.daily_report import daily_report_path  # noqa: E402
 from orchestrator.evidence import EvidenceLogger  # noqa: E402
 from orchestrator.mcp_client import MCPClient, MCPError  # noqa: E402
 
@@ -51,7 +56,8 @@ async def cmd_start(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
         "Commands:\n"
         "/budget — show the $500/mo constraint\n"
         "/campaigns — list active simulated campaigns\n"
-        "/report — fresh marketing_report_to_owner\n"
+        "/report — fresh marketing_report_to_owner (with yesterday's digest)\n"
+        "/digest [date] — show a daily report (defaults to yesterday)\n"
         "/run — kick off full demand-engine chain"
     )
 
@@ -87,6 +93,31 @@ async def cmd_campaigns(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None
     await update.effective_message.reply_text(text, parse_mode="Markdown")
 
 
+def _daily_preface(target: date_cls) -> str | None:
+    """If yesterday's daily report exists, return a short preface block.
+
+    The bot reads the same JSON file the audit endpoint serves — that's the
+    "agent analytics layer" in action. No recomputation from raw JSONL.
+    """
+    path = daily_report_path(target)
+    if not path.exists():
+        return None
+    try:
+        body = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    highs = body.get("highlights") or []
+    lows = body.get("lowlights") or []
+    if not highs and not lows:
+        return None
+    lines = [f"_From the {target.isoformat()} daily report_"]
+    for h in highs[:3]:
+        lines.append(f"✅ {h}")
+    for low in lows[:3]:
+        lines.append(f"⚠️ {low}")
+    return "\n".join(lines)
+
+
 @owner_only
 async def cmd_report(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
     try:
@@ -96,8 +127,68 @@ async def cmd_report(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
     except MCPError as exc:
         await update.effective_message.reply_text(f"❌ MCP error: {exc}")
         return
-    text = "📋 *Marketing report*\n\n" + json.dumps(report, indent=2)[:3500]
-    await update.effective_message.reply_text(text, parse_mode="Markdown")
+    yesterday = date_cls.today() - timedelta(days=1)
+    preface = _daily_preface(yesterday) or _daily_preface(date_cls.today())
+    chunks = []
+    if preface:
+        chunks.append(preface)
+        chunks.append("")
+    chunks.append("📋 *Marketing report*")
+    chunks.append("```")
+    chunks.append(json.dumps(report, indent=2)[:3200])
+    chunks.append("```")
+    await update.effective_message.reply_text("\n".join(chunks), parse_mode="Markdown")
+
+
+@owner_only
+async def cmd_digest(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show one day's daily report. ``/digest`` → yesterday; ``/digest 2026-05-09`` → that date."""
+    args = ctx.args or []
+    if args:
+        try:
+            target = date_cls.fromisoformat(args[0])
+        except ValueError:
+            await update.effective_message.reply_text(
+                f"❌ Bad date: {args[0]!r}. Use YYYY-MM-DD."
+            )
+            return
+    else:
+        target = date_cls.today() - timedelta(days=1)
+
+    path = daily_report_path(target)
+    if not path.exists():
+        # Fall back to today if yesterday isn't ready yet.
+        today = date_cls.today()
+        if not args and daily_report_path(today).exists():
+            target = today
+            path = daily_report_path(today)
+        else:
+            await update.effective_message.reply_text(
+                f"❌ No daily report for {target.isoformat()} yet. "
+                f"Run `python -m orchestrator.daily_report --date {target.isoformat()}` first."
+            )
+            return
+
+    body = json.loads(path.read_text(encoding="utf-8"))
+    lines = [f"☀️ *Daily report — {target.isoformat()}*"]
+    if body.get("llmFallback"):
+        lines.append(f"_⚠️ LLM fallback active: {body.get('fallbackReason') or 'unknown'}_")
+    if body.get("highlights"):
+        lines.append("")
+        lines.append("*Highlights:*")
+        for h in body["highlights"]:
+            lines.append(f"✅ {h}")
+    if body.get("lowlights"):
+        lines.append("")
+        lines.append("*Lowlights:*")
+        for low in body["lowlights"]:
+            lines.append(f"⚠️ {low}")
+    metrics = body.get("metrics") or {}
+    if metrics.get("totalEvents") is not None:
+        lines.append("")
+        lines.append(f"_Events recorded: {metrics['totalEvents']}_")
+    text = "\n".join(lines)
+    await update.effective_message.reply_text(text[:4000], parse_mode="Markdown")
 
 
 @owner_only
@@ -142,6 +233,7 @@ def main() -> None:
     app.add_handler(CommandHandler("budget", cmd_budget))
     app.add_handler(CommandHandler("campaigns", cmd_campaigns))
     app.add_handler(CommandHandler("report", cmd_report))
+    app.add_handler(CommandHandler("digest", cmd_digest))
     app.add_handler(CommandHandler("run", cmd_run))
     run_polling(app)
 

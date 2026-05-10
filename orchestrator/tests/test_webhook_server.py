@@ -4,6 +4,9 @@ from __future__ import annotations
 import http.client
 import json
 import threading
+from pathlib import Path
+
+import pytest
 
 from orchestrator.webhook_server import (
     make_webhook_server,
@@ -15,8 +18,9 @@ from orchestrator.webhook_server import (
 class _RecordingEvidence:
     run_id = "run-test"
 
-    def __init__(self):
+    def __init__(self, base_dir: Path | None = None):
         self.entries = []
+        self.base_dir = base_dir or Path("evidence")
 
     def write(self, kind, **fields):
         self.entries.append({"kind": kind, **fields})
@@ -210,3 +214,112 @@ def _raw_request(server, method, path, body):
     raw = response.read()
     conn.close()
     return response.status, json.loads(raw.decode("utf-8"))
+
+
+def _request_with_headers(server, method, path, headers=None):
+    """Like _request but returns raw bytes + status + content-type, no JSON parsing."""
+    conn = http.client.HTTPConnection(server.server_address[0], server.server_address[1], timeout=5)
+    conn.request(method, path, headers=headers or {})
+    response = conn.getresponse()
+    raw = response.read()
+    ct = response.getheader("Content-Type", "")
+    conn.close()
+    return response.status, ct, raw
+
+
+# ---------------------------------------------------------------- audit endpoint (paths 13-15)
+
+
+def _seed_audit(tmp_path: Path, date_str: str, summary: dict | None = None) -> Path:
+    base = tmp_path / "evidence"
+    base.mkdir(exist_ok=True)
+    body = summary or {
+        "date": date_str,
+        "highlights": ["12 orders today"],
+        "lowlights": ["3 messages waited >2h"],
+        "metrics": {"totalEvents": 7, "byKind": {"event": 7}},
+        "evidence_refs": [{"runId": "run-x", "kind": "event", "ts": "2026-05-09T18:00:00Z"}],
+        "llmFallback": False,
+        "generatedAt": "2026-05-10T02:00:00Z",
+    }
+    (base / f"daily-{date_str}.json").write_text(json.dumps(body, indent=2), encoding="utf-8")
+    return base
+
+
+def test_audit_html_when_default_accept(tmp_path: Path):
+    """Path #14 — default request returns rendered HTML 200."""
+    base = _seed_audit(tmp_path, "2026-05-09")
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        status, ct, body = _request_with_headers(server, "GET", "/audit/2026-05-09")
+    assert status == 200
+    assert ct.startswith("text/html")
+    text = body.decode("utf-8")
+    assert "Arai daily report" in text
+    assert "12 orders today" in text
+    assert "3 messages waited" in text
+    # evidence row written
+    assert any(e["kind"] == "audit_request" and e.get("status") == 200 for e in evidence.entries)
+
+
+def test_audit_json_when_accept_header(tmp_path: Path):
+    """Path #13 — Accept: application/json returns the raw daily JSON."""
+    base = _seed_audit(tmp_path, "2026-05-09")
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        status, ct, body = _request_with_headers(
+            server, "GET", "/audit/2026-05-09", headers={"Accept": "application/json"}
+        )
+    assert status == 200
+    assert ct.startswith("application/json")
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["highlights"] == ["12 orders today"]
+
+
+def test_audit_json_when_format_query(tmp_path: Path):
+    """Defensive: ?format=json query also opts into JSON, useful from the
+    Telegram inline button when Accept headers aren't set by the browser."""
+    base = _seed_audit(tmp_path, "2026-05-09")
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        status, ct, body = _request_with_headers(
+            server, "GET", "/audit/2026-05-09?format=json"
+        )
+    assert status == 200
+    assert ct.startswith("application/json")
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["date"] == "2026-05-09"
+
+
+def test_audit_404_when_no_report(tmp_path: Path):
+    """Path #15 — file missing → clean 404 JSON with the date echoed back."""
+    base = tmp_path / "evidence"
+    base.mkdir()
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        status, ct, body = _request_with_headers(server, "GET", "/audit/2026-05-09")
+    assert status == 404
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed == {"ok": False, "error": "no_daily_report", "date": "2026-05-09"}
+
+
+def test_audit_400_on_bad_date_format(tmp_path: Path):
+    """A malformed date should give 400, not 500."""
+    base = tmp_path / "evidence"
+    base.mkdir()
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        # The path regex requires \d{4}-\d{2}-\d{2}, so this gets caught at
+        # the regex (returns 404 not_found rather than 400 bad_date_format).
+        # We still want a non-500 response.
+        status, ct, body = _request_with_headers(server, "GET", "/audit/not-a-date")
+    assert status == 404
+
+
+def test_audit_unknown_path_still_404(tmp_path: Path):
+    base = tmp_path / "evidence"
+    base.mkdir()
+    evidence = _RecordingEvidence(base_dir=base)
+    with _server([], evidence) as server:
+        status, ct, body = _request_with_headers(server, "GET", "/some/random/path")
+    assert status == 404
