@@ -8,11 +8,11 @@
 **Branch:** `feat/self-eval`
 **Estimated:** 3 hr
 **Depends on:** T-008 (need fresh evidence to score). Blocks nothing — bonus track.
-**Strategy gate:** only proceed if `bash scripts/evaluator_preview.sh` shows core ≥ 80. Otherwise triage core first per `docs/BONUS-PLAN.md`.
+**Strategy gate:** only proceed if `bash scripts/evaluator_preview.sh` shows core ≥ 80. Otherwise triage core first per `docs/hackathon/BONUS-PLAN.md`.
 
 ## Why this task
 
-The leaderboard scores 7 dims via 7 AI passes (`docs/HACKATHON-AUDIT.md:24-43`).
+The leaderboard scores 7 dims via 7 AI passes (`docs/hackathon/HACKATHON-AUDIT.md:24-43`).
 The MCP `evaluator_*` tools preview *evidence*, not *grades*. We mirror the
 judging pipeline with our own 7 `claude -p` shadow-judges so we can:
 
@@ -64,7 +64,7 @@ Per-dim input scoping (each agent reads ~10–20% of the repo, not all):
 | UX | `website/app/`, `website/public/brand/` | none |
 | Arch | `docs/ARCHITECTURE.md`, `orchestrator/main.py`, all `.mcp.json` | none |
 | Prod | `.env.example`, `.gitignore`, `scripts/`, `tasks/`, `docs/EVIDENCE-SCHEMA.md` | none |
-| Inn | `docs/BONUS-PLAN.md`, `docs/SUBMISSION.md`, README.md, this very pipeline | none |
+| Inn | `docs/hackathon/BONUS-PLAN.md`, `docs/SUBMISSION.md`, README.md, this very pipeline | none |
 
 ## What `scripts/self_eval.sh` does
 
@@ -137,7 +137,7 @@ waits for orchestrator processing, writes the response to
 - **Rubric too lax:** if all 7 dims score 90+ on first run, the rubric
   isn't honest. Tighten before committing `docs/SELF-EVAL.md`.
 - **Scope creep:** if T-008 isn't green or core < 80, abandon this task.
-  Bonus is wasted below 80 (per `docs/BONUS-PLAN.md:8-13`).
+  Bonus is wasted below 80 (per `docs/hackathon/BONUS-PLAN.md:8-13`).
 - **Token cost:** 7 parallel `claude -p` calls = real Opus burn. Each
   agent's prompt should be tight (<2KB) and inputs scoped per dim.
 - **Inn agent self-reference:** the Inn agent reads its own existence

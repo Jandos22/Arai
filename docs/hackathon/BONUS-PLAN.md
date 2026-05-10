@@ -1,6 +1,6 @@
 # Bonus Plan — Going for 115/100
 
-> **Source:** `docs/HACKATHON_BRIEF.md` §9 "Bonus points" (added by mods on 2026-05-09 mid-hackathon).
+> **Source:** `docs/hackathon/HACKATHON_BRIEF.md` §9 "Bonus points" (added by mods on 2026-05-09 mid-hackathon).
 > **TL;DR:** Core score is 100. Bonus adds up to **+15** if the team solves additional Happy Cake business pains. Cap = **115**.
 
 ## Bonus gating

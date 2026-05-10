@@ -48,13 +48,13 @@ PYTHONPATH=.. .venv/bin/python -m bots.sales_bot       # /menu /threads /orders 
 ## Key docs
 
 - [`CLAUDE.md`](CLAUDE.md) — team contract, ownership, hard rules
-- [`docs/PLAN.md`](docs/PLAN.md) — strategy, time budget, decision log
+- [`docs/hackathon/PLAN.md`](docs/hackathon/PLAN.md) — strategy, time budget, decision log
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system diagram + event flow + running totals
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md) — brief checklist → repo file mapping
 - [`docs/AGENT-NOTES.md`](docs/AGENT-NOTES.md) — agent-friendly website contracts
 - [`docs/PRODUCTION-PATH.md`](docs/PRODUCTION-PATH.md) — post-hackathon real-adapter path
 - [`docs/EVIDENCE-SCHEMA.md`](docs/EVIDENCE-SCHEMA.md) — JSONL evidence shape
-- [`docs/HACKATHON_BRIEF.md`](docs/HACKATHON_BRIEF.md) — original hackathon brief
+- [`docs/hackathon/HACKATHON_BRIEF.md`](docs/hackathon/HACKATHON_BRIEF.md) — original hackathon brief
 - [`docs/brand/HCU_BRANDBOOK.md`](docs/brand/HCU_BRANDBOOK.md) — Happy Cake brand book
 - [`docs/MCP-TOOLS.md`](docs/MCP-TOOLS.md) — sandbox tool catalog (55 tools)
 - [`docs/MCP-SETUP.md`](docs/MCP-SETUP.md) — Claude Code MCP wiring
