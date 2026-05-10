@@ -529,10 +529,9 @@ In rank order by points-per-minute:
    `ARCHITECTURE.md:131-141` "running totals" disagree with the
    artefacts judges actually read.
 5. **Final token-leak scan over full history** per
-   `SUBMISSION.md:80`: `git log -p | grep -iE
-   '(sbc_team_|Bearer [A-Za-z0-9]{20,})'` should print nothing. Do it
-   right before pushing the final commit (~5 min). Single hardest
-   failure mode — DQ if a real token slipped in.
+   `SUBMISSION.md`: `bash scripts/secret_scan.sh` should print
+   `clean`. Do it right before pushing the final commit (~5 min).
+   Single hardest failure mode — DQ if a real token slipped in.
 
 Wall-clock for all five: ~80 min. The May 10 09:00 CT dress rehearsal
 in `SUBMISSION.md:38` is the hard gate.

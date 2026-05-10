@@ -34,7 +34,7 @@ Brief reference: [`docs/HACKATHON_BRIEF.md`](HACKATHON_BRIEF.md) §8 + §12.
 | Fresh clone works | `bash scripts/test_website.sh` (no token needed) + `python -m orchestrator.main --dry-run` |
 | README setup is clear | Top of [`/README.md`](../README.md) — three commands |
 | `.env.example` has placeholders only | `grep -i token .env.example` returns only literal placeholders |
-| No secrets in repo | `git log -p \| grep -iE '(sbc_team_\|Bearer [A-Za-z0-9]{20,})'` empty |
+| No secrets in repo | `bash scripts/secret_scan.sh` prints `clean` |
 | Website runs | `cd website && npm install && npm run build && npm start` |
 | Bot/wrapper runs | `python -m orchestrator.main --dry-run` exits 0 |
 | MCP/sandbox calls documented | [`/docs/MCP-TOOLS.md`](MCP-TOOLS.md) — 55 tools + sample curls |
@@ -82,7 +82,7 @@ PYTHONPATH=orchestrator orchestrator/.venv/bin/python -m orchestrator.main --dry
 bash scripts/evaluator_preview.sh
 
 # 4. Token leak check
-git log -p | grep -iE '(sbc_team_|Bearer [A-Za-z0-9]{20,})' && echo "LEAK" || echo "clean"
+bash scripts/secret_scan.sh
 
 # 5. Final commit + submission
 git status         # must be clean
